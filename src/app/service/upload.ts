@@ -209,28 +209,49 @@ export class UploadComponent implements OnInit {
     return snapshot.state === 'running' && snapshot.bytesTransferred < snapshot.totalBytes;
   }
 
+  convertBytes(bytes: number) {
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"]
+  
+    if (bytes == 0) {
+      return "n/a"
+    }
+  
+    const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)).toString())
+  
+    if (i == 0) {
+      return bytes + " " + sizes[i]
+    }
+  
+    return (bytes / Math.pow(1024, i)).toFixed(1) + " " + sizes[i]
+  }
+  
+ //END Format bytes to a MB GB TB and so forth
+  private renderDocuments(document: any): FileElement{
+    let result: FileElement = null;
+    result = new FileElement;
+    result.id = document.id;
+    result.name = document.data()?.name ? document.data()?.name : "Unknown File";
+    result.isFolder = document.data()?.isFolder ? JSON.parse(document.data()?.isFolder) : false;
+    result.parent = document.data()?.parent && document.data()?.parent != this.defaultPublicRootFilePath ? document.data().parent!= "PublicBucket" ? document.data().parent : "root" : document.data()?.parent === this.defaultPublicRootFilePath? "root": "root";
+    result.size = this.convertBytes(document.data()?.size);;
+    result.downloadURL = document.data()?.downloadURL;
+    result.metaData = document.data()?.metaData;
+
+    return result;
+  }
+
+  private renderMap(result: FileElement){
+    this.map.set(result.id, this.clone(result));
+  }
 
   public async getFsDocumentCollections() {
-
-    let result: FileElement = null;
-
       //Get all folders from root directory
       await this.fbStore.collection('files').get().toPromise().then((snapShot)=> {
   
         snapShot.docs.forEach(
-
           document => {
-            result = new FileElement;
-            result.id = document.id;
-            result.name = document.data()?.name ? document.data()?.name : "Unknown File";
-            result.isFolder = document.data()?.isFolder ? JSON.parse(document.data()?.isFolder) : false;
-            result.parent = document.data()?.parent && document.data()?.parent != this.defaultPublicRootFilePath ? document.data().parent!= "PublicBucket" ? document.data().parent : "root" : document.data()?.parent === this.defaultPublicRootFilePath? "root": "root";
-            result.size = document.data()?.size;
-            result.downloadURL = document.data()?.downloadURL;
-            result.metaData = document.data()?.metaData;
-  
-            this.map.set(result.id, this.clone(result));
-
+            let result = this.renderDocuments(document);
+            this.renderMap(result);
           }
         );
       },
@@ -248,28 +269,36 @@ clone(element: FileElement) {
     return JSON.parse(JSON.stringify(element));
   }
 
+  parentId: string;
+
+  private renderParentDoc(parentName: string, parentPath: string,document: any): string
+  {
+    this.parentId = null;
+    if(document.data()?.isFolder && document.data()?.name === parentName && document.data()?.fullPath === parentPath)
+    {
+      this.parentId = document.id;
+      return this.parentId;
+    }
+
+    return this.parentId;
+  }
+  
  public async getParentId(parentName: string, parentPath: string): Promise<string> {
 
-    var parentId: string = null;
     await this.fbStore.collection('files').get().toPromise().then((snapShot)=> {
   
       snapShot.docs.forEach(
         document => {
-          if(document.data()?.isFolder && document.data()?.name ===parentName && document.data()?.fullPath ===parentPath)
-          {
-            parentId = document.id;
-            return parentId;
-          }
+          this.renderParentDoc(parentName, parentPath, document);
+          return this.parentId;
         }
       );
      },
      function(error){
       console.log("Error getting document:", error);
-     }
-     
-     ); 
+     }); 
 
-     return parentId;
+     return this.parentId;
   }
 
   async getParentFolder(parentPath?: string, folderName?: string): Promise<FileElement>{
@@ -283,14 +312,7 @@ clone(element: FileElement) {
     .get().toPromise()
     .then(function(querySnapshot) {
         querySnapshot.forEach(function(document) {
-         
-            //result = document.data()?.originalDocumentFolderInfo;
-            result.id = document.id;
-            result.name = document.data()?.name ? document.data()?.name : "Unknown File";
-            result.isFolder = document.data()?.isFolder ? JSON.parse(document.data()?.isFolder) : false;
-            result.parent = document.data()?.parent;
-            result.size = document.data()?.metaData?.size;
-            result.metaData = document.data()?.metaData;
+          result = this.renderDocuments(document);
         });
     })
     .catch(function(error) {

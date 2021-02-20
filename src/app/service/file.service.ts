@@ -243,40 +243,42 @@ export class FileService implements IFileService {
     return (bytes / Math.pow(1024, i)).toFixed(1) + " " + sizes[i]
   }
  //END Format bytes to a MB GB TB and so forth
+
  
-  //TODO: RENAME THIS TO REFRESH, AND MOVE IT TO UPLOAD COMPONENT
-  async fireStoreCollections() {
+ private renderDocuments(document: any): FileElement{
+  let result: FileElement = null;
+  result = new FileElement;
+  result.id = document.id;
+  result.name = document.data()?.name ? document.data()?.name : "Unknown File";
+  result.isFolder = document.data()?.isFolder ? JSON.parse(document.data()?.isFolder) : false;
+  result.parent = document.data()?.parent && document.data()?.parent != this.defaultPublicRootFilePath ? document.data().parent!= "PublicBucket" ? document.data().parent : "root" : document.data()?.parent === this.defaultPublicRootFilePath? "root": "root";
+  result.size = this.convertBytes(document.data()?.size);
+  result.downloadURL = document.data()?.downloadURL;
+  result.metaData = document.data()?.metaData;
 
-      //Get all folders from root directory
-      await this.fireStore.collection('files').get().toPromise().then((snapShot)=> {
-  
-        snapShot.docs.forEach(
+  return result;
+}
 
-          document => {
-            
-            let result = new FileElement;
-            //result = new FileElement;
-            result.id = document.id;
-            result.name = document.data()?.name ? document.data()?.name : "Unknown File";
-            result.isFolder = document.data()?.isFolder ? JSON.parse(document.data()?.isFolder) : false;
-            result.parent = document.data()?.parent && document.data()?.parent != this.defaultPublicRootFilePath ? document.data().parent!= "PublicBucket" ? document.data().parent : "root" : document.data()?.parent === this.defaultPublicRootFilePath? "root": "root";
-            result.size = this.formatBytes(document.data()?.size);
-            result.downloadURL = document.data()?.downloadURL;
-            result.metaData = document.data()?.metaData;
-  
-            this.map.set(result.id, this.clone(result));
+private renderMap(result: FileElement){
+  this.map.set(result.id, this.clone(result));
+}
 
-          }
-        );
-        
-       },
-       function(error){
-        console.log("Error getting document:", error);
-       }
-       
-       ); 
 
-    }
+
+async fireStoreCollections()
+{
+  await this.fireStore.collection('files').get().toPromise().then((snapShot)=> {
+    snapShot.docs.forEach(
+      document => {
+        let result = this.renderDocuments(document);
+        this.renderMap(result);
+      }
+    );
+  },
+  function(error){
+    console.log("Error getting document:", error);
+  }); 
+}
 
   async uploadFile(parentPath?: string, docId?: string,  fileToUpload?: File, currentFoler?: FileElement) {
 
@@ -423,7 +425,7 @@ export class FileService implements IFileService {
     async getParentFolder(parentPath?: string, folderName?: string): Promise<FileElement>{
 
       parentPath = (parentPath === "root" || parentPath === undefined || parentPath === null) ? this.defaultPublicRootFilePath : this.defaultPublicRootFilePath + parentPath;
-      var result = new FileElement;
+      var result: any;
   
       await this.fireStore.collection('files', 
       document => document.where("fullPath", "==", parentPath) && document.where("name", "==", folderName)
@@ -431,14 +433,7 @@ export class FileService implements IFileService {
       .get().toPromise()
       .then(function(querySnapshot) {
           querySnapshot.forEach(function(document) {
-           
-              //result = document.data()?.originalDocumentFolderInfo;
-              result.id = document.id;
-              result.name = document.data()?.name ? document.data()?.name : "Unknown File";
-              result.isFolder = document.data()?.isFolder ? JSON.parse(document.data()?.isFolder) : false;
-              result.parent = document.data()?.parent;
-              result.size = document.data()?.metaData?.size;
-              result.metaData = document.data()?.metaData;
+           result = this.renderDocuments(document);
           });
       })
       .catch(function(error) {
@@ -446,10 +441,8 @@ export class FileService implements IFileService {
       })
       .finally(function(){
         return result;
-      }
-        
-      );
-  
+      });
+      
       return result
     }
 
@@ -492,21 +485,11 @@ export class FileService implements IFileService {
               {
                 await this.fireStore.collection("files").doc(docId).get().toPromise().then((document)=>
                   {
-                    let result: FileElement;
+                    let result: any;
                     if(document.exists)
                     {
-                      
-                      result = new FileElement;
-                      result.id = document.id;
-                      result.name = document.data()?.name ? document.data()?.name : "Unknown File";
-                      result.isFolder = document.data()?.isFolder ? JSON.parse(document.data()?.isFolder) : false;
-                      result.parent = document.data()?.parent && document.data()?.parent != this.defaultPublicRootFilePath ? document.data().parent!= "PublicBucket" ? document.data().parent : "root" : document.data()?.parent === this.defaultPublicRootFilePath? "root": "root";
-                      result.size = document.data()?.size;
-                      result.downloadURL = document.data()?.downloadURL;
-                      result.metaData = document.data()?.metaData;
-            
-                      this.map.set(result.id, this.clone(result));
-    
+                      result = this.renderDocuments(document);
+                      this.renderMap(result);
                     }
                     return result;
                   })
@@ -521,29 +504,35 @@ export class FileService implements IFileService {
       }
       return docId;
     }
+    
+  parentId: string;
 
+    private renderParentDoc(parentName: string, parentPath: string,document: any): string
+    {
+      this.parentId = null;
+      if(document.data()?.isFolder && document.data()?.name === parentName && document.data()?.fullPath === parentPath)
+      {
+        this.parentId = document.id;
+        return this.parentId;
+      }
+  
+      return this.parentId;
+    }
+  
     public async getParentId(parentName: string, parentPath: string): Promise<string> {
 
-      var parentId: string = null;
       await this.fireStore.collection('files').get().toPromise().then((snapShot)=> {
-    
         snapShot.docs.forEach(
           document => {
-            if(document.data()?.isFolder && document.data()?.name ===parentName && document.data()?.fullPath ===parentPath)
-            {
-              parentId = document.id;
-              return parentId;
-            }
-          }
-        );
+            this.renderParentDoc(parentName, parentPath, document);
+            return this.parentId;
+            });
        },
        function(error){
         console.log("Error getting document:", error);
-       }
-       
-       ); 
+       }); 
   
-       return parentId;
+       return this.parentId;
     }
 
     async moveFile(currentPath, destinationPath) {
@@ -610,6 +599,9 @@ export class FileService implements IFileService {
     return c;
   }
 
+  returnStorageFilePath(document: any) : string{
+    return document?.data()?.fullPath
+  }
   async getStorageFilePath(fileElement: FileElement){
     if(fileElement){
       var fileFullPath: string = null;
@@ -619,7 +611,7 @@ export class FileService implements IFileService {
           document => {
             if(document?.id === fileElement?.id)
             {
-              fileFullPath = document?.data()?.fullPath;
+              fileFullPath = this.returnStorageFilePath(document);
               return fileFullPath;
             }
           }
@@ -627,9 +619,7 @@ export class FileService implements IFileService {
        },
        function(error){
         console.log("Error getting document fullPath:", error);
-       }
-       
-       ); 
+       }); 
   
        return fileFullPath;
     }
