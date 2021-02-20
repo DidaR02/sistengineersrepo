@@ -1,0 +1,53 @@
+<p>This is a more complete example with a fileElementService that simulates server calling:</p>
+
+<ul>
+    <li>an observable async fileElementService to fetch a list of countries</li>
+    <li>sorting, filtering and pagination</li>
+    <li>simulated delay and loading indicator</li>
+    <li>debouncing of search requests</li>
+</ul>
+
+<form>
+    <div class="form-group form-inline">
+        Full text search: <input class="form-control ml-2" type="text" name="searchTerm" [(ngModel)]="fileElementService.searchTerm" />
+        <span class="ml-3" *ngIf="fileElementService.loading$ | async">Loading...</span>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col"># Will be a checkbox</th>
+                <th scope="col" sortable="name" (sort)="onSort($event)">Name</th>
+                <th scope="col" sortable="area" (sort)="onSort($event)">Date Added</th>
+                <th scope="col" sortable="population" (sort)="onSort($event)">Date Modified</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let file of fileElements$ | async">
+                <th scope="row">{{ file.id }}</th>
+                <td>
+                    <img [src]="'https://upload.wikimedia.org/wikipedia/commons/' + country.flag" class="mr-2" style="width: 20px">
+                    <ngb-highlight [result]="file.name" [term]="fileElementService.searchTerm"></ngb-highlight>
+                </td>
+                <td>
+                    <!-- <ngb-highlight [result]="country.area | number" [term]="fileElementService.searchTerm"></ngb-highlight> -->
+                </td>
+                <td>
+                    <!-- <ngb-highlight [result]="country.population | number" [term]="fileElementService.searchTerm"></ngb-highlight> -->
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between p-2">
+        <ngb-pagination [collectionSize]="(total$ | async)!" [(page)]="fileElementService.page" [pageSize]="fileElementService.pageSize">
+        </ngb-pagination>
+
+        <select class="custom-select" style="width: auto" name="pageSize" [(ngModel)]="fileElementService.pageSize">
+      <option [value]="2">2 items per page</option>
+      <option [value]="4">4 items per page</option>
+      <option [value]="6">6 items per page</option>
+    </select>
+    </div>
+
+</form>

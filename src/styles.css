@@ -1,0 +1,56 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import "~bootstrap/dist/css/bootstrap.css";
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+.dropzone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    min-width: 80vw;
+    font-weight: 200;
+    height: 300px;
+    border: 2px dashed #f16624;
+    border-radius: 5px;
+    background: white;
+    margin: 10px 0;
+}
+
+.dropzone:hovering {
+    border: 2px solid #f16624;
+    color: #dadada !important;
+}
+
+.file-label {
+    font-size: 1.2em;
+}
+
+progress::-webkit-progress-value {
+    transition: width 0.1s ease;
+}
+
+body {
+    background-color: #d30752;
+    height: 100% !important;
+    display: inline-block;
+    min-width: 100%;
+    /* margin: 0; */
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    font-size: 14px;
+}
+
+.footer {
+    height: 150px;
+    text-align: center;
+    /* font-size: 1.1vw; */
+}
+
+
+/* If the screen size is 600px wide or less, set the font-size*/
+
+@media screen and (max-width: 600px) {
+    .footer .container {
+        /* font-size: 3vw; */
+        padding: 0px;
+    }
+}

@@ -1,0 +1,626 @@
+.base-page {
+    background-color: #ffff important;
+    -webkit-overflow-scrolling: touch;
+}
+
+.folderItemContent-header {
+    padding: 32px 0px 32px 32px;
+    box-sizing: border-box;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: flex-end;
+}
+
+.folderItemContent-title {
+    font-size: 28px;
+    font-weight: 100;
+    margin: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.itemTile {
+    /* position: absolute;
+    uncomment at the end of the component css formatting*/
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 0;
+    background-color: #ffffff;
+    display: block;
+    outline-color: transparent;
+    outline-style: initial;
+    outline-width: initial;
+    cursor: default;
+    user-select: none;
+    -webkit-user-drag: element;
+    -webkit-box-direction: normal;
+    -webkit-user-drag: element;
+    -webkit-box-direction: normal;
+    cursor: default;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    font-weight: 400;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.tile-link {
+    outline: transparent;
+    border: none;
+    background: 0 0;
+    position: absolute;
+    padding: 0;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    text-decoration: none;
+    color: inherit;
+    overflow: hidden;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+    -webkit-box-align: stretch;
+    align-items: stretch;
+    align-content: stretch;
+    pointer-events: none;
+    user-select: none;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    /* -webkit-tap-highlight-color: transparent; */
+}
+
+.tile-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+    -webkit-box-direction: normal;
+    color: inherit;
+    pointer-events: none;
+    font-weight: 400;
+    cursor: pointer;
+    user-select: none;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.tile-template {
+    -webkit-box-flex: 1;
+    flex: 1;
+    position: relative;
+    margin: 16px 16px 0 16px;
+    color: inherit;
+    -webkit-box-direction: normal;
+    pointer-events: none;
+    font-weight: 400;
+    cursor: pointer;
+    user-select: none;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+}
+
+.itemTile-template-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    color: inherit;
+    pointer-events: none;
+    font-weight: 400;
+    cursor: pointer;
+    user-select: none;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.itemTile-foreground {
+    pointer-events: auto;
+    cursor: pointer;
+    display: inline-flex;
+    position: relative;
+    overflow: visible;
+    max-width: 100%;
+    max-height: 100%;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    flex-direction: row;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    opacity: 1;
+    -webkit-transition: opacity .2s linear;
+    transition: opacity .2s linear;
+    color: inherit;
+    font-weight: 400;
+    user-select: none;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.itemTile-folderCover {
+    display: inline-block;
+    margin: 3px;
+    pointer-events: auto;
+    cursor: pointer;
+    -webkit-box-direction: normal;
+    color: inherit;
+    font-weight: 400;
+    user-select: none;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+/*******-----Revisit neccesity of these elements**********/
+
+.item-FolderCover {
+    width: 72px;
+    height: 52px;
+    display: inline-flex;
+    position: relative;
+    vertical-align: bottom;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    flex-direction: row;
+    -webkit-box-align: end;
+    align-items: flex-end;
+    pointer-events: auto;
+    cursor: pointer;
+    color: inherit;
+    font-weight: 400;
+    user-select: none;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.item-FolderCover-back {
+    display: block;
+    position: absolute;
+    left: -3px;
+    right: -3px;
+    bottom: -4px;
+    width: 78px;
+    height: 58px;
+    font-weight: normal;
+    font-style: normal;
+    overflow: hidden;
+    -webkit-box-direction: normal;
+    pointer-events: auto;
+    cursor: pointer;
+    color: inherit;
+    user-select: none;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.item-FolderCover-content {
+    top: 12px;
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    opacity: 1;
+    transition: opacity .2s linear;
+    pointer-events: auto;
+    cursor: pointer;
+    color: inherit;
+    font-weight: 400;
+    user-select: none;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.item-FolderCover-frame {
+    /* display: -webkit-inline-box; */
+    /* display: -ms-inline-flexbox; */
+    display: inline-flex;
+    position: relative;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    /* -ms-flex-direction: row; */
+    flex-direction: row;
+    -webkit-box-align: center;
+    /* -ms-flex-align: center; */
+    align-items: center;
+    -webkit-box-pack: center;
+    /* -ms-flex-pack: center; */
+    justify-content: center;
+    overflow: hidden;
+    max-width: 100%;
+    max-height: 100%;
+    /* -webkit-box-shadow: 0 1px 3px 2px rgba(1, 1, 0, .06); */
+    box-shadow: 0 1px 3px 2px rgba(1, 1, 0, .06);
+    background-color: #ffffff;
+    min-width: 32px;
+    min-height: 32px;
+    pointer-events: auto;
+    cursor: pointer;
+    color: inherit;
+    font-weight: 400;
+    user-select: none;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.itemTile-blankCover {
+    width: 64px;
+    height: 36px;
+    background: #ffffff;
+    display: inline-block;
+    -webkit-box-direction: normal;
+    pointer-events: auto;
+    cursor: pointer;
+    color: inherit;
+    font-weight: 400;
+    user-select: none;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.item-FolderCover-front {
+    width: 78px;
+    height: 58px;
+    font-weight: normal;
+    font-style: normal;
+    overflow: hidden;
+    display: block;
+    position: absolute;
+    left: -3px;
+    right: -3px;
+    bottom: -4px;
+    -webkit-box-direction: normal;
+    pointer-events: auto;
+    cursor: pointer;
+    color: inherit;
+    user-select: none;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+img {
+    -webkit-box-direction: normal;
+    pointer-events: auto;
+    cursor: pointer;
+    color: inherit;
+    user-select: none;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.item-FolderCover-metadata {
+    text-align: left;
+    margin-left: 4px;
+    margin-right: 8px;
+    color: #bf5712;
+    font-size: 12px;
+    margin-bottom: 1px;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: block;
+    -webkit-box-flex: 1;
+    flex: 1 1;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-weight: 400;
+    position: relative;
+    -webkit-box-direction: normal;
+    pointer-events: auto;
+    cursor: pointer;
+    user-select: none;
+}
+
+.item-FolderCover-signal {
+    margin-right: 4px;
+    margin-left: 8px;
+    font-size: 16px;
+    margin-bottom: 1px;
+    display: block;
+    position: relative;
+    -webkit-box-direction: normal;
+    pointer-events: auto;
+    cursor: pointer;
+    color: inherit;
+    font-weight: 400;
+    user-select: none;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.item-tile-info {
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: end;
+    -ms-flex-pack: end;
+    justify-content: flex-end;
+    position: relative;
+    margin: auto 0 0 0;
+    padding: 12px 8px;
+    text-align: center;
+    z-index: 0;
+}
+
+.item-name-tag {
+    pointer-events: auto;
+    cursor: pointer;
+    padding-left: 8px;
+    margin-left: -8px;
+    font-size: 12px;
+    height: 24px;
+    margin-top: -5px;
+    margin-bottom: -7px;
+    transition: color .2s linear;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    flex-direction: row;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    font-weight: 400;
+    color: #323130;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    text-align: center;
+    user-select: none;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+.item-signalField {
+    display: inline-flex;
+    max-width: 100%;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    pointer-events: auto;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 400;
+    color: #323130;
+    white-space: nowrap;
+    text-align: center;
+    user-select: none;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.signalFieldValue {
+    text-align: left;
+    flex: 1 1 auto !important;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    -webkit-box-flex: 1;
+    -webkit-box-direction: normal;
+    pointer-events: auto;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 400;
+    color: #323130;
+    user-select: none;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.item-date-tag {
+    padding-left: 8px;
+    margin-left: -8px;
+    transition: color .2s linear;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    flex-direction: row;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    font-weight: 400;
+    font-size: 12px;
+    color: #605e5c;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    height: 24px;
+    margin-bottom: -4px;
+    text-align: center;
+    pointer-events: none;
+    cursor: pointer;
+    user-select: none;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.item-check-box {
+    display: flex;
+    right: 0;
+    position: absolute;
+    outline: transparent;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+    -webkit-box-align: end;
+    align-items: flex-end;
+    -webkit-box-pack: start;
+    justify-content: flex-start;
+    top: 0;
+    border: none;
+    background: 0 0;
+    background-color: transparent;
+    opacity: 0;
+    box-sizing: border-box;
+    padding: 6px;
+    cursor: default;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    font-weight: 400;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.item-Check {
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+    width: 18px;
+    height: 18px;
+    vertical-align: top;
+    position: relative;
+    user-select: none;
+    -webkit-box-direction: normal;
+    color: #323130;
+    cursor: default;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.root-103 {
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+    width: 18px;
+    height: 18px;
+    vertical-align: top;
+    position: relative;
+    user-select: none;
+}
+
+.root-103::before {
+    content: "";
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    bottom: 1px;
+    left: 1px;
+    opacity: 1;
+    border-radius: 50%;
+    background: rgb(255, 255, 255);
+}
+
+.root-164::before {
+    content: "";
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    bottom: 1px;
+    left: 1px;
+    opacity: 1;
+    border-radius: 50%;
+    background: rgb(0, 120, 212);
+}
+
+.item-check-circle {
+    color: #605e5c;
+    cursor: default;
+}
+
+.circle-104 {
+    font-size: 18px;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+    vertical-align: middle;
+    color: rgb(200, 198, 196);
+}
+
+.root-36 {
+    display: inline-block;
+}
+
+.css-33 {
+    -webkit-font-smoothing: antialiased;
+    font-style: normal;
+    font-weight: normal;
+    font-family: FabricMDL2Icons;
+}
+
+.item-check-check {
+    font-family: FabricMDL2Icons;
+    color: #ffffff;
+    -webkit-box-direction: normal;
+}
+
+.check-166 {
+    font-size: 16px;
+    position: absolute;
+    left: 0.5px;
+    top: 0px;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+    vertical-align: middle;
+    opacity: 1;
+    color: rgb(255, 255, 255);
+    font-weight: 900;
+    -webkit-tap-highlight-color: transparent;
+}
