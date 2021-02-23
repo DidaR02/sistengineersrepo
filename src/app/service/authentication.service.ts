@@ -5,6 +5,7 @@ import auth from "../../../node_modules/firebase";
 import { AngularFireAuth } from "@angular/fire/auth";
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Router } from "@angular/router";
+import { AngularFireDatabase } from '@angular/fire/database';
 
 @Injectable({
   providedIn: 'root'
@@ -15,20 +16,10 @@ export class AuthenticationService {
   constructor(public afs: AngularFirestore,   // Inject Firestore service
     public afAuth: AngularFireAuth, // Inject Firebase auth service
     public router: Router,
-    public ngZone: NgZone // NgZone service to remove outside scope warning
+    public ngZone: NgZone, // NgZone service to remove outside scope warning
+    public afsDb: AngularFireDatabase
     ) {
-      /* Saving user data in localstorage when
-      logged in and setting up null when logged out */
-      this.afAuth.authState.subscribe(user => {
-        if (user) {
-          this.userData = user;
-          localStorage.setItem('user', JSON.stringify(this.userData));
-          JSON.parse(localStorage.getItem('user'));
-        } else {
-          localStorage.setItem('user', null);
-          JSON.parse(localStorage.getItem('user'));
-        }
-      })
+        this.getLocalUserData();
     }
   
     // Sign in with email/password
@@ -39,6 +30,7 @@ export class AuthenticationService {
             this.router.navigate(['dashboard']);
           });
           this.SetUserData(result.user);
+          this.GetAndSetUserAccess(result.user) 
         }).catch((error) => {
           window.alert(error.message)
         })
@@ -115,6 +107,24 @@ export class AuthenticationService {
         merge: true
       })
     }
+
+    
+    /* Saving user data in localstorage when
+    logged in and setting up null when logged out */
+    async getLocalUserData() {
+      await this.afAuth.authState.subscribe(user => {
+        if (user) {
+          this.userData = user;
+          localStorage.setItem('user', JSON.stringify(this.userData));
+          JSON.parse(localStorage.getItem('user'));
+        } else {
+          localStorage.setItem('user', null);
+          JSON.parse(localStorage.getItem('user'));
+        }
+        console.log(user)
+        this.GetAndSetUserAccess(user);
+      })
+    }
   
     // Sign out
     SignOut() {
@@ -122,6 +132,14 @@ export class AuthenticationService {
         localStorage.removeItem('user');
         this.router.navigate(['sign-in']);
       })
+    }
+
+    GetAndSetUserAccess(user) {
+      //const userRef: AngularFirestoreDocument<any> = this.afs.doc(`users/${user.uid}`);
+      const userAccess = this.afsDb.database.ref()
+      .child('tb_userAccess')
+      .on('value', snapshot => console.log(snapshot.val()));
+
     }
   
   }

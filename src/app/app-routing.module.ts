@@ -5,6 +5,7 @@ import { SignUpUserComponent } from './components/signup-user/signup-user.compon
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { VerifyEmailComponent } from './components/verify-email/verify-email.component';
 import { AuthGuard } from "./service/guard/auth.guard";
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/sign-in', pathMatch: 'full'},
@@ -15,8 +16,7 @@ const routes: Routes = [
   { path: 'signin', component: SignInUserComponent},
   { path: 'sign-in', component: SignInUserComponent},
   { path: 'register-user', component: SignUpUserComponent},
-  { path: 'dashboard', 
-  loadChildren: ()=> import('./components/table-sortable/table-sortable.module').then(tbSort  => tbSort.TableSortableModule) , canActivate: [AuthGuard] },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'verify-email-address', component: VerifyEmailComponent }
   
