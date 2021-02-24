@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { FileElement } from './models/file-element/file-element';
-import { FileService } from './service/file.service';
+import { FileService } from './service/fileService/file.service';
 
 @Component({
   selector: 'app-root',
@@ -10,7 +10,7 @@ import { FileService } from './service/file.service';
 })
 
 export class AppComponent {
-  title = 'WiseBox';
+  title = 'Sist Engineers';
   fileElements: Observable<FileElement[]>;
 
   constructor(public fileService: FileService) {

@@ -1,7 +1,7 @@
 import { Component, OnInit, Directive, EventEmitter, Input, Output, QueryList, ViewChildren, PipeTransform, ElementRef, ViewChild } from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {FileElement} from '../../models/file-element/file-element';
-import { FileService } from '../../service/file.service';
+import { FileService } from '../../service/fileService/file.service';
 import { FormControl } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { map, startWith } from 'rxjs/operators';

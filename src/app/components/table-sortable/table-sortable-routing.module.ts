@@ -5,8 +5,7 @@ import { TableSortableComponent } from './table-sortable.component';
 
 const routes: Routes = [
   {
-    path: '',
-    component: TableSortableComponent, canActivate: [AuthGuard]
+    path: '', component: TableSortableComponent, canActivate: [AuthGuard]
   }
 ];
 

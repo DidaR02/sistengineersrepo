@@ -7,7 +7,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgbdSortableHeader } from './sortable.directive';
 import { FileTableComponent } from './file-table.component';
 import {MatCardModule} from '@angular/material/card';
-import { FileService } from '../../service/file.service';
+import { FileService } from '../../service/fileService/file.service';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatIconModule } from '@angular/material/icon';

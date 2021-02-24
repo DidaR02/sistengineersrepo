@@ -14,8 +14,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
-import { UploadComponent } from 'src/app/service/upload';
-import { FileService } from '../../service/file.service';
+import { UploadComponent } from 'src/app/service/fileService/upload';
+import { FileService } from '../../service/fileService/file.service';
 
 @NgModule({
   declarations: [NgbdSortableHeader, TableSortableComponent], 
@@ -37,10 +37,10 @@ import { FileService } from '../../service/file.service';
     ReactiveFormsModule,
     MatCheckboxModule
   ],
-  // exports: [
-  //   TableSortableComponent
-  // ],
+  exports: [
+    TableSortableComponent
+  ],
   entryComponents: [],
-  bootstrap: [TableSortableComponent]
+  bootstrap: [TableSortableComponent, NgbdSortableHeader]
 })
 export class TableSortableModule { }

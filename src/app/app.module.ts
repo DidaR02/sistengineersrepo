@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
-import { FileService } from './service/file.service';
+import { FileService } from './service/fileService/file.service';
 
 import { AppRoutingModule, routingComponents } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -22,15 +22,15 @@ import { AngularFireStorageModule} from '@angular/fire/storage';
 import { AngularFireDatabaseModule } from '@angular/fire/database';
 import { AngularFireAuthModule } from '@angular/fire/auth'
 
-import { DropzoneDirective } from './dropzone.directive';
+import { DropzoneDirective } from './service/fileService/dropzone.directive';
 
-import { UploadTaskComponent } from './upload-task/upload-task.component';
+import { UploadTaskComponent } from './components/upload-task/upload-task.component';
 import { UploaderComponent } from './components/uploader/uploader.component';
-import { UploadComponent } from './service/upload';
+import { UploadComponent } from './service/fileService/upload';
 import { FileTableModule } from './components/file-table/file-table.module';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AuthenticationService } from './service/authentication.service';
+import { AuthenticationService } from 'src/app/Service/authentication/authentication.service';
 import { RenameDialogModule } from './components/rename-dialog/rename-dialog.module';
 import { NewFolderDialogModule } from './components/new-folder-dialog/new-folder-dialog.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';

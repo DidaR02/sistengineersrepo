@@ -16,8 +16,8 @@ import { RenameDialogComponent } from '../rename-dialog/rename-dialog.component'
 import { NewFolderDialogComponent } from '../new-folder-dialog/new-folder-dialog.component';
 
 import {MatCardModule} from '@angular/material/card';
-import { UploadComponent } from 'src/app/service/upload';
-import { FileService } from '../../service/file.service';
+import { UploadComponent } from '../../service/fileService/upload';
+import { FileService } from '../../service/fileService/file.service';
 
 @NgModule({
   declarations: [FileExplorerComponent], 

@@ -7,7 +7,7 @@ import {DecimalPipe} from '@angular/common';
 import {debounceTime, delay, switchMap, tap} from 'rxjs/operators';
 import {SortColumn, SortDirection} from './sortable.directive';
 
-import { FileService } from '../../service/file.service';
+import { FileService } from '../../service/fileService/file.service';
 
 interface SearchResult {
   fileElement: FileElement[];

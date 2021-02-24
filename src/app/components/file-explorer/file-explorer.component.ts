@@ -7,8 +7,8 @@ import { RenameDialogComponent } from '../rename-dialog/rename-dialog.component'
 
 import { FormControl, Validators } from '@angular/forms';
 import { ThemePalette } from '@angular/material/core';
-import { FileService } from '../../service/file.service';
-import { UploadComponent } from '../../service/upload';
+import { UploadComponent } from '../../service/fileService/upload';
+import { FileService } from '../../service/fileService/file.service';
 
 @Component({
   selector: 'file-explorer',

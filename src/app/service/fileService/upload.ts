@@ -4,8 +4,8 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { finalize, map, tap } from 'rxjs/operators';
 import * as firebase from 'firebase';
-import { FileElement } from '../models/file-element/file-element';
-import {FileService} from '../service/file.service'
+import { FileElement } from '../../models/file-element/file-element';
+import {FileService} from './file.service';
 
 export interface IFileService {
 

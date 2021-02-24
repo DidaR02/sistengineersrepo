@@ -1,7 +1,7 @@
 import { Injectable, Inject,Input } from '@angular/core';
 
 import { v4 } from 'uuid';
-import { FileElement } from '../models/file-element/file-element';
+import { FileElement } from '../../models/file-element/file-element';
 import { BehaviorSubject, Observable  } from 'rxjs';
 import { AngularFireStorage, AngularFireUploadTask } from '@angular/fire/storage';
 import { AngularFireList, AngularFireDatabase } from '@angular/fire/database';

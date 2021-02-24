@@ -1,6 +1,6 @@
 import { Component,Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators,FormsModule, ReactiveFormsModule } from '@angular/forms'; // Reactive form services
-import { AuthenticationService } from '../../service/authentication.service';
+import { AuthenticationService } from 'src/app/Service/authentication/authentication.service';
 
 @Component({
   selector: 'app-signup-user',
