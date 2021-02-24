@@ -1,4 +1,4 @@
-export interface UserAcess {
+export interface UserAccess {
     uid: string;
     canDownload?: string;
     canShare?: string;

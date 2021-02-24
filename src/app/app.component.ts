@@ -2,6 +2,9 @@ import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { FileElement } from './models/file-element/file-element';
 import { FileService } from './service/fileService/file.service';
+import { User } from './models/userAccess/IUser';
+import { UserAccess } from './models/userAccess/IUserAccess';
+import { SignedInUser } from './models/userAccess/ISignedInUser';
 
 @Component({
   selector: 'app-root',

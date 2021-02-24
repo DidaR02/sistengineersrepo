@@ -7,14 +7,14 @@ import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firest
 import { Router } from '@angular/router';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { Observable } from 'rxjs';
-import { UserAcess } from '../../models/userAccess/IUserAcess';
+import { UserAccess } from '../../models/userAccess/IUserAccess';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
   userData: any; // Save logged in user data
-  userAccess: UserAcess;
+  userAccess: UserAccess;
 
   constructor(public afs: AngularFirestore,   // Inject Firestore service
     public afAuth: AngularFireAuth, // Inject Firebase auth service
