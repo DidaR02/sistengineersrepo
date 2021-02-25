@@ -25,7 +25,6 @@ export class AppComponent {
   canNavigateUp = false;
   files: File[] = [];
 
-
   signedInUser: SignedInUser;
   private user: User;
   private userAccess: UserAccess;
@@ -69,6 +68,7 @@ export class AppComponent {
       };
 
       localStorage.setItem('signedInUser', JSON.stringify(this.signedInUser));
+      JSON.parse(localStorage.getItem('signedInUser'));
     }
   }
   
