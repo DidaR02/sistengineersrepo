@@ -4,7 +4,7 @@ import { SignInUserComponent } from './components/signin-user/signin-user.compon
 import { SignUpUserComponent } from './components/signup-user/signup-user.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { VerifyEmailComponent } from './components/verify-email/verify-email.component';
-import { AuthGuard } from 'src/app/Service/guard/auth.guard';
+import { AuthGuard } from 'src/app/service/guard/auth.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: '/sign-in', pathMatch: 'full'},

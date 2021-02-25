@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Routes, RouterModule } from '@angular/router';
-import { AuthGuard } from 'src/app/Service/guard/auth.guard';
-import { FormsModule, ReactiveFormsModule, Validators, FormGroup } from '@angular/forms'; // Reactive form services
+import { FormsModule, ReactiveFormsModule} from '@angular/forms'; // Reactive form services
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DashboardRoutingModule } from './dashboard-routing.module'
 import { DashboardComponent } from './dashboard.component';
@@ -13,7 +11,7 @@ import { TableSortableModule } from '../table-sortable/table-sortable.module';
     DashboardComponent,
   ],
   imports: [
-    CommonModule,
+    CommonModule, 
     DashboardRoutingModule,
     FormsModule,
     ReactiveFormsModule,

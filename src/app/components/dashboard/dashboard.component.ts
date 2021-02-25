@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { FormBuilder, FormGroup, FormControl, Validators,FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AuthenticationService } from 'src/app/Service/authentication/authentication.service';
+import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
 import { UserAccess } from 'src/app/models/userAccess/IUserAccess';
 import { User } from '../../models/userAccess/IUser';
 import { SignedInUser } from '../../models/userAccess/ISignedInUser';

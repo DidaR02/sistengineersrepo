@@ -30,7 +30,7 @@ import { UploadComponent } from './service/fileService/upload';
 import { FileTableModule } from './components/file-table/file-table.module';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AuthenticationService } from 'src/app/Service/authentication/authentication.service';
+import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
 import { RenameDialogModule } from './components/rename-dialog/rename-dialog.module';
 import { NewFolderDialogModule } from './components/new-folder-dialog/new-folder-dialog.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';

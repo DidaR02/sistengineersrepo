@@ -2,10 +2,11 @@ import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { FileElement } from './models/file-element/file-element';
 import { FileService } from './service/fileService/file.service';
-import { AuthenticationService } from 'src/app/Service/authentication/authentication.service';
+import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
 import { UserAccess } from 'src/app/models/userAccess/IUserAccess';
 import { User } from './models/userAccess/IUser';
 import { SignedInUser } from './models/userAccess/ISignedInUser';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +18,7 @@ export class AppComponent {
   title = 'Sist Engineers';
   fileElements: Observable<FileElement[]>;
 
-  constructor(public fileService: FileService, public authService: AuthenticationService) {
+  constructor(public fileService: FileService, public authService: AuthenticationService, public router: Router,) {
   }
 
   public currentRoot: FileElement;
@@ -25,8 +26,8 @@ export class AppComponent {
   canNavigateUp = false;
   files: File[] = [];
 
-  signedInUser: SignedInUser;
-  private user: User;
+  private signedInUser: SignedInUser;
+  user: User;
   private userAccess: UserAccess;
 
   ngOnInit(element?: FileElement) {
@@ -48,7 +49,8 @@ export class AppComponent {
         for( var entries in dashBoardAccess) {
           if (entries == "dashboard")
           {
-            console.log("You do not have any access to view",entries);
+            window.alert("You do not have any access to view" + entries +".");
+            this.router.navigate(['sign-in']);
           }
         };
       }
