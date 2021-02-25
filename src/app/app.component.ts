@@ -2,8 +2,9 @@ import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { FileElement } from './models/file-element/file-element';
 import { FileService } from './service/fileService/file.service';
+import { AuthenticationService } from 'src/app/Service/authentication/authentication.service';
+import { UserAccess } from 'src/app/models/userAccess/IUserAccess';
 import { User } from './models/userAccess/IUser';
-import { UserAccess } from './models/userAccess/IUserAccess';
 import { SignedInUser } from './models/userAccess/ISignedInUser';
 
 @Component({
@@ -16,7 +17,7 @@ export class AppComponent {
   title = 'Sist Engineers';
   fileElements: Observable<FileElement[]>;
 
-  constructor(public fileService: FileService) {
+  constructor(public fileService: FileService, public authService: AuthenticationService) {
   }
 
   public currentRoot: FileElement;
@@ -24,10 +25,52 @@ export class AppComponent {
   canNavigateUp = false;
   files: File[] = [];
 
+
+  signedInUser: SignedInUser;
+  private user: User;
+  private userAccess: UserAccess;
+
   ngOnInit(element?: FileElement) {
-    //this.updateFileElementQuery(element);
+    this.getUserInfo();
   }
 
+  getUserInfo()
+  {
+    if(this.authService.isLoggedIn)
+    {
+      this.authService.getLocalUserData();
+
+      this.userAccess = this.authService.userAccess;
+
+      if(this.userAccess && this.userAccess.disableView)
+      {
+        //if user cant view dashboard, redirect user to no access page.
+        let dashBoardAccess: string[] = this.userAccess.disableView;
+        for( var entries in dashBoardAccess) {
+          if (entries == "dashboard")
+          {
+            console.log("You do not have any access to view",entries);
+          }
+        };
+      }
+
+      this.user = {
+      uid: this.authService.userData?.uid,
+      displayName: this.authService.userData?.displayName,
+      email: this.authService.userData?.email,
+      emailVerified: this.authService.userData?.emailVerified,
+      photoURL: this.authService.userData?.photoURL
+      };
+
+      this.signedInUser = {
+        Uid: this.authService.userData?.uid,
+        User: this.user,
+        UserAccess: this.userAccess
+      };
+
+      localStorage.setItem('signedInUser', JSON.stringify(this.signedInUser));
+    }
+  }
   
   async addFolder(folder: { name: string }) {
     await this.fileService.add(this.currentRoot, { isFolder: true, name: folder.name, size: 0 });
