@@ -35,7 +35,6 @@ import { RenameDialogModule } from './components/rename-dialog/rename-dialog.mod
 import { NewFolderDialogModule } from './components/new-folder-dialog/new-folder-dialog.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgbAlertComponent } from './components/ngb-alert/ngb-alert.component';
-import { UserProfileComponent } from './components/user-profile/user-profile.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +44,6 @@ import { UserProfileComponent } from './components/user-profile/user-profile.com
     UploadTaskComponent,
     UploaderComponent,
     NgbAlertComponent,
-    UserProfileComponent
     
   ],
   imports: [
