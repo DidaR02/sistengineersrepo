@@ -12,17 +12,14 @@ import { AuthenticationService } from 'src/app/service/authentication/authentica
 })
 export class UserProfileComponent implements OnInit {
   user: User;
-  private userData: any;
+
   private userAccess: UserAccess;
   viewDashboard: boolean = true;
 
   private signedInUser: SignedInUser;
   
   constructor(
-    public authService: AuthenticationService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private location: Location
+    public authService: AuthenticationService
   ) { 
     
     this.authService.getLocalUserData();
@@ -53,7 +50,7 @@ export class UserProfileComponent implements OnInit {
         {
           let dashBoardAccess: string[] = this.userAccess.disableView;
           for( var entries in dashBoardAccess) {
-            if (entries == "dashboard")
+            if (entries == "userProfile")
             {
               this.viewDashboard = false
             }
@@ -79,5 +76,4 @@ export class UserProfileComponent implements OnInit {
       JSON.parse(localStorage.getItem('signedInUser'));
     }
   }
-
 }

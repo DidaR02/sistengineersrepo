@@ -14,13 +14,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
-import { UploadComponent } from 'src/app/service/fileService/upload';
-import { FileService } from '../../service/fileService/file.service';
-import { userInfo } from 'os';
 
 @NgModule({
   declarations: [UserProfileComponent], 
-  providers: [ UploadComponent, FileService],
+  providers: [],
   imports: [
     UserProfileRoutingModule,
     CommonModule,

@@ -20,7 +20,7 @@ export class DashboardComponent implements OnInit {
   viewDashboard: boolean = true;
 
   private signedInUser: SignedInUser;
-  
+
   constructor(
     public authService: AuthenticationService,
     private router: Router,
@@ -51,6 +51,17 @@ export class DashboardComponent implements OnInit {
             else
             {
               this.router.navigate(['dashboard/manageFiles']);
+            }
+            break;
+          }
+          case "userProfile": {
+            if(this.userAccess &&  ("userProfile" in this.userAccess.disableView))
+            {
+              this.viewDashboard = false
+            }
+            else
+            {
+              this.router.navigate(['dashboard/userProfile']);
             }
             break;
           }

@@ -5,6 +5,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DashboardRoutingModule } from './dashboard-routing.module'
 import { DashboardComponent } from './dashboard.component';
 import { TableSortableModule } from '../table-sortable/table-sortable.module';
+import { UserProfileModule } from '../user-profile/user-profile.module';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { TableSortableModule } from '../table-sortable/table-sortable.module';
     FormsModule,
     ReactiveFormsModule,
     NgbModule,
-    TableSortableModule
+    TableSortableModule,
+    UserProfileModule
   ],
   bootstrap: [DashboardComponent],
   exports: [],
