@@ -9,6 +9,12 @@ import { NewFolderDialogComponent } from '../new-folder-dialog/new-folder-dialog
 import { RenameDialogComponent } from '../rename-dialog/rename-dialog.component';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { MatDialog } from '@angular/material/dialog';
+import { SignedInUser } from 'src/app/models/userAccess/ISignedInUser';
+import { User } from 'src/app/models/userAccess/IUser';
+import { UserAccess } from 'src/app/models/userAccess/IUserAccess';
+import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
+import { Router } from '@angular/router';
+import { DataTypeConversionService } from 'src/app/service/shared/dataType-conversion.service';
 
 export type SortColumn = keyof FileElement | '';
 export type SortDirection = 'asc' | 'desc' | '';
@@ -69,13 +75,32 @@ export class TableSortableComponent implements OnInit {
   currentRoot: FileElement
   currentPath: string;
 
+  canDownload :boolean = true;
+  canDelete :boolean = true;
+  canShare :boolean = true;
+  canCreateFolder: boolean = true;
+  canAddFile: boolean = true;
+  canMove: boolean = true;
+
   //uploadProgress: any;
   uploadProgress: Observable<number>;
 
   filter = new FormControl('')
   
-  constructor(public fileService: FileService, public pipe: DecimalPipe,public dialog: MatDialog) { 
+  private signedInUser: SignedInUser;
+  user: User;
+  private userAccess: UserAccess;
 
+  constructor(
+    public fileService: FileService,
+    public router: Router,
+    public authService: AuthenticationService,
+    public pipe: DecimalPipe,
+    public dialog: MatDialog,
+    public convertDataType: DataTypeConversionService)
+    { 
+      this.authService.getLocalUserData();
+      this.getUserInfo();
     //let filelements = this.fileElements.subscribe(fileelentz => filelements = fileelentz);
     
     // this.filter.valueChanges.pipe(
@@ -96,7 +121,57 @@ export class TableSortableComponent implements OnInit {
   async ngOnInit(element?: FileElement){
       this.updateFileElementQuery(element); 
   }
- 
+
+  getUserInfo()
+  {
+    if(this.authService.isLoggedIn)
+    {
+      JSON.parse(localStorage.getItem('userAccess'));
+
+      //this.authService.getLocalUserData();
+
+      console.log(this.userAccess);
+
+      this.userAccess = this.authService.userAccess;
+      if(this.userAccess)
+      {
+        this.canDownload = this.convertDataType.getBoolean(this.authService.userAccess.canLogin);
+        this.canDelete = this.convertDataType.getBoolean(this.authService.userAccess.canDelete);
+        this.canShare = this.convertDataType.getBoolean(this.authService.userAccess.canShare);
+        
+        //if user cant view dashboard, redirect user to no access page.
+        if(this.userAccess.disableView)
+        {
+          let dashBoardAccess: string[] = this.userAccess.disableView;
+          for( var entries in dashBoardAccess) {
+            if (entries == "dashboard")
+            {
+              window.alert("You do not have any access to view" + entries +".");
+              this.router.navigate(['sign-in']);
+            }
+          };
+        }
+      }
+
+      this.user = {
+      uid: this.authService.userData?.uid,
+      displayName: this.authService.userData?.displayName,
+      email: this.authService.userData?.email,
+      emailVerified: this.authService.userData?.emailVerified,
+      photoURL: this.authService.userData?.photoURL
+      };
+
+      this.signedInUser = {
+        Uid: this.authService.userData?.uid,
+        User: this.user,
+        UserAccess: this.userAccess
+      };
+
+      localStorage.setItem('signedInUser', JSON.stringify(this.signedInUser));
+      JSON.parse(localStorage.getItem('signedInUser'));
+    }
+  }
+
    onSort({column, direction}: SortEvent) {
 
   //   // resetting other headers
@@ -175,6 +250,7 @@ export class TableSortableComponent implements OnInit {
 
   openMenu(event: MouseEvent, viewChild: MatMenuTrigger) {
     event.preventDefault();
+    this.getUserInfo();
     viewChild.openMenu();
   }
 

@@ -28,10 +28,24 @@
                                         <input type="password" class="form-control" id="password" name="password" placeholder="Password *" aria-required="true" formControlName="Password">
                                     </div>
                                 </div>
+
+                                <div *ngIf="!isUserSignInAllowed">
+                                    <div class="alert alert-danger alert-dismissible">
+                                        <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="resetErrorMsg()">&times;</a>
+                                        <strong>Error!</strong> User account locked! Unfortunately the account supplied has been blocked.
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <button type="submit" class="btn btn-success btn-primary">Sign In</button>
+
+                        <li class="signup-item" style="text-decoration: none;">
+                            <a class="sign-link" style="text-decoration: none;" (click)="redirectToRegister()">
+                                <i class="fas fa-sign-in-alt" style="text-decoration: none;"></i>Sign Up New Account
+                            </a>
+                        </li>
+
                     </form>
                 </div>
             </div>

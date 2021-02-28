@@ -4,4 +4,5 @@ export interface UserAccess {
     canShare?: string;
     canLogin?: string;
     disableView?: string[];
+    canDelete: string;
  }

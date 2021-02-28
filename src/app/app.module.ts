@@ -34,6 +34,8 @@ import { AuthenticationService } from 'src/app/service/authentication/authentica
 import { RenameDialogModule } from './components/rename-dialog/rename-dialog.module';
 import { NewFolderDialogModule } from './components/new-folder-dialog/new-folder-dialog.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgbAlertComponent } from './components/ngb-alert/ngb-alert.component';
+import { UserProfileComponent } from './components/user-profile/user-profile.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +43,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     routingComponents,
     DropzoneDirective,
     UploadTaskComponent,
-    UploaderComponent
+    UploaderComponent,
+    NgbAlertComponent,
+    UserProfileComponent
     
   ],
   imports: [

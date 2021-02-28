@@ -3,11 +3,8 @@ import { Observable } from 'rxjs';
 import { FileElement } from './models/file-element/file-element';
 import { FileService } from './service/fileService/file.service';
 import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
-import { UserAccess } from 'src/app/models/userAccess/IUserAccess';
 import { User } from './models/userAccess/IUser';
-import { SignedInUser } from './models/userAccess/ISignedInUser';
 import { Router } from '@angular/router';
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -18,7 +15,11 @@ export class AppComponent {
   title = 'Sist Engineers';
   fileElements: Observable<FileElement[]>;
 
-  constructor(public fileService: FileService, public authService: AuthenticationService, public router: Router,) {
+  constructor(
+    public fileService: FileService,
+    public authService: AuthenticationService,
+    public router: Router
+    ) {
   }
 
   public currentRoot: FileElement;
@@ -26,52 +27,9 @@ export class AppComponent {
   canNavigateUp = false;
   files: File[] = [];
 
-  private signedInUser: SignedInUser;
   user: User;
-  private userAccess: UserAccess;
 
-  ngOnInit(element?: FileElement) {
-    this.getUserInfo();
-  }
-
-  getUserInfo()
-  {
-    if(this.authService.isLoggedIn)
-    {
-      this.authService.getLocalUserData();
-
-      this.userAccess = this.authService.userAccess;
-
-      if(this.userAccess && this.userAccess.disableView)
-      {
-        //if user cant view dashboard, redirect user to no access page.
-        let dashBoardAccess: string[] = this.userAccess.disableView;
-        for( var entries in dashBoardAccess) {
-          if (entries == "dashboard")
-          {
-            window.alert("You do not have any access to view" + entries +".");
-            this.router.navigate(['sign-in']);
-          }
-        };
-      }
-
-      this.user = {
-      uid: this.authService.userData?.uid,
-      displayName: this.authService.userData?.displayName,
-      email: this.authService.userData?.email,
-      emailVerified: this.authService.userData?.emailVerified,
-      photoURL: this.authService.userData?.photoURL
-      };
-
-      this.signedInUser = {
-        Uid: this.authService.userData?.uid,
-        User: this.user,
-        UserAccess: this.userAccess
-      };
-
-      localStorage.setItem('signedInUser', JSON.stringify(this.signedInUser));
-      JSON.parse(localStorage.getItem('signedInUser'));
-    }
+  ngOnInit() {
   }
   
   async addFolder(folder: { name: string }) {

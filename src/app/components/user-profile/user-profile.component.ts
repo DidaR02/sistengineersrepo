@@ -1,19 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { Location } from '@angular/common';
-import { FormBuilder, FormGroup, FormControl, Validators,FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { SignedInUser } from 'src/app/models/userAccess/ISignedInUser';
+import { User } from 'src/app/models/userAccess/IUser';
 import { UserAccess } from 'src/app/models/userAccess/IUserAccess';
-import { User } from '../../models/userAccess/IUser';
-import { SignedInUser } from '../../models/userAccess/ISignedInUser';
+import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  selector: 'app-user-profile',
+  templateUrl: './user-profile.component.html',
+  styleUrls: ['./user-profile.component.css']
 })
-export class DashboardComponent implements OnInit {
-
+export class UserProfileComponent implements OnInit {
   user: User;
   private userData: any;
   private userAccess: UserAccess;
@@ -32,33 +29,8 @@ export class DashboardComponent implements OnInit {
 
     this.getUserInfo();
   }
-
   ngOnInit(): void {
-    
   }
-  async clickNavigateHandler(url: string)
-  {
-    if (this.viewDashboard)
-    {
-      if(url.length > 0)
-      {
-        switch(url){
-          case "manageFiles": {
-            if(this.userAccess &&  ("manageFiles" in this.userAccess.disableView))
-            {
-              this.viewDashboard = false
-            }
-            else
-            {
-              this.router.navigate(['dashboard/manageFiles']);
-            }
-            break;
-          }
-        }
-      }
-    }
-  }
-  
   async getUserInfo()
   {
     if(this.authService.isLoggedIn)

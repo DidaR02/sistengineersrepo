@@ -14,7 +14,7 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-sm file-command">
+        <div *ngIf="canCreateFolder" class="col-sm file-command">
             <button class="btn-file-command" mat-menu-item (click)="openNewFolderDialog()">
             <mat-icon class="pointer">
                 create_new_folder
@@ -22,13 +22,13 @@
             <span>New Folder</span>
             </button>
         </div>
-        <div class="col-sm file-command">
+        <div *ngIf="canAddFile" class="col-sm file-command">
             <button class="btn-file-command" mat-menu-item (click)="onFileUploadButtonClick()">
             <mat-icon class="pointer">
                 note_add
             </mat-icon>
-        <span>New File</span>
-        </button>
+            <span>New File</span>
+            </button>
         </div>
     </div>
 </div>
@@ -87,11 +87,11 @@
 
 <mat-menu #rootMenu="matMenu" [overlapTrigger]="false">
     <ng-template matMenuContent let-self="self">
-        <!-- <button mat-menu-item [matMenuTriggerFor]="moveToMenu" [matMenuTriggerData]="{self: self}">
+        <!-- <button **ngIf="canMove" mat-menu-item [matMenuTriggerFor]="moveToMenu" [matMenuTriggerData]="{self: self}">
         <mat-icon>open_with</mat-icon>
         <span>Move To</span>
       </button> -->
-        <button mat-menu-item [matMenuTriggerData]="{self: self}" (click)="downloadElement(self)">
+        <button **ngIf="canDownload" mat-menu-item [matMenuTriggerData]="{self: self}" (click)="downloadElement(self)">
         <mat-icon>cloud_download</mat-icon>
         <span>Download</span>
       </button>
@@ -99,11 +99,11 @@
         <mat-icon>edit</mat-icon>
         <span>Rename</span>
       </button> -->
-        <!-- <button mat-menu-item (click)="openShareDialog(self)">
+        <!-- <button **ngIf="canShare" mat-menu-item (click)="openShareDialog(self)">
         <mat-icon>share</mat-icon>
         <span>Share</span>
         </button> -->
-        <button mat-menu-item [matMenuTriggerData]="{self: self}" (click)="deleteElement(self)">
+        <button **ngIf="canDelete" mat-menu-item [matMenuTriggerData]="{self: self}" (click)="deleteElement(self)">
         <mat-icon>delete</mat-icon>
         <span>Delete</span>
       </button>

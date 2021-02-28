@@ -9,6 +9,10 @@ const routes: Routes = [
     {
       path: 'manageFiles',
       loadChildren: ()=> import('../table-sortable/table-sortable.module').then(viewSales => viewSales.TableSortableModule)
+    },
+    {
+      path: 'userProfile',
+      loadChildren: ()=> import('../user-profile/user-profile.module').then(viewSales => viewSales.UserProfileModule)
     }],
     canActivateChild: [AuthGuard]}
 ]
