@@ -63,7 +63,9 @@ export class UserProfileComponent implements OnInit {
       displayName: this.authService.userData?.displayName,
       email: this.authService.userData?.email,
       emailVerified: this.authService.userData?.emailVerified,
-      photoURL: this.authService.userData?.photoURL
+      photoURL: this.authService.userData?.photoURL,
+      firstName: this.authService.userData?.firstName,
+      lastName: this.authService.userData?.lastName
       };
 
       this.signedInUser = {

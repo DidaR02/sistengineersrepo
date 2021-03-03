@@ -4,6 +4,7 @@ import { AuthenticationService } from 'src/app/service/authentication/authentica
 import { Router } from "@angular/router";
 import { DataTypeConversionService } from 'src/app/service/shared/dataType-conversion.service';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
+import { UserAccess } from 'src/app/models/userAccess/IUserAccess';
 
 @Component({
   selector: 'app-signin-user',
@@ -37,10 +38,11 @@ export class SignInUserComponent implements OnInit {
     if(email && password)
     {
       await this.authService.SignIn(email, password);
+      let signInAccess = this.syncSignInData();
 
-      if(!this.authService.userAccess.canLogin)
+      if(!signInAccess.canLogin)
       {
-        this.isUserSignInAllowed = this.convertDataType.getBoolean(this.authService.userAccess.canLogin)
+        this.isUserSignInAllowed = this.convertDataType.getBoolean(signInAccess.canLogin)
       }
       else{
         this.router.navigate(['dashboard']);
@@ -48,6 +50,11 @@ export class SignInUserComponent implements OnInit {
     }
   }
 
+  syncSignInData(): UserAccess
+  {
+    let userAccessResults = JSON.parse(localStorage.getItem('userAccess'));
+    return userAccessResults;
+  }
   redirectToRegister()
   {
     this.router.navigate(['register-user']);
