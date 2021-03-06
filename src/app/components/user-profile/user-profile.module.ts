@@ -14,9 +14,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
+import { UserListComponent } from '../user-list/user-list.component';
 
 @NgModule({
-  declarations: [UserProfileComponent], 
+  declarations: [UserProfileComponent, UserListComponent], 
   providers: [],
   imports: [
     UserProfileRoutingModule,
@@ -36,9 +37,10 @@ import { MatCardModule } from '@angular/material/card';
     MatCheckboxModule
   ],
   exports: [
-    UserProfileComponent
+    UserProfileComponent,
+    UserListComponent
   ],
   entryComponents: [],
-  bootstrap: [UserProfileComponent]
+  bootstrap: [UserProfileComponent, UserListComponent]
 })
 export class UserProfileModule { }

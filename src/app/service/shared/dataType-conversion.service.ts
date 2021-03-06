@@ -21,4 +21,18 @@ export class DataTypeConversionService {
                 return false;
         }
     }
+
+    getStringBoolean(value){
+        switch(value){
+            case true:
+            case "true":
+            case 1:
+            case "1":
+            case "on":
+            case "yes":
+                return "yes";
+            default: 
+                return "no";
+        }
+    }
 }

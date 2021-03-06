@@ -1,0 +1,72 @@
+<div class="listUsers" style="margin: 3px; padding: 6px;">
+    <ul class="users">
+        <li *ngFor="let user of userList" [class.selected]="user === selectedUser" (click)="onSelect(user,userAccess)">
+            <span class="badge">{{user.firstName}} {{user.lastName}}</span> {{user.firstName}} {{user.lastName}}
+        </li>
+    </ul>
+</div>
+
+<div *ngIf="selectedUser">
+    <form [formGroup]="manageUserGroups" id="editUser-form" action="#" (ngSubmit)="submitUserDetails()">
+        <h2>{{selectedUser.firstName | uppercase}} {{selectedUser.lastName | uppercase}} Details</h2>
+        <div><span>id: </span>{{selectedUser.uid}}</div>
+        <div class="form-group">
+            <label for="first-name">First Name: </label>
+            <input type="text" id="first-name" formControlName="firstName" placeholder="firstName">
+        </div>
+        <div class="form-group">
+            <label for="user-name">Last Name: </label>
+            <input type="text" id="user-name" formControlName="lastName" placeholder="lastName">
+        </div>
+
+        <div class="form-group">
+            <label>Can Download ? *</label>
+            <br>
+            <label class="radio-inline"><input type="radio" formControlName="canDownload" name="canDownload" value="yes">Yes</label>
+            <label class="radio-inline"><input type="radio" formControlName="canDownload" name="canDownload"value="no">No</label>
+        </div>
+
+        <div class="form-group">
+            <label>Can Share ? *</label>
+            <br>
+            <label class="radio-inline"><input type="radio" class="form-control" formControlName="canShare" name="canShare" class="access-buttons" value="yes">Yes</label>
+            <label class="radio-inline"><input type="radio" class="form-control" formControlName="canShare" name="canShare" class="access-buttons" value="no">No</label>
+        </div>
+
+        <div class="form-group">
+            <label>Can Login ? *</label>
+            <br>
+            <label class="radio-inline"><input type="radio" class="form-control" formControlName="canLogin" name="canLogin" class="access-buttons" value="yes">Yes</label>
+            <label class="radio-inline"><input type="radio" class="form-control" formControlName="canLogin" name="canLogin" class="access-buttons" value="no">No</label>
+        </div>
+
+        <div class="form-group">
+            <label>Can Delete ? *</label>
+            <br>
+            <label class="radio-inline"><input type="radio" class="form-control" formControlName="canDelete" name="canDelete" class="access-buttons" value="yes">Yes</label>
+            <label class="radio-inline"><input type="radio" class="form-control" formControlName="canDelete" name="canDelete" class="access-buttons" value="no">No</label>
+        </div>
+
+        <div class="form-group">
+            <label>Is Admin ? *</label>
+            <br>
+            <label class="radio-inline"><input type="radio" class="form-control" formControlName="isAdmin" name="isAdmin" class="access-buttons" value="yes">Yes</label>
+            <label class="radio-inline"><input type="radio" class="form-control" formControlName="isAdmin" name="isAdmin" class="access-buttons" value="no">No</label>
+        </div>
+
+        <div class="form-group">
+            <label>Admin Access Level ? *</label>
+            <br>
+            <label class="radio-inline"><input type="radio" class="form-control" formControlName="adminAccessLevel" name="adminAccessLevel" class="access-buttons" value="fullAccess">Full Access</label>
+            <label class="radio-inline"><input type="radio" class="form-control" formControlName="adminAccessLevel" name="adminAccessLevel" class="access-buttons" value="partialAccess">Partial Custom Access</label>
+            <label class="radio-inline"><input type="radio" class="form-control" formControlName="adminAccessLevel" name="adminAccessLevel" class="access-buttons" value="No Access">No Access</label>
+        </div>
+        <button type="submit" class="btn btn-success btn-primary">Save</button>
+        <div *ngIf="saveComplete">
+            <div class="alert alert-success alert-dismissible">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="resetMsg()">&times;</a>
+                <strong>Saved!</strong> User account information has been saved.
+            </div>
+        </div>
+    </form>
+</div>

@@ -10,7 +10,7 @@
                 <p>User ID: <strong>{{user?.uid}}</strong></p>
                 <p>Email: <strong>{{user?.email}}</strong></p>
                 <p>Email Verified: <strong>{{user?.emailVerified}}</strong></p>
-                <p *ngIf="signedInUser?.UserAccess?.AdminAccessLevel === 'fullAccess' || signedInUser?.UserAccess?.AdminAccessLevel === 'partialAccess' ">You have admin rights. <strong>{{user?.displayName}}</strong></p>
+                <p *ngIf="signedInUser?.UserAccess?.adminAccessLevel === 'fullAccess' || signedInUser?.UserAccess?.adminAccessLevel === 'partialAccess' ">You have admin rights. <strong>{{user?.displayName}}</strong></p>
             </div>
         </div>
     </div>
@@ -21,11 +21,7 @@
         <div class="media">
             <div class="media-body">
                 <h1 class="h2">Manage User Profiles</h1>
-                <ul class="heroes">
-                    <li *ngFor="let user of userList">
-                        <span class="badge">"{{user.uid}}"</span> "{{user.firstName}} {{user.lastName}}"
-                    </li>
-                </ul>
+                <user-list [userList]="userList" [userAccess]="userAccess"></user-list>
             </div>
         </div>
     </div>

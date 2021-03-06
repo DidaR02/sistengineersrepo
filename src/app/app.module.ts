@@ -43,8 +43,7 @@ import { NgbAlertComponent } from './components/ngb-alert/ngb-alert.component';
     DropzoneDirective,
     UploadTaskComponent,
     UploaderComponent,
-    NgbAlertComponent,
-    
+    NgbAlertComponent
   ],
   imports: [
     BrowserModule,

@@ -6,6 +6,7 @@ import { User } from 'src/app/models/userAccess/IUser';
 import { UserAccess } from 'src/app/models/userAccess/IUserAccess';
 import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
 import { UserManagerService } from 'src/app/service/authentication/userManager.service';
+import { UserListComponent } from '../user-list/user-list.component';
 
 @Component({
   selector: 'app-user-profile',
@@ -14,7 +15,7 @@ import { UserManagerService } from 'src/app/service/authentication/userManager.s
 })
 export class UserProfileComponent implements OnInit {
   user: User;
-  private userAccess: UserAccess;
+  userAccess: UserAccess;
   viewDashboard: boolean = true;
 
   signedInUser: SignedInUser;

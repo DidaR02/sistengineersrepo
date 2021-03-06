@@ -120,7 +120,7 @@ export class AuthenticationService {
           user.uid = userResults.uid;
         }
         
-        if(!user.displayName && (user.firstName && user.lastName))
+        if(user.firstName || user.lastName)
         {
           user.displayName = user.firstName.substring(0,1).toUpperCase() + ", " + user.lastName;
         }
@@ -148,7 +148,7 @@ export class AuthenticationService {
           user.uid = userResults.user.uid;
         }
                 
-        if(!user.displayName && (user.firstName && user.lastName))
+        if(user.firstName || user.lastName)
         {
           user.displayName = user.firstName.substring(0,1).toUpperCase() + ", " + user.lastName;
         }
@@ -237,8 +237,8 @@ export class AuthenticationService {
             disableView: null,
             canDelete: "false",
             isAdmin: "false",
-            AdminAccessLevel: "None",
-            PartialAcces: null
+            adminAccessLevel: "None",
+            partialAccess: null
           };
         }
 

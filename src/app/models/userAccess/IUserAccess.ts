@@ -6,11 +6,11 @@ export interface UserAccess {
     disableView?: string[];
     canDelete: string;
     isAdmin: string;
-    AdminAccessLevel: string;
-    PartialAcces: PartialAcces[];
+    adminAccessLevel: string;
+    partialAccess: PartialAccess[];
  }
 
- export interface PartialAcces{
+ export interface PartialAccess{
      canDisableButtonActions: string;
      canLockFiles: string;
      canModifyUser: string;
