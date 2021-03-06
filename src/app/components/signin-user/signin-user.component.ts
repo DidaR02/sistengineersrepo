@@ -29,7 +29,7 @@ export class SignInUserComponent implements OnInit {
     Password: new FormControl()
   });
 
-  async submitSignInDetails()
+  submitSignInDetails()
   {
     var signInDetails = this.signInFormGroup?.value;
     let email = signInDetails?.Email;
@@ -37,16 +37,26 @@ export class SignInUserComponent implements OnInit {
 
     if(email && password)
     {
-      await this.authService.SignIn(email, password);
-      await this.authService.getLocalUserData();
+      this.authService.SignIn(email, password).then(
+        (results)=>{
+          console.log("results in sign in then: ", results);
+          if(this.authService.isLoggedIn)
+          {
+            this.authService.getLocalUserData();
 
-      if(this.authService.userAccess && this.authService.userAccess.canLogin)
-      {
-        this.router.navigate(['dashboard']);
-      }
-      else{
-        this.isUserSignInAllowed = this.convertDataType.getBoolean(this.authService.userAccess.canLogin);
-      }
+            if(this.authService.userAccess && this.authService.userAccess.canLogin)
+            {
+              this.router.navigate(['dashboard']);
+            }
+            else{
+              this.isUserSignInAllowed = this.convertDataType.getBoolean(this.authService.userAccess.canLogin);
+            }
+          }
+        },
+        function (error){
+          console.log("Error in sign in then: ", error);
+        }
+      );
     }
   }
 

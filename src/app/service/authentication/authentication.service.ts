@@ -6,7 +6,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { AngularFireDatabase, AngularFireDatabaseModule } from '@angular/fire/database';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { UserAccess } from '../../models/userAccess/IUserAccess';
 
 @Injectable({
@@ -15,25 +15,32 @@ import { UserAccess } from '../../models/userAccess/IUserAccess';
 export class AuthenticationService {
   userData: any; // Save logged in user data
   userAccess: UserAccess;
-
+  
   constructor(public afs: AngularFirestore,   // Inject Firestore service
     public afAuth: AngularFireAuth, // Inject Firebase auth service
     public router: Router,
     public ngZone: NgZone, // NgZone service to remove outside scope warning
     public afsDb: AngularFireDatabase
     ) {
-      this.getLocalUserData()
+      if(this.isLoggedIn)
+      {
+        this.getLocalUserData();
+      }
+      else
+      {
+        this.router.navigate(['signin']);
+      }
     }
   
     // Sign in with email/password
     SignIn(email, password) {
       return this.afAuth.signInWithEmailAndPassword(email, password)
-        .then((result) => {
-          this.ngZone.run(() => {
-            this.SetFsUserData(result.user);
-            this.SetDbUserData(result.user);
-            this.getLocalUserData();
-          });
+        .then(async (result) => {
+          //this.ngZone.run(() => {
+            await this.SetFsUserData(result.user);
+            await this.SetDbUserData(result.user);
+            await this.getLocalUserData();
+          //});
         }).catch((error) => {
           let errorMsg = "Error Signing in:" + error;
           window.alert(errorMsg);
@@ -161,10 +168,8 @@ export class AuthenticationService {
           firstName: user.firstName?? null,
           lastName: user.lastName?? null
         }
-        
-        this.afsDb.database.ref(`tb_user/${user.uid}`).set(
-          userData
-        );
+        this.afsDb.database.ref(`tb_user/${user.uid}`)
+        .set(userData);
       }
     }
 
@@ -257,7 +262,8 @@ export class AuthenticationService {
           const userAccount = snapshot.val();
 
           localStorage.setItem('user', JSON.stringify(userAccount));
-          JSON.parse(localStorage.getItem('user'));
+          //this.userData
+          return JSON.parse(localStorage.getItem('user'));
         });
       }
     }
