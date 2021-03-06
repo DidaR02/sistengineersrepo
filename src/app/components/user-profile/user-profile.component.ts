@@ -16,26 +16,30 @@ export class UserProfileComponent implements OnInit {
   private userAccess: UserAccess;
   viewDashboard: boolean = true;
 
-  private signedInUser: SignedInUser;
+  signedInUser: SignedInUser;
   
   constructor(
     public authService: AuthenticationService
-  ) { 
-    
+  ) {
+    this.createSignInUser();
     this.authService.getLocalUserData();
+  }
 
+  ngOnInit(): void {
     this.getUserInfo();
   }
-  ngOnInit(): void {
-  }
+  
+
   async getUserInfo()
   {
+    let userSignedIn = await this.createSignInUser();
+
     if(this.authService.isLoggedIn)
     {
-      var xUserAccess = JSON.parse(localStorage.getItem('userAccess'));
       if(!this.userAccess)
       {
-        this.userAccess = xUserAccess;
+        this.authService.getLocalUserData();
+        await this.createSignInUser();
       }
 
       if(this.authService.userAccess)
@@ -58,24 +62,63 @@ export class UserProfileComponent implements OnInit {
         }
       }
 
-      this.user = {
-      uid: this.authService.userData?.uid,
-      displayName: this.authService.userData?.displayName,
-      email: this.authService.userData?.email,
-      emailVerified: this.authService.userData?.emailVerified,
-      photoURL: this.authService.userData?.photoURL,
-      firstName: this.authService.userData?.firstName,
-      lastName: this.authService.userData?.lastName
-      };
+      if(this.authService.userData){
+        this.user = {
+              uid: this.authService.userData?.uid,
+              displayName: this.authService.userData?.displayName,
+              email: this.authService.userData?.email,
+              emailVerified: this.authService.userData?.emailVerified,
+              photoURL: this.authService.userData?.photoURL,
+              firstName: this.authService.userData?.firstName,
+              lastName: this.authService.userData?.lastName
+              };
 
-      this.signedInUser = {
-        Uid: this.authService.userData?.uid,
-        User: this.user,
-        UserAccess: this.userAccess
-      };
+        this.signedInUser = {
+          Uid: this.authService.userData?.uid,
+          User: this.user,
+          UserAccess: this.userAccess
+        };
 
-      localStorage.setItem('signedInUser', JSON.stringify(this.signedInUser));
-      JSON.parse(localStorage.getItem('signedInUser'));
+        localStorage.setItem('signedInUser', JSON.stringify(this.signedInUser));
+        JSON.parse(localStorage.getItem('signedInUser'));
+        }
+        else
+        {
+          if(!this.signedInUser || !this.signedInUser.Uid || !this.signedInUser.User || !this.signedInUser.User.uid || !this.signedInUser.UserAccess)
+          {
+            this.createSignInUser();
+          }
+        }
     }
+  }
+
+  async createSignInUser(){
+    
+    const _signedInUser = JSON.parse(localStorage.getItem('signedInUser'));
+    const _user = JSON.parse(localStorage.getItem('user'));
+    this.userAccess = JSON.parse(localStorage.getItem('userAccess'));
+
+    if(_user){
+      this.user = {
+        uid: _user.uid ??_signedInUser?.uid,
+        displayName: _user.displayName ?? _signedInUser?.displayName,
+        email: _user?.email ?? _signedInUser?.email,
+        emailVerified: _user?.emailVerified ?? _signedInUser?.emailVerified,
+        photoURL: _user?.photoURL ?? _signedInUser?.photoURL,
+        firstName: _user?.firstName,
+        lastName: _user?.lastName
+        };
+      };
+    
+    _signedInUser.User = this.user;
+    _signedInUser.UserAccess = this.userAccess ;
+
+    this.signedInUser = {
+      Uid: _signedInUser.User.uid,
+      User: _signedInUser.User,
+      UserAccess: _signedInUser.UserAccess
+    };
+
+    return this.signedInUser;
   }
 }

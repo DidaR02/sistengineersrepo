@@ -38,23 +38,18 @@ export class SignInUserComponent implements OnInit {
     if(email && password)
     {
       await this.authService.SignIn(email, password);
-      let signInAccess = this.syncSignInData();
+      await this.authService.getLocalUserData();
 
-      if(!signInAccess.canLogin)
+      if(this.authService.userAccess && this.authService.userAccess.canLogin)
       {
-        this.isUserSignInAllowed = this.convertDataType.getBoolean(signInAccess.canLogin)
+        this.router.navigate(['dashboard']);
       }
       else{
-        this.router.navigate(['dashboard']);
+        this.isUserSignInAllowed = this.convertDataType.getBoolean(this.authService.userAccess.canLogin);
       }
     }
   }
 
-  syncSignInData(): UserAccess
-  {
-    let userAccessResults = JSON.parse(localStorage.getItem('userAccess'));
-    return userAccessResults;
-  }
   redirectToRegister()
   {
     this.router.navigate(['register-user']);

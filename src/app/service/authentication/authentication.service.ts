@@ -22,18 +22,17 @@ export class AuthenticationService {
     public ngZone: NgZone, // NgZone service to remove outside scope warning
     public afsDb: AngularFireDatabase
     ) {
-        //this.getLocalUserData();
+      this.getLocalUserData()
     }
   
     // Sign in with email/password
     SignIn(email, password) {
       return this.afAuth.signInWithEmailAndPassword(email, password)
         .then((result) => {
-          this.ngZone.run(async () => { 
-            //this.GetUserAccess(result.user);
-            await this.getLocalUserData();
-            await this.SetUserData(result.user);
-            return this.userAccess
+          this.ngZone.run(() => {
+            this.SetFsUserData(result.user);
+            this.SetDbUserData(result.user);
+            this.getLocalUserData();
           });
         }).catch((error) => {
           let errorMsg = "Error Signing in:" + error;
@@ -47,7 +46,7 @@ export class AuthenticationService {
         .then((result) => {
           /* Call the SendVerificaitonMail() function when new user sign
           up and returns promise */
-          this.SetUserData(user, result.user);
+          this.SetFsUserData(user, result.user);
           this.SetDbUserData(user, result);
           this.SetUserAccess(result.user.uid);
           this.SendVerificationMail();
@@ -98,7 +97,7 @@ export class AuthenticationService {
          this.ngZone.run(() => {
             this.router.navigate(['dashboard']);
           })
-        this.SetUserData(result.user);
+        this.SetFsUserData(result.user);
       }).catch((error) => {
         window.alert(error)
       })
@@ -107,20 +106,25 @@ export class AuthenticationService {
     /* Setting up user data when sign in with username/password,
     sign up with username/password and sign in with social auth
     provider in Firestore database using AngularFirestore + AngularFirestoreDocument service */
-     SetUserData(user, userResults?: any) {
+     SetFsUserData(user, userResults?: any) {
       if(user){
         if(userResults)
         {
           user.uid = userResults.uid;
         }
         
+        if(!user.displayName && (user.firstName && user.lastName))
+        {
+          user.displayName = user.firstName.substring(0,1).toUpperCase() + ", " + user.lastName;
+        }
+
         const userRef: AngularFirestoreDocument<any> = this.afs.doc(`users/${user.uid}`);
         const userData: User = {
           uid: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          emailVerified: user.emailVerified,
+          email: user.email ?? null,
+          displayName: user.displayName ?? null,
+          photoURL: user.photoURL ?? null,
+          emailVerified: user.emailVerified ?? false,
           firstName: user.firstName?? null,
           lastName: user.lastName?? null
         }
@@ -136,37 +140,54 @@ export class AuthenticationService {
         {
           user.uid = userResults.user.uid;
         }
-        
+                
+        if(!user.displayName && (user.firstName && user.lastName))
+        {
+          user.displayName = user.firstName.substring(0,1).toUpperCase() + ", " + user.lastName;
+        }
+
         if(!user?.uid || user?.uid === "")
         {
           window.alert('Cannot get user Id from document collection or database');
           return;
         }
 
+        const userData: User = {
+          uid: user.uid,
+          email: user.email ?? null,
+          displayName: user.displayName ?? null,
+          photoURL: user.photoURL ?? null,
+          emailVerified: user.emailVerified ?? false,
+          firstName: user.firstName?? null,
+          lastName: user.lastName?? null
+        }
+        
         this.afsDb.database.ref(`tb_user/${user.uid}`).set(
-          user
+          userData
         );
       }
     }
 
     /* Saving user data in localstorage when
     logged in and setting up null when logged out */
-     async getLocalUserData() {
+     getLocalUserData() {
 
-      localStorage.removeItem('user');
-      localStorage.removeItem('userAccess');
-      localStorage.removeItem('signedInUser');
-
-      await this.afAuth.authState.subscribe(async user => {
+      this.afAuth.authState.subscribe(user => {
         if (user) {
-          this.userData = user;
-          localStorage.setItem('user', JSON.stringify(this.userData));
-          JSON.parse(localStorage.getItem('user'));
+          this.ngZone.run(async () => {
+            
           await this.GetUserAccess(user);
-          await this.GetAndSetDbUserAccount(user);
+          await this.GetDbUserAccount(user);
+          
+          localStorage.setItem('signedInUser', JSON.stringify(user));
+          JSON.parse(localStorage.getItem('signedInUser'));
+
+          });
+          
         } else {
           localStorage.setItem('user', null);
-          JSON.parse(localStorage.getItem('user'));
+          localStorage.setItem('signedInUser', null);
+          localStorage.setItem('userAccess', null);
         }
       })
     }
@@ -181,22 +202,24 @@ export class AuthenticationService {
       })
     }
 
-     GetUserAccess(user) {
+     GetUserAccess(user) : UserAccess {
       if(user)
       {
-        localStorage.removeItem('userAccess');
         const userAccessObj = this.afsDb.database.ref('tb_userAccess/' + user?.uid);
 
-        userAccessObj.on('value', (useAccess) => {
+         userAccessObj.on('value', (useAccess) => {
           this.userAccess = useAccess.val(); 
   
           localStorage.setItem('userAccess', JSON.stringify(this.userAccess));
           JSON.parse(localStorage.getItem('userAccess'));
+
+          return this.userAccess;
         });
+        return this.userAccess;
       }
     }
 
-     async SetUserAccess(uid: string) {
+     SetUserAccess(uid: string) : UserAccess{
       if(uid)
       {
         if(!this.userAccess)
@@ -218,21 +241,21 @@ export class AuthenticationService {
         JSON.parse(localStorage.getItem('userAccess'));
 
 
-        await this.afsDb.database.ref('tb_userAccess/' + uid).set(
+        this.afsDb.database.ref('tb_userAccess/' + uid).set(
           this.userAccess
         );
+        return this.userAccess;
       }
     }
 
-     async GetAndSetDbUserAccount(user) {
+     GetDbUserAccount(user) {
       if(user)
       {
         const userAccount = this.afsDb.database.ref('tb_user/' + user?.uid);
 
-        await userAccount.on('value', (snapshot) => {
+        userAccount.on('value', (snapshot) => {
           const userAccount = snapshot.val();
-  
-          localStorage.removeItem('user');
+
           localStorage.setItem('user', JSON.stringify(userAccount));
           JSON.parse(localStorage.getItem('user'));
         });

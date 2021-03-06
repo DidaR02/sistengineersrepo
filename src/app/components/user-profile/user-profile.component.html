@@ -10,6 +10,7 @@
                 <p>User ID: <strong>{{user?.uid}}</strong></p>
                 <p>Email: <strong>{{user?.email}}</strong></p>
                 <p>Email Verified: <strong>{{user?.emailVerified}}</strong></p>
+                <p *ngIf="signedInUser?.UserAccess?.AdminAccessLevel === 'fullAccess' || signedInUser?.UserAccess?.AdminAccessLevel === 'partialAccess' ">You have admin rights. <strong>{{user?.displayName}}</strong></p>
             </div>
         </div>
     </div>
