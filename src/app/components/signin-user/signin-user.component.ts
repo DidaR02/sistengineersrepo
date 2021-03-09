@@ -31,32 +31,19 @@ export class SignInUserComponent implements OnInit {
 
   submitSignInDetails()
   {
+    this.isUserSignInAllowed = true;
+
     var signInDetails = this.signInFormGroup?.value;
     let email = signInDetails?.Email;
     let password = signInDetails?.Password;
 
     if(email && password)
     {
-      this.authService.SignIn(email, password).then(
-        (results)=>{
-          console.log("results in sign in then: ", results);
-          if(this.authService.isLoggedIn)
-          {
-            this.authService.getLocalUserData();
-
-            if(this.authService.userAccess && this.authService.userAccess.canLogin)
-            {
-              this.router.navigate(['dashboard']);
-            }
-            else{
-              this.isUserSignInAllowed = this.convertDataType.getBoolean(this.authService.userAccess.canLogin);
-            }
-          }
-        },
-        function (error){
-          console.log("Error in sign in then: ", error);
-        }
-      );
+      this.authService.SignIn(email, password);
+    }
+    else
+    {
+      this.isUserSignInAllowed = false;
     }
   }
 

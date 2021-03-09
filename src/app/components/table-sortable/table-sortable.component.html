@@ -1,3 +1,7 @@
+<div class="pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Manage Files</h1>
+</div>
+
 <form>
     <div class="form-group form-inline">
         Search: <input class="form-control ml-2" type="text" [formControl]="filter" />
@@ -42,8 +46,6 @@
         <tr>
             <th scope="col"></th>
             <th scope="col" sortable="name" (sort)="onSort($event)">Name</th>
-            <!-- <th scope="col">Upload Progress</th> -->
-            <!-- <th scope="col" sortable="size" (sort)="onSort($event)">Size</th> -->
             <th scope="col"></th>
         </tr>
     </thead>
@@ -76,7 +78,6 @@
                     <progress [value]="pct" max="100"></progress> {{ pct | number }}%
                 </div>
             </td>
-            <!-- <td>{{ file.size }}</td> -->
             <td>
                 <span [matMenuTriggerFor]="rootMenu" [matMenuTriggerData]="{self: file}" #menuTrigger="matMenuTrigger"></span>
                 <button type="button" class="btn btn-light btn-sm" (click)="openMenu($event, menuTrigger)">More</button>
@@ -87,24 +88,24 @@
 
 <mat-menu #rootMenu="matMenu" [overlapTrigger]="false">
     <ng-template matMenuContent let-self="self">
-        <!-- <button **ngIf="canMove" mat-menu-item [matMenuTriggerFor]="moveToMenu" [matMenuTriggerData]="{self: self}">
+        <!-- <button [disabled]="!canMove" mat-menu-item [matMenuTriggerFor]="moveToMenu" [matMenuTriggerData]="{self: self}">
         <mat-icon>open_with</mat-icon>
         <span>Move To</span>
       </button> -->
-        <button **ngIf="canDownload" mat-menu-item [matMenuTriggerData]="{self: self}" (click)="downloadElement(self)">
-        <mat-icon>cloud_download</mat-icon>
+        <button [disabled]="!canDownload" mat-menu-item [matMenuTriggerData]="{self: self}" (click)="downloadElement(self)">
+        <mat-icon [disabled]="!canDownload">cloud_download</mat-icon>
         <span>Download</span>
       </button>
         <!-- <button mat-menu-item (click)="openRenameDialog(self)">
         <mat-icon>edit</mat-icon>
         <span>Rename</span>
       </button> -->
-        <!-- <button **ngIf="canShare" mat-menu-item (click)="openShareDialog(self)">
+        <!-- <button [disabled]="!canShare" mat-menu-item (click)="openShareDialog(self)">
         <mat-icon>share</mat-icon>
         <span>Share</span>
         </button> -->
-        <button **ngIf="canDelete" mat-menu-item [matMenuTriggerData]="{self: self}" (click)="deleteElement(self)">
-        <mat-icon>delete</mat-icon>
+        <button [disabled]="!canDelete" mat-menu-item [matMenuTriggerData]="{self: self}" (click)="deleteElement(self)">
+        <mat-icon [disabled]="!canDelete">delete</mat-icon>
         <span>Delete</span>
       </button>
     </ng-template>

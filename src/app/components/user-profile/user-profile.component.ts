@@ -138,15 +138,13 @@ export class UserProfileComponent implements OnInit {
         };
       };
     
-    _signedInUser.User = this.user;
-    _signedInUser.UserAccess = this.userAccess ;
-
     this.signedInUser = {
-      Uid: _signedInUser.User.uid,
-      User: _signedInUser.User,
-      UserAccess: _signedInUser.UserAccess
+      Uid: this.user.uid?? null,
+      User: this.user ?? null,
+      UserAccess: this.userAccess?? null
     };
 
+    localStorage.setItem('signedInUser', JSON.stringify(this.signedInUser));
     return this.signedInUser;
   }
 

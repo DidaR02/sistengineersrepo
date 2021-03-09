@@ -1,5 +1,7 @@
 export interface UserAccess {
     uid: string;
+    canAddFile: string;
+    canCreateFolder: string;
     canDownload?: string;
     canShare?: string;
     canLogin?: string;

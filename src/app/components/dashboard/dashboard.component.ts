@@ -6,6 +6,7 @@ import { AuthenticationService } from 'src/app/service/authentication/authentica
 import { UserAccess } from 'src/app/models/userAccess/IUserAccess';
 import { User } from '../../models/userAccess/IUser';
 import { SignedInUser } from '../../models/userAccess/ISignedInUser';
+import { DataTypeConversionService } from 'src/app/service/shared/dataType-conversion.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -24,6 +25,7 @@ export class DashboardComponent implements OnInit {
   constructor(
     public authService: AuthenticationService,
     private router: Router,
+    public convertDataType: DataTypeConversionService,
     private route: ActivatedRoute,
     private location: Location
   ) { 
@@ -41,9 +43,12 @@ export class DashboardComponent implements OnInit {
       {
         switch(url){
           case "manageFiles": {
-            if(this.userAccess &&  ("manageFiles" in this.userAccess.disableView))
+            if(this.userAccess && this.userAccess.disableView)
             {
-              this.viewDashboard = false
+              if(url in this.userAccess.disableView)
+              {
+                this.viewDashboard = false
+              }
             }
             else
             {
@@ -52,16 +57,19 @@ export class DashboardComponent implements OnInit {
             break;
           }
           case "userProfile": {
-            if(this.userAccess &&  ("userProfile" in this.userAccess.disableView))
+            if(this.userAccess && this.userAccess.disableView)
             {
-              this.viewDashboard = false
+              if(url in this.userAccess.disableView)
+              {
+                this.viewDashboard = false
+              }
             }
             else
             {
               this.router.navigate(['dashboard/userProfile']);
             }
             break;
-          }
+          }5
         }
       }
     }
@@ -86,6 +94,11 @@ export class DashboardComponent implements OnInit {
 
       if(this.userAccess)
       {
+        if(!this.convertDataType.getBoolean(this.userAccess.canLogin?.toString()))
+        {
+          this.viewDashboard = false
+          return;
+        }
         //if user cant view dashboard, redirect user to no access page.
         if(this.userAccess.disableView)
         {
@@ -147,15 +160,14 @@ export class DashboardComponent implements OnInit {
         };
       };
     
-    _signedInUser.User = this.user;
-    _signedInUser.UserAccess = this.userAccess ;
-
+    
     this.signedInUser = {
-      Uid: _signedInUser.User.uid,
-      User: _signedInUser.User,
-      UserAccess: _signedInUser.UserAccess
+      Uid: this.user.uid?? null,
+      User: this.user ?? null,
+      UserAccess: this.userAccess?? null
     };
 
+    localStorage.setItem('signedInUser', JSON.stringify(this.signedInUser));
     return this.signedInUser;
   }
 

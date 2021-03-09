@@ -10,43 +10,48 @@
                     <h1>Already have sign in credentials!</h1>
                     <br>
 
-                    <form [formGroup]="signInFormGroup" id="signIn-form" action="#" (ngSubmit)="submitSignInDetails()">
+                    <!-- <form [formGroup]="signInFormGroup" id="signIn-form" action="#"> -->
 
-                        <div class="panel panel-primary">
+                    <div class="panel panel-primary">
 
-                            <div class="panel-body">
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <label for="email">Email</label>
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="Email *" aria-required="true" formControlName="Email">
-                                    </div>
+                        <div class="panel-body">
+                            <div class="form-row">
+                                <div class="form-group col-md-6 formGroup">
+                                    <input type="email" class="form-control" id="email" name="email" #email required placeholder="Email *" aria-required="true">
                                 </div>
+                            </div>
 
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <label for="password">Password</label>
-                                        <input type="password" class="form-control" id="password" name="password" placeholder="Password *" aria-required="true" formControlName="Password">
-                                    </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6 formGroup">
+                                    <input type="password" class="form-control" id="password" name="password" #password required placeholder="Password *" aria-required="true">
                                 </div>
+                            </div>
 
-                                <div *ngIf="!isUserSignInAllowed">
-                                    <div class="alert alert-danger alert-dismissible">
-                                        <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="resetErrorMsg()">&times;</a>
-                                        <strong>Error!</strong> User account locked! Unfortunately the account supplied has been blocked.
-                                    </div>
+                            <div *ngIf="!isUserSignInAllowed">
+                                <div class="alert alert-danger alert-dismissible">
+                                    <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="resetErrorMsg()">&times;</a>
+                                    <strong>Sign in error!</strong> Please check your details and retry sign in.
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="formGroup">
+                        <button type="submit" class="btn btn-success btn-primary" (click)="authService.SignIn(email.value, password.value)">Sign In</button>
+                    </div>
 
-                        <button type="submit" class="btn btn-success btn-primary">Sign In</button>
-
-                        <li class="signup-item" style="text-decoration: none;">
-                            <a class="sign-link" style="text-decoration: none;" (click)="redirectToRegister()">
-                                <i class="fas fa-sign-in-alt" style="text-decoration: none;"></i>Sign Up New Account
-                            </a>
-                        </li>
-
-                    </form>
+                    <div class="signup-div" style="padding-top: 15px;">
+                        <p>
+                            I do not have an account.
+                            <span>
+                                <li class="signup-item" style="list-style-type: none;">
+                                    <a class="sign-link" (click)="redirectToRegister()">
+                                        <i class="fas fa-sign-in-alt"></i>Sign Up New Account
+                                    </a>
+                                </li>
+                            </span>
+                        </p>
+                    </div>
+                    <!-- </form> -->
                 </div>
             </div>
         </div>

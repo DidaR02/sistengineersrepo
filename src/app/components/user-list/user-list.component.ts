@@ -19,6 +19,8 @@ export class UserListComponent implements OnInit {
   canDownload: string;
   canShare: string;
   canLogin: string;
+  canAddFile: string;
+  canCreateFolder: string;
   disableView: string[];
   canDelete: string;
   isAdmin: string;
@@ -33,11 +35,14 @@ export class UserListComponent implements OnInit {
     public userManagerService: UserManagerService) { }
 
   ngOnInit(): void {
+    this.saveComplete = false;
   }
 
   public manageUserGroups= new FormGroup({
     firstName: new FormControl(),
     lastName: new FormControl(),
+    canAddFile: new FormControl(),
+    canCreateFolder: new FormControl(),
     canDownload: new FormControl(),
     canShare: new FormControl(),
     canLogin: new FormControl(),
@@ -48,6 +53,8 @@ export class UserListComponent implements OnInit {
   });
 
   onSelect(user: User, userAccess: UserAccess): void {
+    this.saveComplete = false;
+
     this.selectedUser = user;
     this.canDownload = userAccess.canDownload;
     this.canShare = userAccess.canShare;
@@ -56,6 +63,8 @@ export class UserListComponent implements OnInit {
     this.canDelete = userAccess.canDelete;
     this.isAdmin = userAccess.isAdmin;
     this.adminAccessLevel = userAccess.adminAccessLevel;
+    this.canAddFile = userAccess.canAddFile;
+    this.canCreateFolder = userAccess.canCreateFolder;
 
     this.setupControlModel();
   }
@@ -65,22 +74,26 @@ export class UserListComponent implements OnInit {
       {
         firstName: this.selectedUser?.firstName?.toString(),
         lastName: this.selectedUser?.lastName?.toString(),
+        canAddFile: this.dataTypeConv.getStringBoolean(this.canAddFile?.toString()),
+        canCreateFolder: this.dataTypeConv.getStringBoolean(this.canCreateFolder?.toString()),
         canDownload: this.dataTypeConv.getStringBoolean(this.canDownload?.toString()),
         canShare: this.dataTypeConv.getStringBoolean(this.canShare?.toString()),
         canLogin: this.dataTypeConv.getStringBoolean(this.canLogin?.toString()),
         canDelete: this.dataTypeConv.getStringBoolean(this.canDelete?.toString()),
         isAdmin: this.dataTypeConv.getStringBoolean(this.isAdmin?.toString()),
-        adminAccessLevel: this.adminAccessLevel?.toString()
+        adminAccessLevel: this.dataTypeConv.getAdminAccess(this.adminAccessLevel?.toString())
       }
     );
   }
 
-  submitUserDetails(){
+  async submitUserDetails(){
     const userDetails = this.manageUserGroups.value;
     if(userDetails)
     {
       this.selectedUser.firstName = userDetails.firstName;
       this.selectedUser.lastName = userDetails.lastName;
+      this.userAccess.canAddFile = userDetails.canAddFile;
+      this.userAccess.canCreateFolder = userDetails.canCreateFolder;
       this.userAccess.canDownload = userDetails.canDownload;
       this.userAccess.canShare = userDetails.canShare;
       this.userAccess.canLogin = userDetails.canLogin;

@@ -35,12 +35,13 @@ export class AuthenticationService {
     // Sign in with email/password
     SignIn(email, password) {
       return this.afAuth.signInWithEmailAndPassword(email, password)
-        .then(async (result) => {
-          //this.ngZone.run(() => {
-            await this.SetFsUserData(result.user);
-            await this.SetDbUserData(result.user);
-            await this.getLocalUserData();
-          //});
+        .then((result) => {
+          this.ngZone.run(() => {
+            this.router.navigate(['dashboard']);
+          });
+        
+          this.GetUserAccess(result.user);
+          this.GetDbUserAccount(result.user);
         }).catch((error) => {
           let errorMsg = "Error Signing in:" + error;
           window.alert(errorMsg);
@@ -181,8 +182,8 @@ export class AuthenticationService {
         if (user) {
           this.ngZone.run(async () => {
             
-          await this.GetUserAccess(user);
-          await this.GetDbUserAccount(user);
+          this.GetUserAccess(user);
+          this.GetDbUserAccount(user);
           
           localStorage.setItem('signedInUser', JSON.stringify(user));
           JSON.parse(localStorage.getItem('signedInUser'));
@@ -231,13 +232,15 @@ export class AuthenticationService {
         {
           this.userAccess = {
             uid: uid,
+            canAddFile: "false",
+            canCreateFolder: "string",
             canDownload: "false",
             canShare: "false",
-            canLogin: "false",
+            canLogin: "true",
             disableView: null,
             canDelete: "false",
             isAdmin: "false",
-            adminAccessLevel: "None",
+            adminAccessLevel: "noAccess",
             partialAccess: null
           };
         }

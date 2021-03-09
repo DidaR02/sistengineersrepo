@@ -35,4 +35,29 @@ export class DataTypeConversionService {
                 return "no";
         }
     }
+
+    convertBooleanToString(value){
+        switch(value){
+            case true:
+            case "true":
+            case 1:
+            case "1":
+            case "on":
+            case "yes":
+                return "true";
+            default: 
+                return "false";
+        }
+    }
+
+    getAdminAccess(value){
+        switch(value){
+            case "fullAccess":
+                return "fullAccess"; 
+            case "partialAccess":
+                return "partialAccess"; 
+            default: 
+                return "noAccess";
+        }
+    }
 }

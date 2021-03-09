@@ -35,6 +35,7 @@ import { RenameDialogModule } from './components/rename-dialog/rename-dialog.mod
 import { NewFolderDialogModule } from './components/new-folder-dialog/new-folder-dialog.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgbAlertComponent } from './components/ngb-alert/ngb-alert.component';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -47,6 +48,7 @@ import { NgbAlertComponent } from './components/ngb-alert/ngb-alert.component';
   ],
   imports: [
     BrowserModule,
+    CommonModule,
     AppRoutingModule,
     FileExplorerModule,
     FileTableModule,
