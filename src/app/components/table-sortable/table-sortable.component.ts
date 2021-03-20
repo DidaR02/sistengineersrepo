@@ -444,10 +444,12 @@ export class TableSortableComponent implements OnInit {
     if(newFileList.length > 0){
       for(var file =0 ; file < newFileList.length; file++)
       {
-        
         const docId = await this.fileService.createStoreDocumentUpload(this.currentPath, null, newFileList[file], fulldate);
         
-        let uploadPrcnt = await this.fileService.uploadFile(this.currentPath, docId, newFileList[file]);
+        let uploadPrcnt = await this.fileService.uploadFile(this.currentPath, docId, newFileList[file], this.currentRoot);
+        
+        //Todo, set percentage on the Observable
+        this.fileElements = await this.fileService.queryInFolder(this.currentRoot ? this.currentRoot.id : 'root');
 
         this.fileElements.subscribe(
           value => 
@@ -461,10 +463,17 @@ export class TableSortableComponent implements OnInit {
               })
           }
         )
+
+        uploadPrcnt.toPromise().then
+        (
+          async ()=>{
+            
+            this.fileElements = await this.fileService.queryInFolder(this.currentRoot ? this.currentRoot.id : 'root');
+          }
+        );
       }
     }
 
-     //Todo, set percentage on the Observable
     this.fileElements = await this.fileService.queryInFolder(this.currentRoot ? this.currentRoot.id : 'root');
     this.files = [];
   }

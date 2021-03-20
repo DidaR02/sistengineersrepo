@@ -295,18 +295,22 @@ async fireStoreCollections()
       PrntFilePath = PrntFilePath.slice(0, -1);
     }
 
-    let parentFolder: any;
+    let getParentPathId: string;
+
     //Confirm current folder
     if(currentFoler)
     {
      let getParentFolder = await this.getParentFolder(parentPath, currentFoler.name);
 
       if(getParentFolder?.id){
-        parentFolder = getParentFolder;
+        getParentPathId = getParentFolder.id;
       }
     }
-    
-    let getParentPathId = await this.getParentId(prnt, PrntFilePath);
+    else
+    {
+      getParentPathId = await this.getParentId(prnt, PrntFilePath);
+    }
+
     getParentPathId = getParentPathId ? getParentPathId : prnt;
     
     let setMetadata = {
@@ -363,15 +367,12 @@ async fireStoreCollections()
             PrntFilePath = PrntFilePath.slice(0,-1);
           }
 
-          var getParentPathId = await this.getParentId(prnt, PrntFilePath);
-          getParentPathId = getParentPathId ? getParentPathId : prnt;
-
           this.metaData = await this.fireStorage.ref(path).getMetadata().toPromise();
 
           var metadata = {
             customMetadata: {
-              'parentId': getParentPathId,
-              'parentName': prnt,
+              'parentId': this.metaData?.customMetadata?.parentId ?? getParentPathId,
+              'parentName': this.metaData?.customMetadata?.parentName ?? prnt,
               'parentPath': PrntFilePath,
               'isFolder': 'false',
               'fullPath': this.metaData?.fullPath
@@ -394,7 +395,7 @@ async fireStoreCollections()
               'customMetadata': this.metaData?.customMetadata,
               'isFolder': this.metaData?.customMetadata?.isFolder,
               'parentId': getParentPathId,
-              'parentName': prnt,
+              'parentName': this.metaData?.customMetadata?.parentName ?? prnt,
               'parentPath': PrntFilePath,
               'fullPath': this.metaData?.fullPath,
               'name': this.metaData?.name,
@@ -437,33 +438,16 @@ async fireStoreCollections()
 
       parentPath = (parentPath === "root" || parentPath === undefined || parentPath === null) ? this.defaultPublicRootFilePath : this.defaultPublicRootFilePath + parentPath;
       var result: FileElement;
-      let docData: any;
 
       await this.fireStore.collection('files',
         document => document.where("fullPath", "==", parentPath) && document.where("name", "==", folderName)
-      )
-      .get()
-      .toPromise()
-      .then((querySnapshot) => {
-          querySnapshot.forEach((document) => {
-            docData = document.data();
-            
-            result.id = document.id;
-            result.name = docData?.name ? docData?.name : "Unknown File";
-            result.isFolder = docData?.isFolder ? JSON.parse(docData?.isFolder) : false;
-            result.parent = docData?.parent;
-            result.size = docData?.metaData?.size;
-            result.metaData = docData?.metaData;
-          });
-      })
-      .catch(function(error) {
-          console.log("Error getting documents: ", error);
-      })
-      .finally(function(){
-        return result;
-      });
-      
-      return result
+        ).get().toPromise().then((snapShot)=> {
+        snapShot.docs.forEach(
+          document => {
+            return result = this.renderDocuments(document);
+            });
+       })
+       return result;
     }
 
     async createStoreDocumentUpload(filePath?: string, docId?: string ,file?: File, date?: string){
@@ -535,6 +519,12 @@ async fireStoreCollections()
         return this.parentId;
       }
   
+      // else if(document.exists && document.id)
+      // {
+      //   this.parentId = document.id;
+      //   return this.parentId;
+      // }
+
       return this.parentId;
     }
   
@@ -544,7 +534,6 @@ async fireStoreCollections()
         snapShot.docs.forEach(
           document => {
             this.renderParentDoc(parentName, parentPath, document);
-            return this.parentId;
             });
        },
        function(error){
