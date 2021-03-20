@@ -11,7 +11,7 @@
 .signin-user {
     height: 100%;
     margin: auto;
-    padding: 30px;
+    width: 100%;
 }
 
 h1 {
@@ -31,5 +31,6 @@ h1 {
     }
     input {
         font-size: 2.7vw;
+        width: 100%;
     }
 }

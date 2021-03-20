@@ -11,7 +11,6 @@
 .signup-user {
     height: 100%;
     margin: auto;
-    padding: 30px;
 }
 
 h1 {
@@ -36,5 +35,6 @@ h1 {
     }
     input {
         font-size: 2.7vw;
+        width: 100%;
     }
 }

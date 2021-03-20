@@ -138,11 +138,11 @@ export class TableSortableComponent implements OnInit {
 
       if(this.userAccess)
       {
-        this.canDownload = this.convertDataType.getBoolean(this.authService.userAccess?.canDownload);
-        this.canDelete = this.convertDataType.getBoolean(this.authService.userAccess?.canDelete);
-        this.canShare = this.convertDataType.getBoolean(this.authService.userAccess?.canShare);
-        this.canAddFile = this.convertDataType.getBoolean(this.authService.userAccess?.canAddFile);
-        this.canCreateFolder = this.convertDataType.getBoolean(this.authService.userAccess?.canCreateFolder);
+        this.canDownload = this.convertDataType.getBoolean(this.userAccess?.canDownload);
+        this.canDelete = this.convertDataType.getBoolean(this.userAccess?.canDelete);
+        this.canShare = this.convertDataType.getBoolean(this.userAccess?.canShare);
+        this.canAddFile = this.convertDataType.getBoolean(this.userAccess?.canAddFile);
+        this.canCreateFolder = this.convertDataType.getBoolean(this.userAccess?.canCreateFolder);
 
         if(this.userAccess.disableView)
         {
@@ -214,7 +214,8 @@ export class TableSortableComponent implements OnInit {
 
     localStorage.setItem('signedInUser', JSON.stringify(this.signedInUser));
   }
-   onSort({column, direction}: SortEvent) {
+
+  onSort({column, direction}: SortEvent) {
 
   //   // resetting other headers
   //   this.headers.forEach(header => {
@@ -424,12 +425,6 @@ export class TableSortableComponent implements OnInit {
     var findCurrentFolder = this.currentPath.split('/');
     var currentFolder = findCurrentFolder[findCurrentFolder.length -1];
 
-    let getParentFolder = await this.getParentFolder(this.currentPath, currentFolder);
-
-    if(getParentFolder?.id){
-      this.currentRoot = getParentFolder;
-    }
-
     const newFileList = this.fileService.removeFileDuplicate(this.files);
 
     const today = new Date();
@@ -452,7 +447,7 @@ export class TableSortableComponent implements OnInit {
         
         const docId = await this.fileService.createStoreDocumentUpload(this.currentPath, null, newFileList[file], fulldate);
         
-        let uploadPrcnt = await this.fileService.uploadFile(this.currentPath, docId, newFileList[file], this.currentRoot);
+        let uploadPrcnt = await this.fileService.uploadFile(this.currentPath, docId, newFileList[file]);
 
         this.fileElements.subscribe(
           value => 

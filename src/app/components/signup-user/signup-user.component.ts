@@ -1,6 +1,7 @@
 import { stringify } from '@angular/compiler/src/util';
 import { Component,OnInit } from '@angular/core';
 import { FormGroup, FormControl} from '@angular/forms'; // Reactive form services
+import { Router } from '@angular/router';
 import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
 import { User } from '../../models/userAccess/IUser'
 
@@ -13,7 +14,7 @@ export class SignUpUserComponent implements OnInit {
 
   isPasswordValid : boolean = true;
 
-  constructor(public authenticationService: AuthenticationService) { }
+  constructor(public authenticationService: AuthenticationService, public router: Router,) { }
 
   ngOnInit(): void {
   }
@@ -57,5 +58,10 @@ export class SignUpUserComponent implements OnInit {
   resetErrorMsg()
   {
     this.isPasswordValid = true;
+  }
+
+  redirectToSignin()
+  {
+    this.router.navigate(['signin']);
   }
 }

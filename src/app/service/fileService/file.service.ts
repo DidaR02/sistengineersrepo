@@ -216,7 +216,7 @@ export class FileService implements IFileService {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-}
+  }
 
   formatBytes2(a,b=2){
     if(0===a)
@@ -227,7 +227,7 @@ export class FileService implements IFileService {
     return parseFloat((a/Math.pow(1024,d)).toFixed(c))+" "+["Bytes","KB","MB","GB","TB","PB","EB","ZB","YB"][d]
   }
 
-  convertBytes(bytes: number) {
+  convertBytes(bytes: number){
     const sizes = ["Bytes", "KB", "MB", "GB", "TB"]
   
     if (bytes == 0) {
@@ -295,6 +295,17 @@ async fireStoreCollections()
       PrntFilePath = PrntFilePath.slice(0, -1);
     }
 
+    let parentFolder: any;
+    //Confirm current folder
+    if(currentFoler)
+    {
+     let getParentFolder = await this.getParentFolder(parentPath, currentFoler.name);
+
+      if(getParentFolder?.id){
+        parentFolder = getParentFolder;
+      }
+    }
+    
     let getParentPathId = await this.getParentId(prnt, PrntFilePath);
     getParentPathId = getParentPathId ? getParentPathId : prnt;
     
@@ -339,8 +350,6 @@ async fireStoreCollections()
         
           this.downloadURL = await this.fireStorage.ref(path).getDownloadURL().toPromise();
 
-          this.metaData = await this.fireStorage.ref(path).getMetadata().toPromise();
-
           await this.fireStorage.ref(path).updateMetadata(setMetadata).toPromise().then(
             function (newMetaData) {
               newCustomMetaData = newMetaData;
@@ -356,6 +365,8 @@ async fireStoreCollections()
 
           var getParentPathId = await this.getParentId(prnt, PrntFilePath);
           getParentPathId = getParentPathId ? getParentPathId : prnt;
+
+          this.metaData = await this.fireStorage.ref(path).getMetadata().toPromise();
 
           var metadata = {
             customMetadata: {
@@ -422,18 +433,27 @@ async fireStoreCollections()
     return this.percentage;
   }
 
-    async getParentFolder(parentPath?: string, folderName?: string): Promise<FileElement>{
+  async getParentFolder(parentPath?: string, folderName?: string): Promise<FileElement>{
 
       parentPath = (parentPath === "root" || parentPath === undefined || parentPath === null) ? this.defaultPublicRootFilePath : this.defaultPublicRootFilePath + parentPath;
-      var result: any;
-  
-      await this.fireStore.collection('files', 
-      document => document.where("fullPath", "==", parentPath) && document.where("name", "==", folderName)
+      var result: FileElement;
+      let docData: any;
+
+      await this.fireStore.collection('files',
+        document => document.where("fullPath", "==", parentPath) && document.where("name", "==", folderName)
       )
-      .get().toPromise()
-      .then(function(querySnapshot) {
-          querySnapshot.forEach(function(document) {
-           result = this.renderDocuments(document);
+      .get()
+      .toPromise()
+      .then((querySnapshot) => {
+          querySnapshot.forEach((document) => {
+            docData = document.data();
+            
+            result.id = document.id;
+            result.name = docData?.name ? docData?.name : "Unknown File";
+            result.isFolder = docData?.isFolder ? JSON.parse(docData?.isFolder) : false;
+            result.parent = docData?.parent;
+            result.size = docData?.metaData?.size;
+            result.metaData = docData?.metaData;
           });
       })
       .catch(function(error) {
@@ -452,7 +472,6 @@ async fireStoreCollections()
       if(!date){
         const today = new Date();
 
-        //let time = today.getTime();
         // adjust 0 before single digit date
         const day = ("0" + today.getDate()).slice(-2);
   
@@ -507,7 +526,7 @@ async fireStoreCollections()
     
   parentId: string;
 
-    private renderParentDoc(parentName: string, parentPath: string,document: any): string
+    private renderParentDoc(parentName: string, parentPath: string, document: any): string
     {
       this.parentId = null;
       if(document.data()?.isFolder && document.data()?.name === parentName && document.data()?.fullPath === parentPath)
