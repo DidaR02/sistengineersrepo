@@ -15,6 +15,7 @@ import { UserAccess } from 'src/app/models/userAccess/IUserAccess';
 import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
 import { Router } from '@angular/router';
 import { DataTypeConversionService } from 'src/app/service/shared/dataType-conversion.service';
+import { downloadFolderAsZip } from '../../service/fileService/zipFile.service';
 
 export type SortColumn = keyof FileElement | '';
 export type SortDirection = 'asc' | 'desc' | '';
@@ -338,7 +339,6 @@ export class TableSortableComponent implements OnInit {
   }
 
   async moveFileElement(event: { fileElement: FileElement; moveTo: FileElement }) {
-  
     //get file metadata and current file path
     let getFilePath = await this.fileService.getStorageFilePath(event.fileElement);
 
@@ -348,11 +348,9 @@ export class TableSortableComponent implements OnInit {
       
       await this.updateFileElementQuery();
     }
-    
   }
 
   async downloadElement(element: FileElement) {
-
     this.currentPath = this.currentPath? this.currentPath: 'root';
 
     if(this.currentPath?.charAt(this.currentPath.length - 1) === "/")
@@ -369,18 +367,20 @@ export class TableSortableComponent implements OnInit {
   }
 
   async downloadFileElement(fileElement: FileElement) {
-
     //get file metadata and current file path
-    let getFilePath = await this.fileService.getStorageFilePath(fileElement);
+    let filePath = await this.fileService.getStorageFilePath(fileElement);
 
-    if(getFilePath){
-      this.fileService.downloadFile(getFilePath);
+    if(fileElement.isFolder)
+    {
+      await downloadFolderAsZip(filePath);
     }
 
+    if(filePath){
+      this.fileService.downloadFile(filePath);
+    }
   }
 
   async deleteElement(element: FileElement) {
-
     this.currentPath = this.currentPath? this.currentPath: 'root';
 
     if(this.currentPath?.charAt(this.currentPath.length - 1) === "/")
@@ -479,12 +479,10 @@ export class TableSortableComponent implements OnInit {
   }
   
   async updateFileElementQuery(element?: FileElement) {
-     
     this.currentRoot = element;
     await this.fileService.fireStoreCollections();
 
     this.fileElements = await this.fileService.queryInFolder(this.currentRoot ? this.currentRoot.id : 'root');
-
   }
 
   private async getParentFolder(parentPath?: string, folderName?: string): Promise<FileElement>{
