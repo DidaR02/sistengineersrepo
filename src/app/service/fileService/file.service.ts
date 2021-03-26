@@ -26,6 +26,7 @@ export interface IFileService {
   getStorageFilePath(fileElement: FileElement);
   createStoreDocumentUpload(filePath?: string, docId?: string ,file?: File, date?: string) :Promise<string>;
   updateProgress(id: string, update: Partial<FileElement>);
+  getDownloadItems(fileId :string);
 }
 
 @Injectable()
@@ -43,6 +44,8 @@ export class FileService implements IFileService {
   fileInfo: [Observable<string>, any];
   @Input() file: File;
   task: AngularFireUploadTask;
+
+  parentChildList: Map<FileElement, FileElement[]>;
 
   constructor(private fireStore: AngularFirestore, private fireStorage: AngularFireStorage, private uploadcomponent: UploadComponent) {}
 
@@ -263,7 +266,78 @@ private renderMap(result: FileElement){
   this.map.set(result.id, this.clone(result));
 }
 
+private childList: FileElement[];
+private parent : FileElement;
+private parentList : FileElement[];
 
+getDownloadItems(fileId :string)
+{
+  this.parentChildList = new Map<FileElement, FileElement[]>();
+  this.parentList = [];
+  this.childList = [];
+    
+  this.map.forEach((rootFile) =>{
+    if(rootFile.isFolder && rootFile.id === fileId)
+    {
+      this.addParentList(rootFile);
+        //create standalone root files
+      this.addChildList(rootFile);
+      this.addParentChildList(rootFile, this.childList);
+      this.childList = [];
+      
+      if(this.parentList.length>0)
+      {
+        for(var i = 0; i < this.parentList.length; i++)
+        {
+          this.parentList.forEach((parentFolder)=>{
+            this.addParentList(parentFolder);
+          });
+
+          i++;
+        }
+      }
+    }
+  });
+
+  //create parentchildlist
+  if(this.parentList.length >0){
+    
+    this.parentList.forEach((parent) =>{
+      this.addChildList(parent);
+      this.addParentChildList(parent, this.childList);
+      this.childList = [];
+    });
+  }
+  
+  return this.parentChildList
+}
+
+addParentChildList(parentFile: FileElement, subfile: FileElement[])
+{
+  this.parentChildList.set(parentFile, this.childList);
+}
+
+addChildList(parentFile: FileElement)
+{
+  this.map.forEach((subFile) =>{
+    if(!subFile.isFolder && subFile.parent === parentFile.id)
+    {
+      this.childList.push(subFile);
+    }
+  });
+}
+
+addParentList(parentFile: FileElement)
+{
+  this.map.forEach((subParent) =>{
+    if(subParent.isFolder && subParent.parent === parentFile.id)
+    {
+      let doesParentExist = this.parentList.find(x => x.id === subParent.id)
+      if(!doesParentExist)
+        this.parentList.push(subParent);
+    }
+  });
+}
 
 async fireStoreCollections()
 {
@@ -518,13 +592,6 @@ async fireStoreCollections()
         this.parentId = document.id;
         return this.parentId;
       }
-  
-      // else if(document.exists && document.id)
-      // {
-      //   this.parentId = document.id;
-      //   return this.parentId;
-      // }
-
       return this.parentId;
     }
   

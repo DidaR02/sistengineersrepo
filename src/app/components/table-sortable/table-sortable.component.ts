@@ -358,28 +358,23 @@ export class TableSortableComponent implements OnInit {
       this.currentPath = this.currentPath.slice(0,-1);
     }
 
-    var findCurrentFolder = this.currentPath.split('/');
-    var currentFolder = findCurrentFolder[findCurrentFolder.length -1];
-
-    var fileElement = await this.getParentFolder(this.currentPath, currentFolder);
-
-    this.downloadFileElement(element);
-  }
-
-  async downloadFileElement(fileElement: FileElement) {
-    //get file metadata and current file path
-    let filePath = await this.fileService.getStorageFilePath(fileElement);
-
-    if(fileElement.isFolder)
-    {
-      await downloadFolderAsZip(filePath);
+    if(element.isFolder)
+    {  
+      var downLoadFolderlist = this.fileService.getDownloadItems(element.id);
+      console.log("getDownloadItems response: ", downLoadFolderlist);
+      await downloadFolderAsZip(element, this.fileService);
+      return;
     }
-
-    if(filePath){
+    else{
+      let filePath = await this.fileService.getStorageFilePath(element);
       this.fileService.downloadFile(filePath);
+      return;
     }
   }
 
+  clone(element: FileElement) {
+    return JSON.parse(JSON.stringify(element));
+  }
   async deleteElement(element: FileElement) {
     this.currentPath = this.currentPath? this.currentPath: 'root';
 
