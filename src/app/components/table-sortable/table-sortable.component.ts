@@ -403,7 +403,6 @@ export class TableSortableComponent implements OnInit {
     fileInput.files = null; 
     fileInput.click();  
   }
-
   async onDrop(files: FileList) {
 
     for (let i = 0; i < files.length; i++) {
@@ -419,6 +418,12 @@ export class TableSortableComponent implements OnInit {
 
     var findCurrentFolder = this.currentPath.split('/');
     var currentFolder = findCurrentFolder[findCurrentFolder.length -1];
+
+    let getParentFolder = await this.getParentFolder(this.currentPath, currentFolder);
+
+    if(getParentFolder?.id){
+      this.currentRoot = getParentFolder;
+    }
 
     const newFileList = this.fileService.removeFileDuplicate(this.files);
 
@@ -439,13 +444,13 @@ export class TableSortableComponent implements OnInit {
     if(newFileList.length > 0){
       for(var file =0 ; file < newFileList.length; file++)
       {
+        
         const docId = await this.fileService.createStoreDocumentUpload(this.currentPath, null, newFileList[file], fulldate);
         
         let uploadPrcnt = await this.fileService.uploadFile(this.currentPath, docId, newFileList[file], this.currentRoot);
-        
+
         //Todo, set percentage on the Observable
         this.fileElements = await this.fileService.queryInFolder(this.currentRoot ? this.currentRoot.id : 'root');
-
         this.fileElements.subscribe(
           value => 
           {
@@ -460,18 +465,86 @@ export class TableSortableComponent implements OnInit {
         )
 
         uploadPrcnt.toPromise().then
-        (
-          async ()=>{
-            
-            this.fileElements = await this.fileService.queryInFolder(this.currentRoot ? this.currentRoot.id : 'root');
-          }
-        );
+          (
+            async ()=>{
+              
+              this.fileElements = await this.fileService.queryInFolder(this.currentRoot ? this.currentRoot.id : 'root');
+            }
+          );
       }
     }
 
-    this.fileElements = await this.fileService.queryInFolder(this.currentRoot ? this.currentRoot.id : 'root');
     this.files = [];
   }
+
+  // async onDrop(files: FileList) {
+
+  //   for (let i = 0; i < files.length; i++) {
+  //     this.files.push(files.item(i));
+  //   }
+
+  //   this.currentPath = this.currentPath ? this.currentPath: 'root';
+
+  //   if(this.currentPath?.charAt(this.currentPath.length - 1) === "/")
+  //   {
+  //     this.currentPath = this.currentPath.slice(0,-1);
+  //   }
+
+  //   var findCurrentFolder = this.currentPath.split('/');
+  //   var currentFolder = findCurrentFolder[findCurrentFolder.length -1];
+
+  //   const newFileList = this.fileService.removeFileDuplicate(this.files);
+
+  //   const today = new Date();
+
+  //   //let time = today.getTime();
+  //   // adjust 0 before single digit date
+  //   const date = ("0" + today.getDate()).slice(-2);
+
+  //   // current month
+  //   const month = ("0" + (today.getMonth() + 1)).slice(-2);
+
+  //   // current year
+  //   const year = today.getFullYear();
+
+  //   const fulldate = year + month + date;
+
+  //   if(newFileList.length > 0){
+  //     for(var file =0 ; file < newFileList.length; file++)
+  //     {
+  //       const docId = await this.fileService.createStoreDocumentUpload(this.currentPath, null, newFileList[file], fulldate);
+        
+  //       let uploadPrcnt = await this.fileService.uploadFile(this.currentPath, docId, newFileList[file], this.currentRoot);
+        
+  //       //Todo, set percentage on the Observable
+  //       this.fileElements = await this.fileService.queryInFolder(this.currentRoot ? this.currentRoot.id : 'root');
+
+  //       this.fileElements.subscribe(
+  //         value => 
+  //         {
+  //           value.forEach(file =>
+  //             {
+  //               if(file.id == docId)
+  //               {
+  //                 file.uploadProgress = uploadPrcnt
+  //               }
+  //             })
+  //         }
+  //       )
+
+  //       uploadPrcnt.toPromise().then
+  //       (
+  //         async ()=>{
+            
+  //           this.fileElements = await this.fileService.queryInFolder(this.currentRoot ? this.currentRoot.id : 'root');
+  //         }
+  //       );
+  //     }
+  //   }
+
+  //   this.fileElements = await this.fileService.queryInFolder(this.currentRoot ? this.currentRoot.id : 'root');
+  //   this.files = [];
+  // }
   
   async updateFileElementQuery(element?: FileElement) {
     this.currentRoot = element;

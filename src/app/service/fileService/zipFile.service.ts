@@ -3,7 +3,6 @@ import firebase from 'firebase/app';
 import { saveAs } from 'file-saver';
 import { FileElement } from 'src/app/models/file-element/file-element';
 import { FileService } from 'src/app/service/fileService/file.service';
-import { folder } from 'jszip';
 
 export const downloadFolderAsZip = async (mainParent: FileElement, fileService: FileService) => {
 
@@ -12,61 +11,80 @@ export const downloadFolderAsZip = async (mainParent: FileElement, fileService: 
     if(downLoadFolderlist.size > 0)
     {
         const filePath = await fileService.getStorageFilePath(mainParent);
-        const folderRef = firebase.storage().ref(filePath);
+        const mainFolderRef = firebase.storage().ref(filePath);
         const jszip = new JSZip();
         let downloadedFiles: any;
-        let fileItems: any[];
+        let fileItems: any[] = [];
+        let folderRefList: firebase.storage.Reference[] = [];
 
-        let folderSize: number = 0;
+        folderRefList.push(mainFolderRef);
 
-        folderRef.listAll()
-        .then((res) => {
+        if(folderRefList)
+        {
+            var newfolder:any = null;
 
-            if(res.prefixes.length > 0)
+            for(var i = 0 ; i <= folderRefList.length - 1; i++)
             {
-                res.prefixes.forEach(async (folderPrefRef) => { 
+                fileItems = [];
+                downloadedFiles = null;
 
-                //if folder ids match, then checkfiles
-                jszip.folder(folderPrefRef.name);
+                var nextFolder = folderRefList[i];
 
+                await nextFolder.listAll()
+                .then(async (res) => {
+
+                    res.prefixes.forEach((folderPrefRef) => {
+                        folderRefList.push(
+                            firebase.storage().ref(folderPrefRef.fullPath)
+                        );
+                    });
+                    
+                    res.items.forEach((itemRef) => {
+                        fileItems.push(itemRef);
+                    });
+                }).catch((error) => {
+                console.log("download folder errors. \n", error)
                 });
-            }
-            
-            res.items.forEach(async (itemRef) => {
-                fileItems.push(itemRef);
 
                 const downloadUrls: Array<string> = await Promise.all(
-                    fileItems.map(({ name }) => folderRef.child(name).getDownloadURL())
+                    fileItems.map(({ name }) => nextFolder.child(name).getDownloadURL())
                 );
+
                 downloadedFiles = await Promise.all(downloadUrls.map(url => fetch(url).then(res => res.blob())));
-                downloadedFiles.forEach((file, i) => jszip.file(fileItems[i].name, file));
-            });
+
+                if(nextFolder.fullPath === mainFolderRef.fullPath && nextFolder.name === mainFolderRef.name)
+                {
+                    downloadedFiles.forEach((file: null, i: string | number) => jszip.file(fileItems[i].name, file));
+                }
+                else
+                {
+                    newfolder = jszip.folder(nextFolder.name);
+                    downloadedFiles.forEach((file: null, i: string | number) => newfolder.file(fileItems[i].name, file));
+                }
+            }
 
             const content = jszip.generateAsync({ type: 'blob' }).then(
                 (content) =>{
-                    console.log(content);
-                    saveAs(content, folderRef.name);
+                    saveAs(content, mainFolderRef.name);
                 }
             );
-            
-        }).catch((error) => {
-            console.log("download folderRef errors.")
-        });
+        }
 
-        
-        // for (let [key, value] of downLoadFolderlist) {
-        //     if(key.parent === "root")
-        //     {
-
-        //     }
-        //     console.log(key, value);
-        // }
-        
-        // for(folderSize; folderSize <= downLoadFolderlist.size; folderSize++){
-
-            
-
-        //     folderSize++;
-        // }
     }
 };
+
+      
+// for (let [key, value] of downLoadFolderlist) {
+//     if(key.parent === "root")
+//     {
+
+//     }
+//     console.log(key, value);
+// }
+
+// for(folderSize; folderSize <= downLoadFolderlist.size; folderSize++){
+
+    
+
+//     folderSize++;
+// }
