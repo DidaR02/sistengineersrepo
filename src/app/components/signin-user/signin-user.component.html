@@ -38,19 +38,37 @@
                     <div class="formGroup">
                         <button type="submit" class="btn btn-success btn-primary" (click)="authService.SignIn(email.value, password.value)">Sign In</button>
                     </div>
-
-                    <div class="signup-div" style="padding-top: 15px;">
-                        <p>
-                            I do not have an account.
-                            <span>
-                                <li class="signup-item" style="list-style-type: none;">
-                                    <a class="sign-link" (click)="redirectToRegister()">
-                                        <i class="fas fa-sign-in-alt"></i>Sign Up New Account
+                    <div class="col-md-6">
+                        <div class="forgot-password" style="padding-top: 15px;">
+                            <p>
+                                Forgot password?
+                                <span>
+                                <li class="resetpassword-item" style="list-style-type: none;">
+                                    <a class="resetpassword-link" (click)="resetPassword()">
+                                        <i class="fas fa-sign-in-alt"></i>Reset password
                                     </a>
                                 </li>
                             </span>
-                        </p>
+                            </p>
+                        </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="forgot-password" style="padding-top: 15px;">
+                            <div class="signup-div" style="padding-top: 15px;">
+                                <p>
+                                    I do not have an account.
+                                    <span>
+                                        <li class="signup-item" style="list-style-type: none;">
+                                            <a class="sign-link" (click)="redirectToRegister()">
+                                                <i class="fas fa-sign-in-alt"></i>Sign Up New Account
+                                            </a>
+                                        </li>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- </form> -->
                 </div>
             </div>

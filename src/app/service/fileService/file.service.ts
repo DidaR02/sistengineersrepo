@@ -363,19 +363,16 @@ async uploadFile(parentPath?: string, docId?: string,  fileToUpload?: File, curr
   const ref = this.fireStorage.ref(path);
 
   let findParentFromPath = path.split('/');
-  let prnt = findParentFromPath[findParentFromPath.length - 2];
+  let parentFolder = findParentFromPath[findParentFromPath.length - 2];
 
   if (PrntFilePath.charAt(PrntFilePath.length - 1) === "/") {
     PrntFilePath = PrntFilePath.slice(0, -1);
   }
 
-  // let getParentPathId = await this.getParentId(prnt, PrntFilePath);
-  // getParentPathId = getParentPathId ? getParentPathId : prnt;
-  
   let setMetadata = {
     customMetadata: {
-      'parentId': currentFoler.id,
-      'parentName': currentFoler.name,
+      'parentId': currentFoler?.id ?? 'root',
+      'parentName': currentFoler?.name ?? parentFolder,
       'parentPath': PrntFilePath,
       'isFolder': 'false'
     }
@@ -469,8 +466,7 @@ async uploadFile(parentPath?: string, docId?: string,  fileToUpload?: File, curr
           .doc('/' + docId)
           .update(updateFileDetails)
           .then(() => {
-            console.log('done updating document details.');
-            alert("Document added");
+            //alert("Document added");
           })
           .catch(function(error) {
           console.error('Error writing document: ', error);
@@ -491,159 +487,6 @@ async uploadFile(parentPath?: string, docId?: string,  fileToUpload?: File, curr
   //this.fireStoreCollections();
   return this.percentage;
 }
-
-  // async uploadFile(parentPath?: string, docId?: string,  fileToUpload?: File, currentFoler?: FileElement) {
-
-  //   parentPath = (parentPath === "root" || parentPath === undefined || parentPath === null) ? this.defaultPublicRootFilePath : this.defaultPublicRootFilePath + parentPath;
-  //   const path = parentPath ? parentPath.charAt(parentPath.length - 1) === "/" ? parentPath + fileToUpload.name : parentPath +"/" + fileToUpload.name : `${this.defaultPublicRootFilePath}${fileToUpload.name}`;
-  //   let PrntFilePath = parentPath ? parentPath : this.defaultPublicRootFilePath;
-
-  //   const ref = this.fireStorage.ref(path);
-
-  //   let findParentFromPath = path.split('/');
-  //   let prnt = findParentFromPath[findParentFromPath.length - 2];
-
-  //   if (PrntFilePath.charAt(PrntFilePath.length - 1) === "/") {
-  //     PrntFilePath = PrntFilePath.slice(0, -1);
-  //   }
-
-  //   let getParentPathId: string;
-
-  //   //Confirm current folder
-  //   if(currentFoler)
-  //   {
-  //    let getParentFolder = await this.getParentFolder(parentPath, currentFoler.name);
-
-  //     if(getParentFolder?.id){
-  //       getParentPathId = getParentFolder.id;
-  //     }
-  //   }
-  //   else
-  //   {
-  //     getParentPathId = await this.getParentId(prnt, PrntFilePath);
-  //   }
-
-  //   getParentPathId = getParentPathId ? getParentPathId : prnt;
-    
-  //   let setMetadata = {
-  //     customMetadata: {
-  //       'parentId': getParentPathId,
-  //       'parentName': prnt,
-  //       'parentPath': PrntFilePath,
-  //       'isFolder': 'false'
-  //     }
-  //   };
-
-  //   const today = new Date();
-
-  //   //let time = today.getTime();
-  //   // adjust 0 before single digit date
-  //   const date = ("0" + today.getDate()).slice(-2);
-
-  //   // current month
-  //   const month = ("0" + (today.getMonth() + 1)).slice(-2);
-
-  //   // current year
-  //   const year = today.getFullYear();
-
-  //   const fulldate = year + month + date;
-
-  //   if(!docId){
-  //     docId = this.fireStore.createId()  + "_" + fulldate;
-  //   }
-
-  //   this.task = this.fireStorage.upload(path, fileToUpload);
-
-  //   this.percentage = this.task.percentageChanges();
-
-  //   var newCustomMetaData: any = null;
-
-  //   this.task.snapshotChanges().pipe(
-  //     finalize(
-        
-  //       async () =>  {
-        
-  //         this.downloadURL = await this.fireStorage.ref(path).getDownloadURL().toPromise();
-
-  //         await this.fireStorage.ref(path).updateMetadata(setMetadata).toPromise().then(
-  //           function (newMetaData) {
-  //             newCustomMetaData = newMetaData;
-  //           });
-
-  //         var findParentFromPath = path.split('/');
-  //         var prnt = findParentFromPath[findParentFromPath.length -2];
-
-  //         if(PrntFilePath.charAt(PrntFilePath.length - 1) === "/")
-  //         {
-  //           PrntFilePath = PrntFilePath.slice(0,-1);
-  //         }
-
-  //         this.metaData = await this.fireStorage.ref(path).getMetadata().toPromise();
-
-  //         var metadata = {
-  //           customMetadata: {
-  //             'parentId': this.metaData?.customMetadata?.parentId ?? getParentPathId,
-  //             'parentName': this.metaData?.customMetadata?.parentName ?? prnt,
-  //             'parentPath': PrntFilePath,
-  //             'isFolder': 'false',
-  //             'fullPath': this.metaData?.fullPath
-  //           }
-  //         }
-
-  //         await this.fireStorage.ref(path).updateMetadata(metadata).toPromise().then(
-  //           function(metaData){
-  //             newCustomMetaData = metaData;
-  //           });
-          
-  //         this.metaData = newCustomMetaData;
-
-  //         const updateFileDetails = {
-  //           "downloadURL": this.downloadURL ? this.downloadURL : '',
-  //           "fullPath": this.metaData?.fullPath ? this.metaData?.fullPath : '' ,
-  //           "metaData": {
-  //             'contentDisposition': this.metaData?.contentDisposition,
-  //             'contentType': this.metaData?.contentType,
-  //             'customMetadata': this.metaData?.customMetadata,
-  //             'isFolder': this.metaData?.customMetadata?.isFolder,
-  //             'parentId': getParentPathId,
-  //             'parentName': this.metaData?.customMetadata?.parentName ?? prnt,
-  //             'parentPath': PrntFilePath,
-  //             'fullPath': this.metaData?.fullPath,
-  //             'name': this.metaData?.name,
-  //             'size': this.metaData?.size,
-  //             'timeCreated': this.metaData?.timeCreated,
-  //             'type': this.metaData?.type,
-  //             'updated': this.metaData?.updated,
-  //           },
-  //           "parent": getParentPathId ? getParentPathId : '',
-  //           "timeCreated": today,
-  //           }
-
-  //           await this.fireStore.collection('files')
-  //           .doc('/' + docId)
-  //           .update(updateFileDetails)
-  //           .then(() => {
-  //             //ToDo, Add a variable that will bubble up to the html to sett styling of fading while uploading
-  //           })
-  //           .catch(function(error) {
-  //           console.error('Error writing document: ', error);
-  //           alert("Error writing document.");
-  //           });
-          
-  //           let newFileElement = this.get(docId);
-  //           newFileElement.downloadURL = this.downloadURL.toString();
-            
-  //           let element = this.map.get(docId);
-  //           element = Object.assign(element, newFileElement);
-  //           this.map.set(element.id, element);
-          
-  //           this.fireStoreCollections();
-  //       })//end finalise async
-  //     ).subscribe(); //end snapshotChanges finalise
-    
-    
-  //   return this.percentage;
-  // }
 
   async getParentFolder(parentPath?: string, folderName?: string): Promise<FileElement>{
 

@@ -27,7 +27,6 @@ import { DropzoneDirective } from './service/fileService/dropzone.directive';
 import { UploadTaskComponent } from './components/upload-task/upload-task.component';
 import { UploaderComponent } from './components/uploader/uploader.component';
 import { UploadComponent } from './service/fileService/upload';
-import { FileTableModule } from './components/file-table/file-table.module';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
@@ -51,7 +50,6 @@ import { CommonModule } from '@angular/common';
     CommonModule,
     AppRoutingModule,
     FileExplorerModule,
-    FileTableModule,
     MatDialogModule,
     FlexLayoutModule,
     MatCardModule,

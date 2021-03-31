@@ -10,8 +10,10 @@ const routes: Routes = [
   { path: '', redirectTo: '/sign-in', pathMatch: 'full'},
   { path: 'register-user', redirectTo: '/register-user', pathMatch: 'full'},
   { path: 'dashboard', redirectTo: '/dashboard', pathMatch: 'full',},
-  { path: 'forgot-password', redirectTo: '/forgot-password', pathMatch: 'full'},
+  { path: 'forgot-password', redirectTo: '/forgotPassword', pathMatch: 'full'},
+  { path: 'forgotPassword', component: ForgotPasswordComponent},
   { path: 'verify-email-address', redirectTo: '/verify-email-address', pathMatch: 'full'},
+  { path: 'login', redirectTo: '/sign-in', pathMatch: 'full'},
   { path: 'signin', component: SignInUserComponent},
   { path: 'sign-in', component: SignInUserComponent},
   { path: 'register-user', component: SignUpUserComponent},
@@ -19,7 +21,6 @@ const routes: Routes = [
     loadChildren: ()=> import('./components/dashboard/dashboard.module').then(dashModule => dashModule.DashboardModule),
     canActivate: [AuthGuard]
   },
-  { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'verify-email-address', component: VerifyEmailComponent }
   
 ];

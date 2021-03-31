@@ -51,6 +51,10 @@ export class SignInUserComponent implements OnInit {
   {
     this.router.navigate(['register-user']);
   }
+  
+  resetPassword(){
+    this.router.navigate(['forgotPassword']);
+  }
 
   resetErrorMsg()
   {

@@ -14,7 +14,7 @@ export class SignUpUserComponent implements OnInit {
 
   isPasswordValid : boolean = true;
 
-  constructor(public authenticationService: AuthenticationService, public router: Router,) { }
+  constructor(public authenticationService: AuthenticationService, public router: Router) { }
 
   ngOnInit(): void {
   }

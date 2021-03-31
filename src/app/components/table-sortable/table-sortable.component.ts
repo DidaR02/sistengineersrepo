@@ -83,7 +83,6 @@ export class TableSortableComponent implements OnInit {
   canAddFile: boolean = true;
   canMove: boolean = true;
 
-  //uploadProgress: any;
   uploadProgress: Observable<number>;
 
   filter = new FormControl('')
@@ -280,7 +279,23 @@ export class TableSortableComponent implements OnInit {
   
   pushToPath(path: string, folderName: string) {
     let p = path ? path : '';
-    p += `${folderName}/`;
+    if(path != 'root' && path?.charAt(this.currentPath.length - 1) === "/")
+    {
+      p += `${folderName}/`;
+    }
+    if(path != 'root' && path?.charAt(this.currentPath.length - 1) != "/")
+    {
+      p += `/${folderName}/`;
+    }
+    if(path === 'root')
+    {
+      p = `Files/${folderName}/`;
+    }
+    if(!path)
+    {
+      p = `${folderName}/`;
+    }
+
     return p;
   }
 
@@ -376,15 +391,21 @@ export class TableSortableComponent implements OnInit {
     return JSON.parse(JSON.stringify(element));
   }
   async deleteElement(element: FileElement) {
-    this.currentPath = this.currentPath? this.currentPath: 'root';
+
+    this.currentPath = this.currentPath ? this.currentPath: 'root';
+
+    if(this.currentPath === 'root')
+    {
+      this.currentPath = null;
+    }
 
     if(this.currentPath?.charAt(this.currentPath.length - 1) === "/")
     {
       this.currentPath = this.currentPath.slice(0,-1);
     }
 
-    var findCurrentFolder = this.currentPath.split('/');
-    var currentFolder = findCurrentFolder[findCurrentFolder.length -1];
+    var findCurrentFolder = this.currentPath?.split('/');
+    var currentFolder = findCurrentFolder ? findCurrentFolder[findCurrentFolder.length -1] : null;
 
     var fileElement = await this.getParentFolder(this.currentPath, currentFolder);
 
@@ -394,7 +415,7 @@ export class TableSortableComponent implements OnInit {
 
   async removeElement(element: FileElement) {
     await this.fileService.delete(element?.metaData?.fullPath,element);
-    this.updateFileElementQuery(this.currentRoot);
+    await this.updateFileElementQuery(this.currentRoot);
   }
 
   //Launch the file upload window.
@@ -409,21 +430,21 @@ export class TableSortableComponent implements OnInit {
       this.files.push(files.item(i));
     }
 
-    this.currentPath = this.currentPath ? this.currentPath: 'root';
+    this.currentPath = this.currentPath ? this.currentPath: null;
 
     if(this.currentPath?.charAt(this.currentPath.length - 1) === "/")
     {
       this.currentPath = this.currentPath.slice(0,-1);
     }
 
-    var findCurrentFolder = this.currentPath.split('/');
-    var currentFolder = findCurrentFolder[findCurrentFolder.length -1];
+    var findCurrentFolder = this.currentPath?.split('/');
+    var currentFolder = findCurrentFolder ? findCurrentFolder[findCurrentFolder.length -1] : null;
 
-    let getParentFolder = await this.getParentFolder(this.currentPath, currentFolder);
-
-    if(getParentFolder?.id){
-      this.currentRoot = getParentFolder;
-    }
+    this.getParentFolder(this.currentPath, currentFolder).then(
+      (parentFolder) => {
+        this.currentRoot = parentFolder;
+      }
+    );
 
     const newFileList = this.fileService.removeFileDuplicate(this.files);
 
@@ -467,84 +488,14 @@ export class TableSortableComponent implements OnInit {
         uploadPrcnt.toPromise().then
           (
             async ()=>{
-              
-              this.fileElements = await this.fileService.queryInFolder(this.currentRoot ? this.currentRoot.id : 'root');
+              this.updateFileElementQuery(this.currentRoot ?? this.currentRoot);
             }
           );
       }
-    }
 
+    }
     this.files = [];
   }
-
-  // async onDrop(files: FileList) {
-
-  //   for (let i = 0; i < files.length; i++) {
-  //     this.files.push(files.item(i));
-  //   }
-
-  //   this.currentPath = this.currentPath ? this.currentPath: 'root';
-
-  //   if(this.currentPath?.charAt(this.currentPath.length - 1) === "/")
-  //   {
-  //     this.currentPath = this.currentPath.slice(0,-1);
-  //   }
-
-  //   var findCurrentFolder = this.currentPath.split('/');
-  //   var currentFolder = findCurrentFolder[findCurrentFolder.length -1];
-
-  //   const newFileList = this.fileService.removeFileDuplicate(this.files);
-
-  //   const today = new Date();
-
-  //   //let time = today.getTime();
-  //   // adjust 0 before single digit date
-  //   const date = ("0" + today.getDate()).slice(-2);
-
-  //   // current month
-  //   const month = ("0" + (today.getMonth() + 1)).slice(-2);
-
-  //   // current year
-  //   const year = today.getFullYear();
-
-  //   const fulldate = year + month + date;
-
-  //   if(newFileList.length > 0){
-  //     for(var file =0 ; file < newFileList.length; file++)
-  //     {
-  //       const docId = await this.fileService.createStoreDocumentUpload(this.currentPath, null, newFileList[file], fulldate);
-        
-  //       let uploadPrcnt = await this.fileService.uploadFile(this.currentPath, docId, newFileList[file], this.currentRoot);
-        
-  //       //Todo, set percentage on the Observable
-  //       this.fileElements = await this.fileService.queryInFolder(this.currentRoot ? this.currentRoot.id : 'root');
-
-  //       this.fileElements.subscribe(
-  //         value => 
-  //         {
-  //           value.forEach(file =>
-  //             {
-  //               if(file.id == docId)
-  //               {
-  //                 file.uploadProgress = uploadPrcnt
-  //               }
-  //             })
-  //         }
-  //       )
-
-  //       uploadPrcnt.toPromise().then
-  //       (
-  //         async ()=>{
-            
-  //           this.fileElements = await this.fileService.queryInFolder(this.currentRoot ? this.currentRoot.id : 'root');
-  //         }
-  //       );
-  //     }
-  //   }
-
-  //   this.fileElements = await this.fileService.queryInFolder(this.currentRoot ? this.currentRoot.id : 'root');
-  //   this.files = [];
-  // }
   
   async updateFileElementQuery(element?: FileElement) {
     this.currentRoot = element;
