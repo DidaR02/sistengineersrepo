@@ -43,9 +43,9 @@ export class DashboardComponent implements OnInit {
       {
         switch(url){
           case "manageFiles": {
-            if(this.userAccess && this.userAccess.disableView)
+            if(this.userAccess && this.userAccess?.disableView)
             {
-              if(url in this.userAccess.disableView)
+              if(url in this.userAccess?.disableView)
               {
                 this.viewDashboard = false
               }
@@ -57,9 +57,9 @@ export class DashboardComponent implements OnInit {
             break;
           }
           case "userProfile": {
-            if(this.userAccess && this.userAccess.disableView)
+            if(this.userAccess && this.userAccess?.disableView)
             {
-              if(url in this.userAccess.disableView)
+              if(url in this.userAccess?.disableView)
               {
                 this.viewDashboard = false
               }
@@ -100,9 +100,9 @@ export class DashboardComponent implements OnInit {
           return;
         }
         //if user cant view dashboard, redirect user to no access page.
-        if(this.userAccess.disableView)
+        if(this.userAccess?.disableView)
         {
-          let dashBoardAccess: string[] = this.userAccess.disableView;
+          let dashBoardAccess: string[] = this.userAccess?.disableView;
           for( var entries in dashBoardAccess) {
             if (entries == "dashboard")
             {

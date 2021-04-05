@@ -14,14 +14,9 @@
             "**/node_modules/**"
         ],
         "rewrites": [{
-                "source": "**",
-                "destination": "/index.html"
-            },
-            {
-                "source": "/sign-in",
-                "destination": "/sign-in"
-            }
-        ]
+            "source": "**",
+            "destination": "/index.html"
+        }]
     },
     "storage": {
         "rules": "storage.rules"

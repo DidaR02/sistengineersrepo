@@ -34,7 +34,7 @@ export class UserProfileComponent implements OnInit {
     public router: Router,
     //public toastr: ToastrService
   ) {
-    if(this.authService.isLoggedIn)
+    if(this.authService?.isLoggedIn)
     {
       this.createSignInUser();
       this.authService.getLocalUserData();
@@ -46,7 +46,7 @@ export class UserProfileComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if(this.authService.isLoggedIn)
+    if(this.authService?.isLoggedIn)
     {
     this.getUserInfo();
     this.GetAllUsers();
@@ -60,27 +60,27 @@ export class UserProfileComponent implements OnInit {
 
   async getUserInfo()
   {
-    let userSignedIn = await this.createSignInUser();
+    await this.createSignInUser();
 
-    if(this.authService.isLoggedIn)
+    if(this.authService?.isLoggedIn)
     {
       if(!this.userAccess)
       {
-        await this.authService.getLocalUserData();
+        this.authService.getLocalUserData();
         await this.createSignInUser();
       }
 
-      if(this.authService.userAccess)
+      if(this.authService?.userAccess)
       {
-        this.userAccess = this.authService.userAccess;
+        this.userAccess = this.authService?.userAccess;
       }
 
       if(this.userAccess)
       {
         //if user cant view dashboard, redirect user to no access page.
-        if(this.userAccess.disableView)
+        if(this.userAccess?.disableView)
         {
-          let dashBoardAccess: string[] = this.userAccess.disableView;
+          let dashBoardAccess: string[] = this.userAccess?.disableView;
           for( var entries in dashBoardAccess) {
             if (entries == "userProfile")
             {
@@ -138,11 +138,13 @@ export class UserProfileComponent implements OnInit {
         };
       };
     
-    this.signedInUser = {
-      Uid: this.user.uid?? null,
-      User: this.user ?? null,
-      UserAccess: this.userAccess?? null
-    };
+      if(this.user){
+        this.signedInUser = {
+        Uid: this.user.uid?? null,
+        User: this.user ?? null,
+        UserAccess: this.userAccess?? null
+      };
+    }
 
     localStorage.setItem('signedInUser', JSON.stringify(this.signedInUser));
     return this.signedInUser;
