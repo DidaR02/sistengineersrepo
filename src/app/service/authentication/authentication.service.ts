@@ -33,15 +33,14 @@ export class AuthenticationService {
     }
   
     // Sign in with email/password
-    SignIn(email, password) {
+    SignIn(email: string, password: string) {
       return this.afAuth.signInWithEmailAndPassword(email, password)
         .then((result) => {
           this.ngZone.run(() => {
+            this.GetUserAccess(result.user);
+            this.GetDbUserAccount(result.user);
             this.router.navigate(['dashboard']);
-          });
-        
-          this.GetUserAccess(result.user);
-          this.GetDbUserAccount(result.user);
+          })
         }).catch((error) => {
           let errorMsg = "Error Signing in:" + error;
           window.alert(errorMsg);

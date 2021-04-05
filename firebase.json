@@ -7,16 +7,21 @@
         "indexes": "firestore.indexes.json"
     },
     "hosting": {
-        "public": "dist\\sistengineers",
+        "public": "dist/sistengineers",
         "ignore": [
             "firebase.json",
             "**/.*",
             "**/node_modules/**"
         ],
         "rewrites": [{
-            "source": "**",
-            "destination": "/index.html"
-        }]
+                "source": "**",
+                "destination": "/index.html"
+            },
+            {
+                "source": "/sign-in",
+                "destination": "/sign-in"
+            }
+        ]
     },
     "storage": {
         "rules": "storage.rules"

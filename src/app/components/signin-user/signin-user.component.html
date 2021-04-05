@@ -10,66 +10,66 @@
                     <h1>Already have sign in credentials!</h1>
                     <br>
 
-                    <!-- <form [formGroup]="signInFormGroup" id="signIn-form" action="#"> -->
+                    <form [formGroup]="signInFormGroup" id="signIn-form" action="#">
 
-                    <div class="panel panel-primary">
+                        <div class="panel panel-primary">
 
-                        <div class="panel-body">
-                            <div class="form-row">
-                                <div class="form-group col-md-6 formGroup">
-                                    <input type="email" class="form-control" id="email" name="email" #email required placeholder="Email *" aria-required="true">
+                            <div class="panel-body">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6 formGroup">
+                                        <input type="email" class="form-control" formControlName="Email" id="email" name="email" #email required placeholder="Email *" aria-required="true">
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="form-row">
-                                <div class="form-group col-md-6 formGroup">
-                                    <input type="password" class="form-control" id="password" name="password" #password required placeholder="Password *" aria-required="true">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6 formGroup">
+                                        <input type="password" class="form-control" formControlName="Password" id="password" name="password" #password required placeholder="Password *" aria-required="true">
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div *ngIf="!isUserSignInAllowed">
-                                <div class="alert alert-danger alert-dismissible">
-                                    <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="resetErrorMsg()">&times;</a>
-                                    <strong>Sign in error!</strong> Please check your details and retry sign in.
+                                <div *ngIf="!isUserSignInAllowed">
+                                    <div class="alert alert-danger alert-dismissible">
+                                        <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="resetErrorMsg()">&times;</a>
+                                        <strong>Sign in error!</strong> Please check your details and retry sign in.
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="formGroup">
-                        <button type="submit" class="btn btn-success btn-primary" (click)="authService.SignIn(email.value, password.value)">Sign In</button>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="forgot-password" style="padding-top: 15px;">
-                            <p>
-                                Forgot password?
-                                <span>
+                        <div class="formGroup">
+                            <button type="submit" class="btn btn-success btn-primary" (click)="submitSignInDetails()">Sign In</button>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="forgot-password" style="padding-top: 15px;">
+                                <p>
+                                    Forgot password?
+                                    <span>
                                 <li class="resetpassword-item" style="list-style-type: none;">
                                     <a class="resetpassword-link" (click)="resetPassword()">
                                         <i class="fas fa-sign-in-alt"></i>Reset password
                                     </a>
                                 </li>
                             </span>
-                            </p>
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="forgot-password" style="padding-top: 15px;">
-                            <div class="signup-div" style="padding-top: 15px;">
-                                <p>
-                                    I do not have an account.
-                                    <span>
+                        <div class="col-md-6">
+                            <div class="forgot-password" style="padding-top: 15px;">
+                                <div class="signup-div" style="padding-top: 15px;">
+                                    <p>
+                                        I do not have an account.
+                                        <span>
                                         <li class="signup-item" style="list-style-type: none;">
                                             <a class="sign-link" (click)="redirectToRegister()">
                                                 <i class="fas fa-sign-in-alt"></i>Sign Up New Account
                                             </a>
                                         </li>
                                     </span>
-                                </p>
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- </form> -->
+                    </form>
                 </div>
             </div>
         </div>

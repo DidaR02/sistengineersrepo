@@ -150,7 +150,7 @@ export class UserProfileComponent implements OnInit {
 
   async GetAllUsers()
   {
-    if(this.userAccess.isAdmin)
+    if(this.userAccess?.isAdmin)
     {
       let users = this.userManagerService.GetAllUsers();
       console.log(this.userList);

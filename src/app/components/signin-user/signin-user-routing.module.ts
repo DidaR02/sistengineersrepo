@@ -5,8 +5,8 @@ import { SignInUserComponent } from './signin-user.component';
 
 const routes: Routes = [
   {
-    path: '', component: SignInUserComponent, canActivate: [AuthGuard]
-  }
+    path: '', component: SignInUserComponent
+  },
 ];
 
 @NgModule({

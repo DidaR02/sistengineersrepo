@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "wisebox-5acef"
+    "default": "sist-engineers",
+    "production": "sist-engineers"
   }
 }

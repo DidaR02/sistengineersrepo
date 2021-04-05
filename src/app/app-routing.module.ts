@@ -19,7 +19,6 @@ const routes: Routes = [
   { path: 'register-user', component: SignUpUserComponent},
   { path: 'dashboard',
     loadChildren: ()=> import('./components/dashboard/dashboard.module').then(dashModule => dashModule.DashboardModule),
-    canActivate: [AuthGuard]
   },
   { path: 'verify-email-address', component: VerifyEmailComponent }
   
