@@ -146,7 +146,7 @@ export class TableSortableComponent implements OnInit {
 
         if(this.userAccess?.disableView)
         {
-          let dashBoardAccess: string[] = this.userAccess.disableView;
+          let dashBoardAccess: string[] = this.userAccess?.disableView;
           for( var entries in dashBoardAccess) {
             if (entries == "dashboard")
             {

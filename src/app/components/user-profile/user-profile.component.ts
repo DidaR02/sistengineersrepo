@@ -31,32 +31,36 @@ export class UserProfileComponent implements OnInit {
   constructor(
     public authService: AuthenticationService,
     public userManagerService: UserManagerService,
-    public router: Router,
-    //public toastr: ToastrService
+    public router: Router
   ) {
-    if(this.authService?.isLoggedIn)
-    {
-      this.createSignInUser();
-      this.authService.getLocalUserData();
-    }
-    else
-    {
-      this.router.navigate(['signin']);
-    }
+    // if(this.authService?.isLoggedIn)
+    // {
+      //this.authService.getLocalUserData();
+      this.refreshAll();
+    // }
+    // else
+    // {
+    //   this.router.navigate(['signin']);
+    // }
   }
 
   ngOnInit(): void {
-    if(this.authService?.isLoggedIn)
-    {
-    this.getUserInfo();
-    this.GetAllUsers();
-    }
-    else
-    {
-      this.router.navigate(['signin']);
-    }
+    // if(this.authService?.isLoggedIn)
+    // {
+     // this.authService.getLocalUserData();
+     this.refreshAll();
+    // }
+    // else
+    // {
+    //   this.router.navigate(['signin']);
+    // }
   }
   
+  async refreshAll()
+  {
+    this.getUserInfo();
+    this.GetAllUsers();
+  }
 
   async getUserInfo()
   {
