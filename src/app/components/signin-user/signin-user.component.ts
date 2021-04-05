@@ -29,7 +29,7 @@ export class SignInUserComponent implements OnInit {
     Password: new FormControl()
   });
 
-  submitSignInDetails()
+  async submitSignInDetails()
   {
     this.isUserSignInAllowed = true;
 
@@ -39,7 +39,7 @@ export class SignInUserComponent implements OnInit {
 
     if(email && password)
     {
-      this.authService.SignIn(email, password);
+      await this.authService.SignIn(email, password);
     }
     else
     {

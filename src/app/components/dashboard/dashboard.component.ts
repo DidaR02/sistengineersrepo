@@ -160,12 +160,14 @@ export class DashboardComponent implements OnInit {
         };
       };
     
-    
-    this.signedInUser = {
-      Uid: this.user.uid?? null,
-      User: this.user ?? null,
-      UserAccess: this.userAccess?? null
-    };
+    if(this.user){
+        this.signedInUser = {
+        Uid: this.user.uid?? null,
+        User: this.user ?? null,
+        UserAccess: this.userAccess?? null
+      };
+    }
+
 
     localStorage.setItem('signedInUser', JSON.stringify(this.signedInUser));
     return this.signedInUser;
