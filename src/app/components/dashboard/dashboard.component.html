@@ -28,7 +28,7 @@
         </nav>
 
         <!-- Main content -->
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mainContent">
             <div class="inner-adjust">
 
                 <div *ngIf="viewDashboard ; else elseBlock" class="dashboard-router">
@@ -36,7 +36,7 @@
                 </div>
                 <ng-template #elseBlock>
                     <div class="alert alert-warning">
-                        <strong>No User Access!</strong> You do not have permission to view this page. Please contact your administrator.
+                        <strong>No User Access !</strong> You do not have permission to view this page. Please contact your administrator.
                     </div>
                 </ng-template>
             </div>

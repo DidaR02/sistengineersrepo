@@ -17,7 +17,7 @@
 }
 
 .dropzone:hovering {
-    border: 2px solid #f16624;
+    border: 2px solid #7c5c4d;
     color: #dadada !important;
 }
 
@@ -34,7 +34,6 @@ body {
     height: 100% !important;
     display: inline-block;
     width: 100%;
-    /* margin: 0; */
     font-family: Roboto, "Helvetica Neue", sans-serif;
     font-size: 14px;
 }
@@ -42,7 +41,6 @@ body {
 .footer {
     height: 150px;
     text-align: center;
-    /* font-size: 1.1vw; */
 }
 
 

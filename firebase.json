@@ -14,9 +14,18 @@
             "**/node_modules/**"
         ],
         "rewrites": [{
-            "source": "**",
-            "destination": "/index.html"
-        }]
+                "source": "**",
+                "destination": "/index.html"
+            },
+            {
+                "source": "/dashboards",
+                "destination": "/index.html"
+            },
+            {
+                "source": "/dashboard/manageFiles",
+                "destination": "/index.html"
+            }
+        ]
     },
     "storage": {
         "rules": "storage.rules"

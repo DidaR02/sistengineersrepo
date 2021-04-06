@@ -1,5 +1,6 @@
 <h1 mat-dialog-title>Copy this link to share</h1>
 <div mat-dialog-content>{{displayItem}}</div>
 <div mat-dialog-actions>
+    <button *ngIf="shareLink" mat-button [cdkCopyToClipboard]="displayItem">Copy Link</button>
     <button mat-button mat-dialog-close>Close</button>
 </div>

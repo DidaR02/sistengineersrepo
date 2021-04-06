@@ -65,7 +65,8 @@ progress::-webkit-progress-value {
 
 .table {
     height: 100% auto;
-    overflow-y: auto;
+    width: 100%;
+    /* overflow-y: auto; */
 }
 
 .tbBody {

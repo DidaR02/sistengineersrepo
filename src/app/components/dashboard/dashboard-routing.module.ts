@@ -4,6 +4,7 @@ import { AuthGuard } from 'src/app/service/guard/auth.guard';
 import { DashboardComponent } from './dashboard.component';
 
 const routes: Routes = [
+  {path: '', component: DashboardComponent},
   { path: '', component: DashboardComponent,
     children: [
     {
