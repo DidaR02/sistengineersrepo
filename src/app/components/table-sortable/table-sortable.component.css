@@ -70,7 +70,8 @@ progress::-webkit-progress-value {
 }
 
 .tbBody {
-    overflow: scroll;
+    width: 100%;
+    /* overflow: scroll; */
 }
 
 .row-checkbox {
@@ -81,6 +82,7 @@ progress::-webkit-progress-value {
 .row-item {
     width: 100%;
     text-align: left;
+    word-break: break-word;
 }
 
 .row-item-span {
@@ -102,5 +104,16 @@ progress::-webkit-progress-value {
 @media screen and (max-width: 600px) {
     .file-command {
         padding-bottom: 20px;
+    }
+    .table {
+        max-width: 600px;
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .table {
+        max-width: 400px;
+        width: 100%;
     }
 }
