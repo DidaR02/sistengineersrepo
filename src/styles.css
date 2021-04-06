@@ -48,7 +48,9 @@ body {
 
 /* If the screen size is 600px wide or less, set the font-size*/
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 600px) {}
+
+@media screen and (max-width: 860px) {
     .footer .container {
         /* font-size: 3vw; */
         padding: 0px;
