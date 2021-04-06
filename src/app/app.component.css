@@ -268,7 +268,6 @@ svg#clouds {
 
 .fileExplore center {
     height: 100%;
-    /* margin: 20px; */
 }
 
 .mat-card-container {
@@ -321,5 +320,9 @@ svg#clouds {
     }
     .mat-card {
         margin-bottom: 20px;
+    }
+    .fileExplore {
+        padding: 0px;
+        margin: 0px;
     }
 }
