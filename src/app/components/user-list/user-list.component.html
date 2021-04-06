@@ -1,4 +1,4 @@
-<div class="listUsers" style="margin: 3px; padding: 6px;">
+<div class="listUsers">
     <ul class="users">
         <li *ngFor="let user of userList" [class.selected]="user === selectedUser" (click)="onSelect(user,userAccess)">
             <span class="badge">{{user.firstName}} {{user.lastName}}</span> {{user.firstName}} {{user.lastName}}
@@ -6,7 +6,7 @@
     </ul>
 </div>
 
-<div *ngIf="selectedUser">
+<div *ngIf="selectedUser" class="selectedUser">
     <form [formGroup]="manageUserGroups" id="editUser-form" action="#">
         <h2>{{selectedUser.firstName | uppercase}} {{selectedUser.lastName | uppercase}} Details</h2>
         <div><span>id: </span>{{selectedUser.uid}}</div>

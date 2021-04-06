@@ -9,10 +9,12 @@
 </form>
 
 
+<mat-icon aria-hidden="false" aria-label="homer" (click)="backToRoot()">home</mat-icon>
+<span class="iconSpace"></span>
 <mat-icon *ngIf="canNavigateUp" class="pointer" (click)="navigateUp()">
     arrow_back
 </mat-icon>
-<span style="margin-left: 8px; font-size: 14px;font-weight: 400px;"> {{currentPath || 'Files'}} </span>
+<span style="margin-left: 8px; font-size: 14px;font-weight: 400px;"> {{currentPath !='root' ?  currentPath : 'Files' || 'Files'}} </span>
 
 <span class="spacer"></span>
 
@@ -100,10 +102,10 @@
         <mat-icon>edit</mat-icon>
         <span>Rename</span>
       </button> -->
-        <!-- <button [disabled]="!canShare" mat-menu-item (click)="openShareDialog(self)">
+        <button [disabled]="!canShare || self.isFolder" mat-menu-item (click)="openShareDialog(self)">
         <mat-icon>share</mat-icon>
         <span>Share</span>
-        </button> -->
+        </button>
         <button [disabled]="!canDelete" mat-menu-item [matMenuTriggerData]="{self: self}" (click)="deleteElement(self)">
         <mat-icon [disabled]="!canDelete">delete</mat-icon>
         <span>Delete</span>

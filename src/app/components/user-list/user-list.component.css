@@ -5,6 +5,11 @@
 
 /* HeroesComponent's private CSS styles */
 
+.listUsers {
+    margin: 3px;
+    padding: 6px;
+}
+
 .users {
     margin: 0 0 3em 0;
     list-style-type: none;
@@ -61,4 +66,18 @@
 
 input {
     padding: .5rem;
+}
+
+@media screen and (max-width: 600px) {
+    .listUsers,
+    .selectedUser {
+        max-width: 100%;
+    }
+}
+
+@media screen and (max-width: 860px) {
+    .listUsers,
+    .selectedUser {
+        max-width: 100%;
+    }
 }

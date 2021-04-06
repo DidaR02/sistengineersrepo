@@ -35,6 +35,7 @@ import { NewFolderDialogModule } from './components/new-folder-dialog/new-folder
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgbAlertComponent } from './components/ngb-alert/ngb-alert.component';
 import { CommonModule } from '@angular/common';
+import { ShareDialogModule } from './components/share-dialog/share-dialog.module';
 
 @NgModule({
   declarations: [
@@ -67,7 +68,8 @@ import { CommonModule } from '@angular/common';
     ReactiveFormsModule,
     RenameDialogModule,
     NewFolderDialogModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    ShareDialogModule
   ],
   providers: [
     AuthenticationService,

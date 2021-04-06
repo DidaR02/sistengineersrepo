@@ -16,6 +16,7 @@ import { AuthenticationService } from 'src/app/service/authentication/authentica
 import { Router } from '@angular/router';
 import { DataTypeConversionService } from 'src/app/service/shared/dataType-conversion.service';
 import { downloadFolderAsZip } from '../../service/fileService/zipFile.service';
+import { ShareDialogComponent } from '../share-dialog/share-dialog.component';
 
 export type SortColumn = keyof FileElement | '';
 export type SortDirection = 'asc' | 'desc' | '';
@@ -257,6 +258,16 @@ export class TableSortableComponent implements OnInit {
         }
     }
   }
+  
+  async backToRoot()
+  {
+    if(this.canNavigateUp){
+      this.currentPath = 'root';
+      await this.updateFileElementQuery();
+      this.currentRoot = null;
+      this.canNavigateUp = false;
+    }
+  }
 
   async navigateBackUp(element: FileElement) {
     if (this.currentRoot && this.currentRoot.parent === 'root') {
@@ -346,7 +357,14 @@ export class TableSortableComponent implements OnInit {
 
   openShareDialog(element: FileElement)
   {
-    
+    let dialogRef = this.dialog.open(ShareDialogComponent,
+      {
+        data: { 
+          shareLink: element.downloadURL,
+          shareZipFolder: null
+        }
+      });
+
   }
 
   moveElement(self: FileElement, element: FileElement){

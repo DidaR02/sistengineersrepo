@@ -94,6 +94,10 @@ progress::-webkit-progress-value {
     background-color: #ff5313;
 }
 
+.iconSpace {
+    padding: 10px 10px;
+}
+
 @media screen and (max-width: 600px) {
     .file-command {
         padding-bottom: 20px;
