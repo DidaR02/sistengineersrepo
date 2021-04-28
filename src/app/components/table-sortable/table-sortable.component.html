@@ -8,7 +8,6 @@
     </div>
 </form>
 
-
 <mat-icon aria-hidden="false" aria-label="homer" (click)="backToRoot()">home</mat-icon>
 <span class="iconSpace"></span>
 <mat-icon *ngIf="canNavigateUp" class="pointer" (click)="navigateUp()">
@@ -42,25 +41,24 @@
 <label class="file-label"> </label>
 <input type="file" #fileInput id="fileUpload" (change)="onDrop($event.target.files)" name="fileUpload" multiple="multiple" accept="*" style="display:none;" />
 
-
 <table class="table">
     <thead>
         <tr>
-            <th scope="col"></th>
+            <!-- <th scope="col"></th> -->
             <th scope="col" sortable="name" (sort)="onSort($event)">Name</th>
             <th scope="col"></th>
         </tr>
     </thead>
     <tbody class="tbBody">
         <tr *ngFor="let file of fileElements | async" (dblclick)="navigate(file)">
-            <td scope="row" class="row-checkbox">
+            <!-- <td scope="row" class="row-checkbox">
                 <mat-checkbox class="tbl-checkbox" (click)="fileChecked(file)">
                 </mat-checkbox>
-            </td>
+            </td> -->
             <td scope="row" class="row-item" [term]="filter.value">
 
                 <div *ngIf="file.isFolder">
-                    <mat-icon [ngStyle]="{'color':'#92CEFF'}" class="file-or-folder-icon pointer" *ngIf="file.isFolder">
+                    <mat-icon [ngStyle]="{'color':'#92CEFF'}" class=" fa file-or-folder-icon pointer" *ngIf="file.isFolder">
                         folder
                     </mat-icon>
                     <span class="row-item-span"> {{ file.name }} </span>
@@ -68,10 +66,11 @@
 
                 <div *ngIf="!file.isFolder">
                     <a *ngIf="!file.isFolder" style="text-decoration: none; color: inherit !important;" [href]="file.downloadURL" target="_blank" rel="noopener noreferrer" class="urlLink">
-                        <mat-icon [ngStyle]="{'color':'#78726e'}" class="file-or-folder-icon pointer" *ngIf="!file.isFolder">
-                            insert_drive_file
+                        <mat-icon svgIcon="myCustomIcon:myCustomIcon" *ngIf="!file.isFolder || getFileTypeIcon(file)" [ngStyle]="{'color':'#78726e'}" class="fa file-or-folder-icon pointer">
+                            <!-- <span *ngIf="getFileTypeIcon(file)"></span> -->
                         </mat-icon>
-                        <span class="row-item-span"> {{ file.name }} </span>
+                        <li></li>
+                        <span class="row-item-span"> {{ file.name }}</span>
                         <br>
                         <span class="row-item-span"> {{ file.size }}</span>
                     </a>

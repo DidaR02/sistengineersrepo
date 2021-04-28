@@ -36,6 +36,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgbAlertComponent } from './components/ngb-alert/ngb-alert.component';
 import { CommonModule } from '@angular/common';
 import { ShareDialogModule } from './components/share-dialog/share-dialog.module';
+import { HttpClientModule } from "@angular/common/http";
+import { IconService } from './service/iconService/icon.service';
+import { APP_INITIALIZER } from '@angular/core';
 
 @NgModule({
   declarations: [
@@ -69,13 +72,24 @@ import { ShareDialogModule } from './components/share-dialog/share-dialog.module
     RenameDialogModule,
     NewFolderDialogModule,
     BrowserAnimationsModule,
-    ShareDialogModule
+    ShareDialogModule,
+    HttpClientModule
   ],
   providers: [
     AuthenticationService,
     UploadComponent,
-    FileService
+    FileService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initIconService,
+      deps: [IconService],
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+
+export function initIconService(iconService: IconService) {
+  return () => iconService.init();
+}

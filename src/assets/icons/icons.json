@@ -1,0 +1,26 @@
+{
+    "icons-array": [
+        "file-adobeBridge",
+        "file-adobeEffects",
+        "file-adobeIllustrator",
+        "file-adobeIndesign",
+        "file-adobeLightroom",
+        "file-adobePhotoshop",
+        "file-adobePremiere",
+        "file-audio",
+        "file-cad-icon",
+        "file-cad",
+        "file-excel-icon",
+        "file-excel",
+        "file-image",
+        "file-pdf-icon",
+        "file-pdf",
+        "file-powerpoint",
+        "file-ppt-icon",
+        "file-txt-default",
+        "file-zip",
+        "file-video",
+        "file-word",
+        "file-word2"
+    ]
+}

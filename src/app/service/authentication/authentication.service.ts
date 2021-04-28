@@ -31,13 +31,24 @@ export class AuthenticationService {
         this.router.navigate(['signin']);
       }
     }
-  
+
     // Sign in with email/password
     async SignIn(email: string, password: string) {
       try {
         const result = await this.afAuth.signInWithEmailAndPassword(email, password);
-        this.GetUserAccess(result.user);
-        this.GetDbUserAccount(result.user);
+        let userAccount = this.GetDbUserAccount(result.user);
+
+        if(userAccount && (userAccount.emailVerified != true && result.user.emailVerified))
+        {
+          userAccount.emailVerified = result.user.emailVerified;
+        }
+
+        //check if user login first time and verified
+        this.SetFsUserData(userAccount, result.user);
+        this.SetDbUserData(userAccount, result.user);
+
+        //this.GetUserAccess(result.user);
+
         this.ngZone.run(() => {
           this.router.navigate(['dashboard']);
         });
@@ -170,6 +181,8 @@ export class AuthenticationService {
         }
         this.afsDb.database.ref(`tb_user/${user.uid}`)
         .set(userData);
+
+        localStorage.setItem('user', JSON.stringify(userData));
       }
     }
 
@@ -239,7 +252,7 @@ export class AuthenticationService {
             disableView: null,
             canDelete: "false",
             isAdmin: "false",
-            adminAccessLevel: "noAccess",
+            adminAccessLevel: "partialAccess",
             partialAccess: null
           };
         }
@@ -256,6 +269,7 @@ export class AuthenticationService {
     }
 
      GetDbUserAccount(user) {
+
       if(user)
       {
         const userAccount = this.afsDb.database.ref('tb_user/' + user?.uid);
@@ -264,9 +278,8 @@ export class AuthenticationService {
           const userAccount = snapshot.val();
 
           localStorage.setItem('user', JSON.stringify(userAccount));
-          //this.userData
-          return JSON.parse(localStorage.getItem('user'));
         });
       }
+      return JSON.parse(localStorage.getItem('user')) as User;
     }
   }

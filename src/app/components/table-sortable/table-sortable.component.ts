@@ -4,7 +4,7 @@ import {FileElement} from '../../models/file-element/file-element';
 import { FileService } from '../../service/fileService/file.service';
 import { FormControl } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
-import { map, startWith } from 'rxjs/operators';
+import { first, map, startWith } from 'rxjs/operators';
 import { NewFolderDialogComponent } from '../new-folder-dialog/new-folder-dialog.component';
 import { RenameDialogComponent } from '../rename-dialog/rename-dialog.component';
 import { MatMenuTrigger } from '@angular/material/menu';
@@ -17,6 +17,8 @@ import { Router } from '@angular/router';
 import { DataTypeConversionService } from 'src/app/service/shared/dataType-conversion.service';
 import { downloadFolderAsZip } from '../../service/fileService/zipFile.service';
 import { ShareDialogComponent } from '../share-dialog/share-dialog.component';
+import { MatIconRegistry } from "@angular/material/icon";
+import { DomSanitizer } from "@angular/platform-browser";
 
 export type SortColumn = keyof FileElement | '';
 export type SortDirection = 'asc' | 'desc' | '';
@@ -98,7 +100,9 @@ export class TableSortableComponent implements OnInit {
     public authService: AuthenticationService,
     public pipe: DecimalPipe,
     public dialog: MatDialog,
-    public convertDataType: DataTypeConversionService)
+    private convertDataType: DataTypeConversionService,
+    private matIconRegistry: MatIconRegistry,
+    private domSanitizer: DomSanitizer)
     { 
       this.authService.getLocalUserData();
       this.getUserInfo();
@@ -120,7 +124,16 @@ export class TableSortableComponent implements OnInit {
   }
 
   async ngOnInit(element?: FileElement){
-      this.updateFileElementQuery(element); 
+      await this.updateFileElementQuery(element);
+
+      // var filesItem = this.fileElements.subscribe(
+      //   (val)=> {
+      //     if(val && val.length > 0){
+      //       var iconUrl =this.getCustomeIconUrl(val[0].metaData?.contentType);
+      //       this.addIconSvg("myCustomIcon", iconUrl)
+      //     }
+      //   }
+      // )
   }
 
   async getUserInfo()
@@ -236,6 +249,340 @@ export class TableSortableComponent implements OnInit {
   //       return direction === 'asc' ? res : -res;
   //     });
   //   }
+   }
+
+   getFileTypeIcon(file?: FileElement)
+   {
+    var iconUrl =this.getCustomeIconUrl(file.metaData?.contentType);
+    this.addIconSvg("myCustomIcon", iconUrl)
+
+     if(file && file.metaData)
+     {
+       if(file.metaData.contentType)
+       {
+         switch (file.metaData.contentType)
+         {
+          case "application/msword": 
+          case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+          case "application/vnd.ms-word.document.macroenabled.12":
+          case "application/vnd.openxmlformats-officedocument.wordprocessingml.template": 
+          {
+            return "../assets/icons/file-word.svg";
+          }
+          case "application/vnd.ms-excel":
+          case "application/vnd.ms-excel.sheet.macroenabled.12": 
+          case "application/vnd.ms-excel.template.macroenabled.12":
+          case "application/vnd.ms-excel.sheet.binary.macroenabled.12": 
+          case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+          case "application/vnd.openxmlformats-officedocument.spreadsheetml.template": 
+          {return "../assets/icons/file-excel.svg"} 
+          case "application/vnd.ms-powerpoint":
+          case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+          case "application/vnd.openxmlformats-officedocument.presentationml.slide": 
+          case "application/vnd.openxmlformats-officedocument.presentationml.slideshow":
+          case "application/vnd.openxmlformats-officedocument.presentationml.template":
+          case "application/vnd.ms-powerpoint.addin.macroenabled.12":
+          case "application/vnd.ms-powerpoint.slide.macroenabled.12":
+          case "application/vnd.ms-powerpoint.presentation.macroenabled.12":
+          case "application/vnd.ms-powerpoint.slideshow.macroenabled.12":
+          case "application/vnd.ms-powerpoint.template.macroenabled.12":
+            {return "../assets/icons/file-powerpoint.svg"}
+          case "application/acad":
+          case "application/clariscad":
+          case "application/dxf":
+          case "application/x-dwf":
+          case "application/x-dwf":
+          case "application/set":
+            {return "../assets/icons/file-cad.svg"}
+          case "application/mp4":
+          case "audio/mpeg":
+          case "audio/adpcm":
+          case "audio/x-aac":
+          case "audio/x-aiff":
+          case "audio/x-aiff":
+          case "audio/vnd.dece.audio":
+          case "audio/vnd.digital-winds":
+          case "audio/vnd.dts":
+          case "audio/vnd.rip":
+          case "audio/vnd.lucent.voice":
+          case "audio/x-mpegurl":
+          case "audio/vnd.ms-playready.media.pya":
+          case "audio/x-ms-wma":
+          case "audio/x-ms-wax":
+          case "audio/midi":
+          case "audio/mpeg":
+          case "audio/mp4":
+          case "audio/x-wav":
+              {return "../assets/icons/file-audio.svg"}
+          case "image/vnd.dxf":
+          case "image/bmp":
+          case "image/prs.btif":
+          case "image/vnd.dvb.subtitle":
+          case "image/x-cmu-raster":
+          case "image/cgm":
+          case "image/x-cmx":
+          case "image/vnd.dece.graphic":
+          case "image/vnd.djvu":
+          case "image/vnd.dwg":
+          case "image/vnd.fujixerox.edmics-mmr":
+          case "image/vnd.fujixerox.edmics-rlc":
+          case "image/vnd.xiff":
+          case "image/vnd.fst":
+          case "image/vnd.fastbidsheet":
+          case "image/vnd.fpx":
+          case "image/vnd.net-fpx":
+          case "image/x-freehand":
+          case "image/g3fax":
+          case "image/gif":
+          case "image/x-icon":
+          case "image/ief":
+          case "image/x-citrix-jpeg":
+          case "image/jpeg":
+          case "image/pjpeg":
+          case "image/vnd.ms-modi":
+          case "image/ktx":
+          case "image/x-pcx":
+          case "image/x-pict":
+          case "image/x-portable-anymap":
+          case "image/x-portable-bitmap":
+          case "image/x-portable-graymap":
+          case "image/x-png":
+          case "image/x-portable-pixmap":
+          case "image/svg+xml":
+          case "image/tiff":
+          case "image/webp":
+          case "image/x-xbitmap":
+          case "image/x-xpixmap":
+          case "image/x-xwindowdump":
+          case "image/x-png":
+          case "image/x-portable-pixmap":
+          case "image/svg+xml":
+          case "image/tiff":
+          case "image/webp":
+            {return "../assets/icons/file-image.svg"}
+          case "video/mpeg":
+          case "video/3gpp":
+          case "video/3gpp2":
+          case "video/ogg":
+          case "video/webm":
+          case "video/x-msvideo":
+          // case "audio/x-aiff":
+          // case "audio/x-aiff":
+          case "video/vnd.dece.hd":
+          case "video/vnd.dece.mobile":
+          case "video/vnd.uvvu.mp4":
+          case "video/vnd.dece.pd":
+          case "video/vnd.dece.sd":
+          case "video/vnd.dece.video":
+          case "video/vnd.fvt":
+          case "video/x-f4v":
+          case "video/x-flv":
+          case "video/x-fli":
+          case "video/h263":
+          case "video/h264":
+          case "video/jpm":
+          case "video/jpeg":
+          case "video/x-m4v":
+          case "video/x-ms-asf":
+          case "video/vnd.ms-playready.media.pyv":
+          case "video/x-ms-wm":
+          case "video/x-ms-wmx":
+          case "video/x-ms-wmv":
+          case "video/x-ms-wvx":
+          case "video/mj2":
+          case "video/vnd.mpegurl":
+          case "video/quicktime":
+          case "video/x-sgi-movie":
+          case "video/vnd.vivo":
+              {return "../assets/icons/file-video.svg"}
+          case "image/vnd.adobe.photoshop":
+            {return "../assets/icons/file-adobePhotoshop.svg"}
+          case "application/x-7z-compressed":
+          case "application/x-zip-compressed":
+            {return "../assets/icons/file-zip.svg"}
+          case "application/pdf": 
+            {return "../assets/icons/file-pdf.svg"}
+          default:
+            {return "../assets/icons/file-txt-default.svg"}
+         }
+       }
+     }
+   }
+
+   getCustomeIconUrl(fileType?: string)
+   {
+    if(fileType)
+    {
+        switch (fileType)
+        {
+         case "application/msword": 
+         case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+         case "application/vnd.ms-word.document.macroenabled.12":
+         case "application/vnd.openxmlformats-officedocument.wordprocessingml.template": 
+         {
+           return "../assets/icons/file-word.svg";
+         }
+         case "application/vnd.ms-excel":
+         case "application/vnd.ms-excel.sheet.macroenabled.12": 
+         case "application/vnd.ms-excel.template.macroenabled.12":
+         case "application/vnd.ms-excel.sheet.binary.macroenabled.12": 
+         case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+         case "application/vnd.openxmlformats-officedocument.spreadsheetml.template": 
+          {return "../assets/icons/file-excel.svg"} 
+         case "application/vnd.ms-powerpoint":
+         case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+         case "application/vnd.openxmlformats-officedocument.presentationml.slide": 
+         case "application/vnd.openxmlformats-officedocument.presentationml.slideshow":
+         case "application/vnd.openxmlformats-officedocument.presentationml.template":
+         case "application/vnd.ms-powerpoint.addin.macroenabled.12":
+         case "application/vnd.ms-powerpoint.slide.macroenabled.12":
+         case "application/vnd.ms-powerpoint.presentation.macroenabled.12":
+         case "application/vnd.ms-powerpoint.slideshow.macroenabled.12":
+         case "application/vnd.ms-powerpoint.template.macroenabled.12":
+           {return "../assets/icons/file-powerpoint.svg"}
+         case "application/acad":
+         case "application/clariscad":
+         case "application/dxf":
+         case "application/x-dwf":
+         case "application/x-dwf":
+         case "application/set":
+           {return "../assets/icons/file-cad.svg"}
+         case "application/mp4":
+         case "audio/mpeg":
+         case "audio/adpcm":
+         case "audio/x-aac":
+         case "audio/x-aiff":
+         case "audio/x-aiff":
+         case "audio/vnd.dece.audio":
+         case "audio/vnd.digital-winds":
+         case "audio/vnd.dts":
+         case "audio/vnd.rip":
+         case "audio/vnd.lucent.voice":
+         case "audio/x-mpegurl":
+         case "audio/vnd.ms-playready.media.pya":
+         case "audio/x-ms-wma":
+         case "audio/x-ms-wax":
+         case "audio/midi":
+         case "audio/mpeg":
+         case "audio/mp4":
+         case "audio/x-wav":
+             {return "../assets/icons/file-audio.svg"}
+         case "image/vnd.dxf":
+         case "image/bmp":
+         case "image/prs.btif":
+         case "image/vnd.dvb.subtitle":
+         case "image/x-cmu-raster":
+         case "image/cgm":
+         case "image/x-cmx":
+         case "image/vnd.dece.graphic":
+         case "image/vnd.djvu":
+         case "image/vnd.dwg":
+         case "image/vnd.fujixerox.edmics-mmr":
+         case "image/vnd.fujixerox.edmics-rlc":
+         case "image/vnd.xiff":
+         case "image/vnd.fst":
+         case "image/vnd.fastbidsheet":
+         case "image/vnd.fpx":
+         case "image/vnd.net-fpx":
+         case "image/x-freehand":
+         case "image/g3fax":
+         case "image/gif":
+         case "image/x-icon":
+         case "image/ief":
+         case "image/x-citrix-jpeg":
+         case "image/jpeg":
+         case "image/pjpeg":
+         case "image/vnd.ms-modi":
+         case "image/ktx":
+         case "image/x-pcx":
+         case "image/x-pict":
+         case "image/x-portable-anymap":
+         case "image/x-portable-bitmap":
+         case "image/x-portable-graymap":
+         case "image/x-png":
+         case "image/x-portable-pixmap":
+         case "image/svg+xml":
+         case "image/tiff":
+         case "image/webp":
+         case "image/x-xbitmap":
+         case "image/x-xpixmap":
+         case "image/x-xwindowdump":
+         case "image/x-png":
+         case "image/x-portable-pixmap":
+         case "image/svg+xml":
+         case "image/tiff":
+         case "image/webp":
+           {return "../assets/icons/file-image.svg"}
+         case "video/mpeg":
+         case "video/3gpp":
+         case "video/3gpp2":
+         case "video/ogg":
+         case "video/webm":
+         case "video/x-msvideo":
+         // case "audio/x-aiff":
+         // case "audio/x-aiff":
+         case "video/vnd.dece.hd":
+         case "video/vnd.dece.mobile":
+         case "video/vnd.uvvu.mp4":
+         case "video/vnd.dece.pd":
+         case "video/vnd.dece.sd":
+         case "video/vnd.dece.video":
+         case "video/vnd.fvt":
+         case "video/x-f4v":
+         case "video/x-flv":
+         case "video/x-fli":
+         case "video/h263":
+         case "video/h264":
+         case "video/jpm":
+         case "video/jpeg":
+         case "video/x-m4v":
+         case "video/x-ms-asf":
+         case "video/vnd.ms-playready.media.pyv":
+         case "video/x-ms-wm":
+         case "video/x-ms-wmx":
+         case "video/x-ms-wmv":
+         case "video/x-ms-wvx":
+         case "video/mj2":
+         case "video/vnd.mpegurl":
+         case "video/quicktime":
+         case "video/x-sgi-movie":
+         case "video/vnd.vivo":
+             {return "../assets/icons/file-video.svg"}
+         case "image/vnd.adobe.photoshop":
+           {return "../assets/icons/file-adobePhotoshop.svg"}
+         case "application/x-7z-compressed":
+         case "application/x-zip-compressed":
+           {return "../assets/icons/file-zip.svg"}
+         case "application/pdf": 
+           {return "../assets/icons/file-pdf.svg"}
+         default:
+           {return "../assets/icons/file-txt-default.svg"}
+        }
+      }
+   }
+
+   addIconSvg(iconName: string, iconSvgPath)
+   {
+    //  this.matIconRegistry.addSvgIcon(
+    //   iconName,
+    //   this.domSanitizer.bypassSecurityTrustResourceUrl(iconSvgPath)
+    //  );
+     
+      this.matIconRegistry
+      .addSvgIconInNamespace(
+        iconName,
+        iconName,
+        this.domSanitizer.bypassSecurityTrustResourceUrl(iconSvgPath)
+      )
+      this.matIconRegistry.addSvgIconSetInNamespace(
+        iconName,
+         this.domSanitizer.bypassSecurityTrustResourceUrl(iconSvgPath))
+         this.matIconRegistry.addSvgIcon(
+        iconName,
+        this.domSanitizer.bypassSecurityTrustResourceUrl(iconSvgPath)
+      );
+
+    return true;
    }
 
   navigate(element: FileElement) {

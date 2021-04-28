@@ -16,6 +16,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
 import { UploadComponent } from 'src/app/service/fileService/upload';
 import { FileService } from '../../service/fileService/file.service';
+import { HttpClientModule } from "@angular/common/http";
 
 @NgModule({
   declarations: [NgbdSortableHeader, TableSortableComponent], 
@@ -35,7 +36,8 @@ import { FileService } from '../../service/fileService/file.service';
     MatCardModule,
     NgbModule,
     ReactiveFormsModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    HttpClientModule
   ],
   exports: [
     TableSortableComponent
