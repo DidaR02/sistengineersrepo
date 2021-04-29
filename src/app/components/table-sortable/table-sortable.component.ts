@@ -253,12 +253,9 @@ export class TableSortableComponent implements OnInit {
 
    getFileTypeIcon(file?: FileElement)
    {
-    var iconUrl =this.getCustomeIconUrl(file.metaData?.contentType);
-    this.addIconSvg("myCustomIcon", iconUrl)
-
      if(file && file.metaData)
      {
-       if(file.metaData.contentType)
+       if(file.metaData?.contentType)
        {
          switch (file.metaData.contentType)
          {
@@ -267,7 +264,8 @@ export class TableSortableComponent implements OnInit {
           case "application/vnd.ms-word.document.macroenabled.12":
           case "application/vnd.openxmlformats-officedocument.wordprocessingml.template": 
           {
-            return "../assets/icons/file-word.svg";
+            this.addIconSvg("file-word", "../assets/icons/file-word.svg");
+            return true;
           }
           case "application/vnd.ms-excel":
           case "application/vnd.ms-excel.sheet.macroenabled.12": 
@@ -275,7 +273,10 @@ export class TableSortableComponent implements OnInit {
           case "application/vnd.ms-excel.sheet.binary.macroenabled.12": 
           case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
           case "application/vnd.openxmlformats-officedocument.spreadsheetml.template": 
-          {return "../assets/icons/file-excel.svg"} 
+          {
+            this.addIconSvg("file-excel", "../assets/icons/file-excel.svg");
+            return true;
+          } 
           case "application/vnd.ms-powerpoint":
           case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
           case "application/vnd.openxmlformats-officedocument.presentationml.slide": 
@@ -286,7 +287,10 @@ export class TableSortableComponent implements OnInit {
           case "application/vnd.ms-powerpoint.presentation.macroenabled.12":
           case "application/vnd.ms-powerpoint.slideshow.macroenabled.12":
           case "application/vnd.ms-powerpoint.template.macroenabled.12":
-            {return "../assets/icons/file-powerpoint.svg"}
+          {
+            this.addIconSvg("file-powerpoint", "../assets/icons/file-powerpoint.svg");
+            return true;
+          }
           case "application/acad":
           case "application/clariscad":
           case "application/dxf":
@@ -420,7 +424,8 @@ export class TableSortableComponent implements OnInit {
          case "application/vnd.ms-word.document.macroenabled.12":
          case "application/vnd.openxmlformats-officedocument.wordprocessingml.template": 
          {
-           return "../assets/icons/file-word.svg";
+            this.addIconSvg("file-word", "../assets/icons/file-word.svg");
+           //return "../assets/icons/file-word.svg";
          }
          case "application/vnd.ms-excel":
          case "application/vnd.ms-excel.sheet.macroenabled.12": 
@@ -428,7 +433,10 @@ export class TableSortableComponent implements OnInit {
          case "application/vnd.ms-excel.sheet.binary.macroenabled.12": 
          case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
          case "application/vnd.openxmlformats-officedocument.spreadsheetml.template": 
-          {return "../assets/icons/file-excel.svg"} 
+          {
+            
+            return "../assets/icons/file-excel.svg"
+          } 
          case "application/vnd.ms-powerpoint":
          case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
          case "application/vnd.openxmlformats-officedocument.presentationml.slide": 
@@ -563,24 +571,24 @@ export class TableSortableComponent implements OnInit {
 
    addIconSvg(iconName: string, iconSvgPath)
    {
-    //  this.matIconRegistry.addSvgIcon(
-    //   iconName,
-    //   this.domSanitizer.bypassSecurityTrustResourceUrl(iconSvgPath)
-    //  );
+     this.matIconRegistry.addSvgIcon(
+      iconName,
+      this.domSanitizer.bypassSecurityTrustResourceUrl(iconSvgPath)
+     );
      
-      this.matIconRegistry
-      .addSvgIconInNamespace(
-        iconName,
-        iconName,
-        this.domSanitizer.bypassSecurityTrustResourceUrl(iconSvgPath)
-      )
-      this.matIconRegistry.addSvgIconSetInNamespace(
-        iconName,
-         this.domSanitizer.bypassSecurityTrustResourceUrl(iconSvgPath))
-         this.matIconRegistry.addSvgIcon(
-        iconName,
-        this.domSanitizer.bypassSecurityTrustResourceUrl(iconSvgPath)
-      );
+      // this.matIconRegistry
+      // .addSvgIconInNamespace(
+      //   iconName,
+      //   iconName,
+      //   this.domSanitizer.bypassSecurityTrustResourceUrl(iconSvgPath)
+      // )
+      // this.matIconRegistry.addSvgIconSetInNamespace(
+      //   iconName,
+      //    this.domSanitizer.bypassSecurityTrustResourceUrl(iconSvgPath))
+      //    this.matIconRegistry.addSvgIcon(
+      //   iconName,
+      //   this.domSanitizer.bypassSecurityTrustResourceUrl(iconSvgPath)
+      // );
 
     return true;
    }
