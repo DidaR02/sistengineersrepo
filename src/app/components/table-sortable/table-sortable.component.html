@@ -66,7 +66,7 @@
 
                 <div *ngIf="!file.isFolder">
                     <a *ngIf="!file.isFolder" style="text-decoration: none; color: inherit !important;" [href]="file.downloadURL" target="_blank" rel="noopener noreferrer" class="urlLink">
-                        <mat-icon svgIcon="file-txt-default" *ngIf="!file.isFolder || getFileTypeIcon(file)" [ngStyle]="{'color':'#78726e'}" class="pointer">
+                        <mat-icon svgIcon={{getFileTypeIcon(file)}} *ngIf="!file.isFolder" [ngStyle]="{'color':'#78726e'}" class="pointer">
                         </mat-icon>
                         <span class="row-item-span"> {{ file.name }}</span>
                         <br>

@@ -21,6 +21,8 @@
         "file-zip",
         "file-video",
         "file-word",
-        "file-word2"
+        "file-word2",
+        "file-rvt",
+        "file-civil3d"
     ]
 }
