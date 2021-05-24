@@ -1,0 +1,46 @@
+<!-- Sidebar navigation -->
+<div class="container-fluid">
+    <div class="row">
+
+        <nav class="col-md-2 d-md-block bg-light sidebar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column">
+                    <!-- Calling SignOut() Api from AuthService -->
+                    <li class="nav-item">
+                        <a class="nav-link" (click)="authService.SignOut()">
+                            <i class="fas fa-sign-out-alt"></i>Log out
+                        </a>
+                    </li>
+
+                    <li *ngIf="viewDashboard" class="nav-item" (click)='clickNavigateHandler("userProfile")'>
+                        <a class="nav-link active">
+                            <i class="fas fa-user"></i>User Profile
+                        </a>
+                    </li>
+
+                    <li *ngIf="viewDashboard" class="nav-item" (click)='clickNavigateHandler("manageFiles")'>
+                        <a class="nav-link active">
+                            <i class="fas fa-user"></i>Manage Files
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mainContent">
+            <div class="inner-adjust">
+
+                <div *ngIf="viewDashboard ; else elseBlock" class="dashboard-router">
+                    <router-outlet></router-outlet>
+                </div>
+                <ng-template #elseBlock>
+                    <div class="alert alert-warning">
+                        <strong>No User Access !</strong> You do not have permission to view this page. Please contact your administrator.
+                    </div>
+                </ng-template>
+            </div>
+        </main>
+
+    </div>
+</div>
