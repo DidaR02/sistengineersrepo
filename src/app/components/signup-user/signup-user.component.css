@@ -1,0 +1,40 @@
+.container {
+    height: 100%;
+    margin: auto
+}
+
+.align-items-center {
+    height: 100%;
+    margin: auto
+}
+
+.signup-user {
+    height: 100%;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+    /* font-size: 5vw; */
+}
+
+.panel-heading {
+    border: 0;
+    margin-bottom: 20px;
+}
+
+
+/* If the screen size is 600px wide or less, set the font-size*/
+
+@media screen and (max-width: 600px) {
+    h1 {
+        font-size: 5vw;
+    }
+    label {
+        font-size: 3vw;
+    }
+    input {
+        font-size: 2.7vw;
+        width: 100%;
+    }
+}
