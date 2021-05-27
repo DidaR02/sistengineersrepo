@@ -10,8 +10,6 @@ import { DomSanitizer } from '@angular/platform-browser';
 })
 export class IconService {
   private supportedIcons: any;
-//   private matIconRegistry: MatIconRegistry;
-//   private domSanitizer: DomSanitizer;
 
   constructor(
     private matIconRegistry: MatIconRegistry,
@@ -23,14 +21,10 @@ export class IconService {
     const iconList = '~/../assets/icons/icons.json';
         return new Promise((resolve) => {
 
-          //return new Promise<boolean>((resolve: (a: boolean) => void): void => {
             this.http.get(iconList)
               .pipe(
                 map((iconList) => {
                   this.supportedIcons = iconList;
-                  console.log("InnerIcons", this.supportedIcons.supportedIcons);
-
-                  console.log("InnerIconsX", iconList["supportedIcons"]);
                    for (const icon of this.supportedIcons.supportedIcons) {
 
                     this.matIconRegistry.addSvgIcon(
@@ -44,48 +38,16 @@ export class IconService {
                            this.domSanitizer.bypassSecurityTrustResourceUrl(`./assets/icons/${icon}.svg`)
                          );
                     }
-
-                  // resolve(true);
                 }),
                  catchError((x: { status: number }, caught: Observable<void>): ObservableInput<{}> => {
                    if (x.status !== 404) {
                      resolve(false);
                    }
-                   
                    resolve(true);
                    return of({});
                  })
                ).subscribe();
 
-            //   resolve(true);
-          //}
-          //);
-
-            // (icons) =>
-            // {
-            //     (innerIcons)=>{
-            //         console.log("InnerIcons", innerIcons);
-            //         // for (const icon of icons) {
-            //         //     this.matIconRegistry.addSvgIconInNamespace(
-            //         //       'my-namespace',
-            //         //       icon,
-            //         //       this.domSanitizer.bypassSecurityTrustResourceUrl(`./assets/icons/${icon}.svg`)
-            //         //     );
-            //         //   }
-        
-            //     }
-                
-            //     console.log("Icons", icons);
-            //     // for (const icon of icons) {
-            //     //     this.matIconRegistry.addSvgIconInNamespace(
-            //     //       'my-namespace',
-            //     //       icon,
-            //     //       this.domSanitizer.bypassSecurityTrustResourceUrl(`./assets/icons/${icon}.svg`)
-            //     //     );
-            //     //   }
-
-            // }
-        
              resolve(true);
         });
   }
