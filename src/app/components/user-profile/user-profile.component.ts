@@ -25,7 +25,7 @@ export class UserProfileComponent implements OnInit {
   userList: User[];                 // Save students data in Student's array.
   hideWhenNoUsers: boolean = false; // Hide students data table when no student.
   noData: boolean = false;            // Showing No Student Message, when no student in database.
-  preLoader: boolean = true;    
+  preLoader: boolean = true;
   /*End UsersList*/
 
   constructor(
@@ -33,29 +33,13 @@ export class UserProfileComponent implements OnInit {
     public userManagerService: UserManagerService,
     public router: Router
   ) {
-    // if(this.authService?.isLoggedIn)
-    // {
-      //this.authService.getLocalUserData();
       this.refreshAll();
-    // }
-    // else
-    // {
-    //   this.router.navigate(['signin']);
-    // }
   }
 
   ngOnInit(): void {
-    // if(this.authService?.isLoggedIn)
-    // {
-     // this.authService.getLocalUserData();
      this.refreshAll();
-    // }
-    // else
-    // {
-    //   this.router.navigate(['signin']);
-    // }
   }
-  
+
   async refreshAll()
   {
     this.getUserInfo();
@@ -112,7 +96,7 @@ export class UserProfileComponent implements OnInit {
         };
 
         localStorage.setItem('signedInUser', JSON.stringify(this.signedInUser));
-        JSON.parse(localStorage.getItem('signedInUser'));
+        JSON.parse(localStorage.getItem('signedInUser') ?? '');
         }
         else
         {
@@ -125,10 +109,10 @@ export class UserProfileComponent implements OnInit {
   }
 
   async createSignInUser(){
-    
-    const _signedInUser = JSON.parse(localStorage.getItem('signedInUser'));
-    const _user = JSON.parse(localStorage.getItem('user'));
-    this.userAccess = JSON.parse(localStorage.getItem('userAccess'));
+
+    const _signedInUser = JSON.parse(localStorage.getItem('signedInUser') ?? '');
+    const _user = JSON.parse(localStorage.getItem('user') ?? '');
+    this.userAccess = JSON.parse(localStorage.getItem('userAccess') ?? '');
 
     if(_user){
       this.user = {
@@ -141,7 +125,7 @@ export class UserProfileComponent implements OnInit {
         lastName: _user?.lastName
         };
       };
-    
+
       if(this.user){
         this.signedInUser = {
         Uid: this.user.uid?? null,
@@ -165,10 +149,10 @@ export class UserProfileComponent implements OnInit {
         this.userList = [];
         data.forEach(currentUser => {
 
-          let a = currentUser.payload.toJSON();
+          let a: any = currentUser.payload.toJSON();
           a['uid'] = currentUser.key;
 
-          this.setupUser(a);
+          this.setupUser(a as User);
 
           //this.userList.push(a as User);
         })
@@ -176,7 +160,7 @@ export class UserProfileComponent implements OnInit {
     }
   }
 
-  setupUser(user){
+  setupUser(user: User){
 
     const userData: User = {
       uid: user.uid,
@@ -191,7 +175,7 @@ export class UserProfileComponent implements OnInit {
     this.userList.push(userData as User);
   }
   // Using valueChanges() method to fetch simple list of students data. It updates the state of hideWhenNoStudent, noData & preLoader variables when any changes occurs in student data list in real-time.
-  dataState() {     
+  dataState() {
     this.userManagerService.GetAllUsers().valueChanges().subscribe(data => {
       this.preLoader = false;
       if(data.length <= 0){

@@ -28,12 +28,12 @@ export class DashboardComponent implements OnInit {
     public convertDataType: DataTypeConversionService,
     private route: ActivatedRoute,
     private location: Location
-  ) { 
+  ) {
     this.getUserInfo();
   }
 
   ngOnInit(): void {
-    
+
   }
   async clickNavigateHandler(url: string)
   {
@@ -74,7 +74,7 @@ export class DashboardComponent implements OnInit {
       }
     }
   }
-  
+
   async getUserInfo()
   {
     let userSignedIn = await this.createSignInUser();
@@ -130,7 +130,6 @@ export class DashboardComponent implements OnInit {
         };
 
         localStorage.setItem('signedInUser', JSON.stringify(this.signedInUser));
-        JSON.parse(localStorage.getItem('signedInUser'));
         }
         else
         {
@@ -143,10 +142,10 @@ export class DashboardComponent implements OnInit {
   }
 
   async createSignInUser(){
-    
-    const _signedInUser = JSON.parse(localStorage.getItem('signedInUser'));
-    const _user = JSON.parse(localStorage.getItem('user'));
-    this.userAccess = JSON.parse(localStorage.getItem('userAccess'));
+
+    const _signedInUser = JSON.parse(localStorage.getItem('signedInUser') ?? '');
+    const _user = JSON.parse(localStorage.getItem('user') ?? '');
+    this.userAccess = JSON.parse(localStorage.getItem('userAccess') ?? '');
 
     if(_user){
       this.user = {
@@ -159,7 +158,7 @@ export class DashboardComponent implements OnInit {
         lastName: _user?.lastName
         };
       };
-    
+
     if(this.user){
         this.signedInUser = {
         Uid: this.user.uid?? null,

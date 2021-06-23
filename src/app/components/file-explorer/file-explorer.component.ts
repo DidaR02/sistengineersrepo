@@ -54,8 +54,8 @@ export class FileExplorerComponent implements OnInit {
   ngOnInit() {
     this.breakpoint = (window.innerWidth <= 400) ? 2 : 6;
   }
-  
-  onResize(event) {
+
+  onResize(event: any) {
     this.breakpoint = (event.target.innerWidth <= 400) ? 2 : 6;
   }
 
@@ -72,7 +72,7 @@ export class FileExplorerComponent implements OnInit {
       }
     });
   }
-  
+
   openRenameDialog(element: FileElement) {
     let dialogRef = this.dialog.open(RenameDialogComponent);
     dialogRef.afterClosed().subscribe(res => {
@@ -102,13 +102,13 @@ export class FileExplorerComponent implements OnInit {
         }
     }
   }
-  
+
   @ViewChild("fileInput", {static: false}) fileInput: ElementRef;
 
-  onFileUploadButtonClick() { 
+  onFileUploadButtonClick() {
     let fileInput = this.fileInput.nativeElement;
-    fileInput.files = null; 
-    fileInput.click();  
+    fileInput.files = null;
+    fileInput.click();
   }
 
   toggleHover(event: boolean) {
@@ -119,7 +119,7 @@ export class FileExplorerComponent implements OnInit {
   async onDrop(files: FileList) {
 
     for (let i = 0; i < files.length; i++) {
-      this.files.push(files.item(i));
+      this.files.push(files.item(i) as File);
     }
 
     var currentPath = this.path? this.path: 'root';
@@ -140,13 +140,13 @@ export class FileExplorerComponent implements OnInit {
 
   }
 
-  private async upload(parentPath?: string, fileToUpload?: File[]) { 
+  private async upload(parentPath?: string, fileToUpload?: File[]) {
 
     //await this.fileService.uploadFile(parentPath,fileToUpload);
     this.files = [];
   }
 
-  private async getParentFolder(parentPath?: string, folderName?: string): Promise<FileElement>{
+  private async getParentFolder(parentPath: string, folderName: string): Promise<FileElement>{
     return await this.fileService.getParentFolder(parentPath, folderName);
   }
 }

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+// import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { UserProfileRoutingModule } from './user-profile-routing.module'
 import { UserProfileComponent } from './user-profile.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -17,7 +17,7 @@ import { MatCardModule } from '@angular/material/card';
 import { UserListComponent } from '../user-list/user-list.component';
 
 @NgModule({
-  declarations: [UserProfileComponent, UserListComponent], 
+  declarations: [UserProfileComponent, UserListComponent],
   providers: [],
   imports: [
     UserProfileRoutingModule,
@@ -32,7 +32,7 @@ import { UserListComponent } from '../user-list/user-list.component';
     FormsModule,
     MatButtonModule,
     MatCardModule,
-    NgbModule,
+    // NgbModule,
     ReactiveFormsModule,
     MatCheckboxModule
   ],

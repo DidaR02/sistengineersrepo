@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+// import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,7 +14,7 @@ import { MatCardModule } from '@angular/material/card';
 import { RenameDialogComponent } from './rename-dialog.component';
 
 @NgModule({
-  declarations: [RenameDialogComponent], 
+  declarations: [RenameDialogComponent],
   providers: [ ],
   imports: [
     CommonModule,
@@ -28,7 +28,7 @@ import { RenameDialogComponent } from './rename-dialog.component';
     FormsModule,
     MatButtonModule,
     MatCardModule,
-    NgbModule,
+    // NgbModule,
     ReactiveFormsModule
   ],
   exports: [

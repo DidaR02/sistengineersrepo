@@ -41,13 +41,13 @@ export class SignUpUserComponent implements OnInit {
       {
         let fName: string = signUpDetails.LastName;
         const newUser: User = {
-          uid : null,
+          uid : '',
           firstName : signUpDetails.FirstName,
           lastName : signUpDetails.LastName,
           displayName : fName.substring(0,1).toUpperCase() + ", " +signUpDetails.LastName,
           email : signUpDetails.Email,
           emailVerified : false,
-          photoURL: null
+          photoURL: ''
         };
 
         this.authenticationService.SignUp(newUser, signUpDetails.Password);

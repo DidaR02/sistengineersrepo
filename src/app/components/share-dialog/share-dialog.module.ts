@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+// import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,7 +17,7 @@ import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatNativeDateModule, MatRippleModule} from '@angular/material/core';
 
 @NgModule({
-  declarations: [ShareDialogComponent], 
+  declarations: [ShareDialogComponent],
   providers: [ ],
   imports: [
     CommonModule,
@@ -31,7 +31,7 @@ import {MatNativeDateModule, MatRippleModule} from '@angular/material/core';
     FormsModule,
     MatButtonModule,
     MatCardModule,
-    NgbModule,
+    // NgbModule,
     ReactiveFormsModule,
     ClipboardModule,
     MatButtonToggleModule,

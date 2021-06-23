@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+// import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { SigninRoutingModule } from './signin-user-routing.module'
 import { SignInUserComponent } from './signin-user.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -19,7 +19,7 @@ import { FileService } from '../../service/fileService/file.service';
 //import { DataTypeConversionService } from '../../service/shared/dataType-conversion.service';
 
 @NgModule({
-  declarations: [SignInUserComponent], 
+  declarations: [SignInUserComponent],
   providers: [ UploadComponent, FileService],
   imports: [
     SigninRoutingModule,
@@ -34,7 +34,7 @@ import { FileService } from '../../service/fileService/file.service';
     FormsModule,
     MatButtonModule,
     MatCardModule,
-    NgbModule,
+    // NgbModule,
     ReactiveFormsModule,
     MatCheckboxModule,
   ],

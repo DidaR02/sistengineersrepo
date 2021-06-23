@@ -16,7 +16,7 @@ export class UploadTaskComponent implements OnInit {
 
   task: AngularFireUploadTask;
 
-  percentage: Observable<number>;
+  percentage: Observable<number | undefined>;
   snapshot: Observable<any>;
   downloadURL: string;
   metaData: any;
@@ -56,7 +56,7 @@ export class UploadTaskComponent implements OnInit {
     );
   }
 
-  isActive(snapshot) {
+  isActive(snapshot: any) {
     return snapshot.state === 'running' && snapshot.bytesTransferred < snapshot.totalBytes;
   }
 

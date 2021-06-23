@@ -1,6 +1,6 @@
 import { Injectable, Inject,Input } from '@angular/core';
 
-import { v4 } from 'uuid';
+// import { v4 } from 'uuid';
 import { FileElement } from '../../models/file-element/file-element';
 import { BehaviorSubject, Observable  } from 'rxjs';
 import { AngularFireStorage, AngularFireUploadTask } from '@angular/fire/storage';
@@ -9,35 +9,35 @@ import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/fire
 import { finalize, map, tap } from 'rxjs/operators';
 import {UploadComponent} from './upload';
 import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/style-transforms';
-import { element } from 'protractor';
+// import { element } from 'protractor';
 import * as firebase from 'firebase';
 
 
 export interface IFileService {
-  add(parentRoot: FileElement, fileElement: FileElement);
+  add(parentRoot: FileElement, fileElement: FileElement): any;
   delete(filePath: string, element: FileElement): Promise<any>;
-  update(id: string, update: Partial<FileElement>);
+  update(id: string, update: Partial<FileElement>): any;
   queryInFolder(folderId: string): Promise<Observable<FileElement[]>>;
   get(id: string): FileElement;
-  removeDuplicate(fileList: FileElement[]);
-  fireStoreCollections(folderId: string);
-  uploadFile(parentPath?: string, docId?: string, fileToUpload?: File, currentFoler?: FileElement): Promise<Observable<number>>;
-  moveFile(currentPath, destinationPath);
-  getStorageFilePath(fileElement: FileElement);
-  createStoreDocumentUpload(filePath?: string, docId?: string ,file?: File, date?: string) :Promise<string>;
-  updateProgress(id: string, update: Partial<FileElement>);
-  getDownloadItems(fileId :string);
+  removeDuplicate(fileList: FileElement[]): any;
+  fireStoreCollections(folderId: string): any;
+  uploadFile(fileToUpload: File, parentPath: string, docId: string, currentFoler: FileElement): Promise<Observable<number | any>>;
+  // moveFile(currentPath: string, destinationPath: any): any;
+  getStorageFilePath(fileElement: FileElement): Promise<string>;
+  createStoreDocumentUpload(filePath: string, docId: string ,file: File, date: string) :Promise<string>;
+  updateProgress(id: string, update: Partial<FileElement>): any;
+  getDownloadItems(fileId :string) : any;
 }
 
 @Injectable()
 export class FileService implements IFileService {
-  
+
   private map = new Map<string, FileElement>();
 
   private defaultPublicRootFilePath : string = "SISTEngStorage/SISTEngStorageBucket/PublicBucket/";
   private progressSubject: BehaviorSubject<number>;
 
-  percentage: Observable<number>;
+  percentage: Observable<number | undefined>;
   snapshot: Observable<any>;
   downloadURL: Observable<string>;
   metaData: any;
@@ -49,10 +49,10 @@ export class FileService implements IFileService {
 
   constructor(private fireStore: AngularFirestore, private fireStorage: AngularFireStorage, private uploadcomponent: UploadComponent) {}
 
-  async add(parentRoot: FileElement,fileElement: FileElement) {
-    
+  async add(fileElement: FileElement, parentRoot?: FileElement) {
+
     let isValidFolder : boolean = (fileElement === null || fileElement === undefined) ? false : true;
-    
+
       if(isValidFolder){
 
         const today = new Date();
@@ -69,19 +69,29 @@ export class FileService implements IFileService {
 
         const fulldate = year + month + date;
         const docId = this.fireStore.createId() +"_"+ fulldate;
-        
-        if(fileElement.id === null || fileElement.id === undefined)
+
+        if(!fileElement.id)
             {
               fileElement.id = docId;
-            }
-            const parentPath: string = fileElement.parent === "root" ? this.defaultPublicRootFilePath : parentRoot?.metaData?.fullPath
+        }
+
+        let parentFolferA: string = '';
+
+        if (parentRoot)
+        {
+          parentFolferA = parentRoot.id === 'root' && !parentRoot.metaData ? this.defaultPublicRootFilePath :
+            parentRoot?.metaData ? parentRoot?.metaData?.fullPath : this.defaultPublicRootFilePath;
+        }
+
+        const parentPath: string = fileElement.parent === "root" ? this.defaultPublicRootFilePath : parentFolferA;
+
                 //call upload, caller must decide the folder path and parent nodes
             fileElement.isFolder = true;
             fileElement.parent = parentRoot? parentRoot.id : 'root';
             fileElement.metaData = {
-              fullPath : parentRoot?.metaData?.fullPath ? parentRoot?.metaData?.fullPath +"/"+ fileElement.name : this.defaultPublicRootFilePath + fileElement.name,
+              fullPath : parentFolferA ? parentFolferA +"/"+ fileElement.name : this.defaultPublicRootFilePath + fileElement.name,
               timeCreated : today,
-              size: fileElement.size,
+              size: fileElement.size ?? 0,
               defaultPublicRootFilePath: this.defaultPublicRootFilePath
             }
 
@@ -91,8 +101,7 @@ export class FileService implements IFileService {
               isFolder: fileElement.isFolder,
               fullPath: fileElement?.metaData?.fullPath ? fileElement?.metaData?.fullPath : parentPath +"/"+ fileElement.name,
               parent: fileElement.parent ==="root" ? this.defaultPublicRootFilePath : fileElement.parent,
-              metaData: fileElement.metaData,
-              originalDocumentFolderInfo: fileElement
+              metaData: fileElement.metaData
             });
 
       }
@@ -115,7 +124,7 @@ export class FileService implements IFileService {
 
       await this.fireStore.collection('files').doc(element?.id).delete().then(
         ()=>{
-          this.map.delete(element?.id);
+          this.map.delete(element.id);
         }
       )
       .catch((error)=>{
@@ -168,9 +177,9 @@ export class FileService implements IFileService {
 
 
   private querySubject: BehaviorSubject<FileElement[]>;
- 
+
   async queryInFolder(folderId: string) {
-    const result: FileElement[] = []; 
+    const result: FileElement[] = [];
     this.map.forEach(element => {
       if (element.parent === folderId && (element.name != null || element.name != undefined)) {
         result.push(this.clone(element));
@@ -184,9 +193,9 @@ export class FileService implements IFileService {
 
     return this.querySubject.asObservable();
   }
-  
+
   get(id: string) {
-    var element: FileElement = null;
+    var element!: FileElement;
     this.map.forEach((file) =>{
       if(file.id === id)
       element = file;
@@ -209,7 +218,7 @@ export class FileService implements IFileService {
   currentDocToQuery: any[] = [];
 
   //Format bytes to a MB GB TB and so forth
-  formatBytes(bytes, decimals = 2) {
+  formatBytes(bytes: number, decimals = 2) {
     if (bytes === 0) return '0 Bytes';
 
     const k = 1024;
@@ -221,35 +230,35 @@ export class FileService implements IFileService {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   }
 
-  formatBytes2(a,b=2){
+  formatBytes2(a: number,b=2){
     if(0===a)
     return"0 Bytes";
-    
+
     const c=0>b?0:b,d=Math.floor(Math.log(a)/Math.log(1024));
-    
+
     return parseFloat((a/Math.pow(1024,d)).toFixed(c))+" "+["Bytes","KB","MB","GB","TB","PB","EB","ZB","YB"][d]
   }
 
   convertBytes(bytes: number){
     const sizes = ["Bytes", "KB", "MB", "GB", "TB"]
-  
+
     if (bytes == 0) {
       return "n/a"
     }
-  
+
     const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)).toString())
-  
+
     if (i == 0) {
       return bytes + " " + sizes[i]
     }
-  
+
     return (bytes / Math.pow(1024, i)).toFixed(1) + " " + sizes[i]
   }
  //END Format bytes to a MB GB TB and so forth
 
- 
+
  private renderDocuments(document: any): FileElement{
-  let result: FileElement = null;
+  let result: FileElement;
   result = new FileElement;
   result.id = document.id;
   result.name = document.data()?.name ? document.data()?.name : "Unknown File";
@@ -275,7 +284,7 @@ getDownloadItems(fileId :string)
   this.parentChildList = new Map<FileElement, FileElement[]>();
   this.parentList = [];
   this.childList = [];
-    
+
   this.map.forEach((rootFile) =>{
     if(rootFile.isFolder && rootFile.id === fileId)
     {
@@ -284,7 +293,7 @@ getDownloadItems(fileId :string)
       this.addChildList(rootFile);
       this.addParentChildList(rootFile, this.childList);
       this.childList = [];
-      
+
       if(this.parentList.length>0)
       {
         for(var i = 0; i < this.parentList.length; i++)
@@ -301,14 +310,14 @@ getDownloadItems(fileId :string)
 
   //create parentchildlist
   if(this.parentList.length >0){
-    
+
     this.parentList.forEach((parent) =>{
       this.addChildList(parent);
       this.addParentChildList(parent, this.childList);
       this.childList = [];
     });
   }
-  
+
   return this.parentChildList
 }
 
@@ -351,10 +360,10 @@ async fireStoreCollections()
   },
   function(error){
     console.log("Error getting document:", error);
-  }); 
+  });
 }
 
-async uploadFile(parentPath?: string, docId?: string,  fileToUpload?: File, currentFoler?: FileElement) {
+async uploadFile(fileToUpload: File, parentPath: string, docId: string, currentFoler: FileElement): Promise<Observable<number | any>> {
 
   parentPath = (parentPath === "root" || parentPath === undefined || parentPath === null) ? this.defaultPublicRootFilePath : this.defaultPublicRootFilePath + parentPath;
   const path = parentPath ? parentPath.charAt(parentPath.length - 1) === "/" ? parentPath + fileToUpload.name : parentPath +"/" + fileToUpload.name : `${this.defaultPublicRootFilePath}${fileToUpload.name}`;
@@ -404,9 +413,9 @@ async uploadFile(parentPath?: string, docId?: string,  fileToUpload?: File, curr
 
   this.task.snapshotChanges().pipe(
     finalize(
-      
+
       async () =>  {
-      
+
         this.downloadURL = await this.fireStorage.ref(path).getDownloadURL().toPromise();
 
         await this.fireStorage.ref(path).updateMetadata(setMetadata).toPromise().then(
@@ -426,9 +435,9 @@ async uploadFile(parentPath?: string, docId?: string,  fileToUpload?: File, curr
           function(metaData){
             newCustomMetaData = metaData;
           });
-        
+
         this.metaData = newCustomMetaData;
-      
+
         var findParentFromPath = path.split('/');
         var prnt = findParentFromPath[findParentFromPath.length -2];
 
@@ -472,26 +481,26 @@ async uploadFile(parentPath?: string, docId?: string,  fileToUpload?: File, curr
           console.error('Error writing document: ', error);
           alert("Error writing document.");
           });
-        
+
           let newFileElement = this.get(docId);
           newFileElement.downloadURL = this.downloadURL.toString();
-          
+
           let element = this.map.get(docId);
           element = Object.assign(element, newFileElement);
           this.map.set(element.id, element);
-        
+
           this.fireStoreCollections();
       })//end finalise async
     ).subscribe(); //end snapshotChanges finalise
-  
+
   //this.fireStoreCollections();
   return this.percentage;
 }
 
-  async getParentFolder(parentPath?: string, folderName?: string): Promise<FileElement>{
+  async getParentFolder(parentPath: string, folderName: string): Promise<FileElement>{
 
       parentPath = (parentPath === "root" || parentPath === undefined || parentPath === null) ? this.defaultPublicRootFilePath : this.defaultPublicRootFilePath + parentPath;
-      var result: FileElement;
+      var result!: FileElement;
 
       await this.fireStore.collection('files',
         document => document.where("fullPath", "==", parentPath) && document.where("name", "==", folderName)
@@ -504,21 +513,21 @@ async uploadFile(parentPath?: string, docId?: string,  fileToUpload?: File, curr
        return result;
     }
 
-    async createStoreDocumentUpload(filePath?: string, docId?: string ,file?: File, date?: string){
+    async createStoreDocumentUpload(filePath: string, docId: string ,file: File, date: string){
       const path = filePath ? filePath.charAt(filePath.length - 1) === "/" ? filePath + file.name : filePath +"/" + file.name : `${this.defaultPublicRootFilePath}${file.name}`;
-      
+
       if(!date){
         const today = new Date();
 
         // adjust 0 before single digit date
         const day = ("0" + today.getDate()).slice(-2);
-  
+
         // current month
         const month = ("0" + (today.getMonth() + 1)).slice(-2);
-  
+
         // current year
         const year = today.getFullYear();
-  
+
         date = year + month + day;
       }
 
@@ -527,7 +536,7 @@ async uploadFile(parentPath?: string, docId?: string,  fileToUpload?: File, curr
       }
 
       if(file){
-        
+
             // Create our initial doc
             await this.fireStore.collection("files").doc(docId)
             .set(
@@ -561,12 +570,12 @@ async uploadFile(parentPath?: string, docId?: string,  fileToUpload?: File, curr
       }
       return docId;
     }
-    
+
   parentId: string;
 
     private renderParentDoc(parentName: string, parentPath: string, document: any): string
     {
-      this.parentId = null;
+      this.parentId = '';
       if(document.data()?.isFolder && document.data()?.name === parentName && document.data()?.fullPath === parentPath)
       {
         this.parentId = document.id;
@@ -574,7 +583,7 @@ async uploadFile(parentPath?: string, docId?: string,  fileToUpload?: File, curr
       }
       return this.parentId;
     }
-  
+
     public async getParentId(parentName: string, parentPath: string): Promise<string> {
 
       await this.fireStore.collection('files').get().toPromise().then((snapShot)=> {
@@ -585,57 +594,14 @@ async uploadFile(parentPath?: string, docId?: string,  fileToUpload?: File, curr
        },
        function(error){
         console.log("Error getting document:", error);
-       }); 
-  
+       });
+
        return this.parentId;
     }
 
-    async moveFile(currentPath, destinationPath) {
-      debugger;
-      let oldRef = this.fireStorage.storage.ref().child(currentPath)
-  
-      oldRef.getDownloadURL().then(url => {
-          fetch(url).then(htmlReturn => {
-              let fileArray = new Uint8Array()
-              const reader = htmlReturn.body.getReader()
-  
-              //get the reader that reads the readable stream of data
-              reader
-                  .read()
-                  .then(function appendStreamChunk({ done, value}) {
-                      //If the reader doesn't return "done = true" append the chunk that was returned to us
-                      // rinse and repeat until it is done.
-                      if (value) {
-                        console.log("its value and merging arrays=>",fileArray)
-                          fileArray = this.mergeTypedArrays(fileArray, value)
-                          console.log("Merged arrays=>",fileArray)
-                      }
-                      if (done) {
-                          console.log("its done", fileArray)
-                          return fileArray
-                      } else {
-                          // "Readout not complete, reading next chunk"
-                          return reader.read().then(appendStreamChunk)
-                      }
-                  })
-                  .then(file => {
-                      //Write the file to the new storage place
-                      let status = this.fireStorage
-                          .storage.ref()
-                          .child(destinationPath)
-                          .put(file)
-                      //Remove the old reference
-                      oldRef.delete()
-  
-                      return status
-                  })
-          })
-      })
-  }
-  
- async mergeTypedArrays(a, b) {
+ async mergeTypedArrays(a: { length: number; constructor: new (arg0: any) => any; }, b: string | any[]) {
     // Checks for truthy values on both arrays
-    if(!a && !b) throw 'Please specify valid arguments for parameters a and b.';  
+    if(!a && !b) throw 'Please specify valid arguments for parameters a and b.';
 
     // Checks for truthy values or empty arrays on each argument
     // to avoid the unnecessary construction of a new array and
@@ -657,36 +623,33 @@ async uploadFile(parentPath?: string, docId?: string,  fileToUpload?: File, curr
   returnStorageFilePath(document: any) : string{
     return document?.data()?.fullPath
   }
-  async getStorageFilePath(fileElement: FileElement){
+
+  async getStorageFilePath(fileElement: FileElement): Promise<string> {
+    var fileFullPath: string = '';
     if(fileElement){
-      var fileFullPath: string = null;
       await this.fireStore.collection('files').get().toPromise().then((snapShot)=> {
-    
+
         snapShot.docs.forEach(
           document => {
             if(document?.id === fileElement?.id)
             {
               fileFullPath = this.returnStorageFilePath(document);
-              return fileFullPath;
             }
+            return fileFullPath;
           }
         );
        },
        function(error){
         console.log("Error getting document fullPath:", error);
-       }); 
-  
-       return fileFullPath;
+       });
     }
+    return fileFullPath;
   }
 
 
-  downloadFile(file) {
- 
+  downloadFile(file: string) {
     this.fireStorage.storage.ref().child(file).getDownloadURL().then(function(url) {
-
       window.open(url);
-    
     }).catch(function(error) {
       // Handle any errors
       console.log("Download failed =>", error);

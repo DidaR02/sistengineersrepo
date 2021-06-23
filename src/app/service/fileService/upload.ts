@@ -22,7 +22,7 @@ export class UploadComponent implements OnInit {
 
   task: AngularFireUploadTask;
 
-  percentage: Observable<number>;
+  percentage: Observable<number | undefined>;
   snapshot: Observable<any>;
   downloadURL: Observable<string>;
   metaData: any;
@@ -33,16 +33,16 @@ export class UploadComponent implements OnInit {
   private querySubject: BehaviorSubject<FileElement[]>;
   public quelist: Observable<FileElement[]>;
 
-  constructor(private fbStorage?: AngularFireStorage, private fbStore?: AngularFirestore) { 
-      
+  constructor(private fbStorage: AngularFireStorage, private fbStore: AngularFirestore) {
+
   }
-  
+
   async ngOnInit() {
     (this.file != null || this.file != undefined)
     {
       await this.startUpload();
     }
-    
+
   }
 
   removeDuplicate(fileList: File[])
@@ -50,8 +50,8 @@ export class UploadComponent implements OnInit {
     return Array.from(new Set(fileList));
   }
 
-  async uploadFolder(parentPath?: string, folderToUpload?: FileElement) {
-   
+  async uploadFolder(parentPath: string, folderToUpload: FileElement) {
+
     let isValidFolder : boolean = (folderToUpload === null || folderToUpload === undefined) ? false : true;
 
       if(isValidFolder){
@@ -61,9 +61,9 @@ export class UploadComponent implements OnInit {
 
   }
 
-  async startUploadFolder(parentPath?: string, folderToUpload?: FileElement)
+  async startUploadFolder(parentPath: string, folderToUpload: FileElement)
   {
-    await this.fbStore.collection('files').add( 
+    await this.fbStore.collection('files').add(
       {
         id: folderToUpload.id,
         name: folderToUpload.name,
@@ -76,36 +76,33 @@ export class UploadComponent implements OnInit {
       });
   }
 
-  async uploadFile(parentPath?: string, fileToUpload?: File[]) {
-   
+  async uploadFile(parentPath: string, fileToUpload: File[]) {
+
     let newFileList = this.removeDuplicate(fileToUpload);
 
-    let hasFile : boolean = (this.file === null || this.file === undefined) ? false : true;
+    // let hasFile : boolean = (this.file === null || this.file === undefined) ? false : true;
 
     parentPath = (parentPath === "root" || parentPath === undefined || parentPath === null) ? this.defaultPublicRootFilePath : this.defaultPublicRootFilePath + parentPath;
 
-    if(!hasFile && newFileList.length > 0){
-        
+    if(newFileList.length > 0){
+
       for(var i =0 ; i < newFileList.length; i++)
       {
-        this.file = newFileList[i];
-        await this.startUpload(parentPath,this.file);
+        // this.file = newFileList[i];
+        await this.startUpload(parentPath, newFileList[i] as File);
       }
 
-      newFileList = null;
-      this.file = null;
+      newFileList = [];
     }
-    else if (hasFile){
+    // else if (hasFile){
+    //     await this.startUpload(parentPath,this.file).then(()=>{
+    //     this.file = null;
+    //   });
 
-        await this.startUpload(parentPath,this.file).then(()=>{
-        this.file = null;
-      }
-      );
-      
-    }
-    else{
-      this.file = null;
-    }
+    // }
+    // else{
+    //   this.file = null;
+    // }
 
     return await this.getFsDocumentCollections();
     //return this.map;
@@ -115,11 +112,11 @@ export class UploadComponent implements OnInit {
     {
       if(file)
       {
-      
-        
+
+
         const path = filePath ? filePath.charAt(filePath.length - 1) === "/" ? filePath + this.file.name : filePath +"/" + this.file.name : `${this.defaultPublicRootFilePath}${this.file.name}`;
         let PrntFilePath = filePath ? filePath : this.defaultPublicRootFilePath;
-        
+
         const ref = this.fbStorage.ref(path);
 
         this.task = this.fbStorage.upload(path, this.file);
@@ -130,9 +127,9 @@ export class UploadComponent implements OnInit {
 
         this.snapshot = await this.task.snapshotChanges().pipe(
           finalize(
-            
+
             async () =>  {
-            
+
               this.downloadURL = await this.fbStorage.ref(path).getDownloadURL().toPromise();
 
               this.metaData = await this.fbStorage.ref(path).getMetadata().toPromise();
@@ -162,7 +159,7 @@ export class UploadComponent implements OnInit {
                 function(metaData){
                   newCustomMetaData = metaData;
                 });
-              
+
               this.metaData = newCustomMetaData;
 
               await this.fbStore.collection('files').add({
@@ -189,7 +186,7 @@ export class UploadComponent implements OnInit {
                   'type': this.metaData?.type,
                   'updated': this.metaData?.updated,
                 }
-                
+
               });
 
               return this.getFsDocumentCollections();
@@ -200,35 +197,34 @@ export class UploadComponent implements OnInit {
 /////////////////////////////////////////
         //console.log("this.snapshot",this.snapshot);
         //this.snapshot.subscribe();
-        
+
       }
 
     }
 
-  async isActive(snapshot) {
+  async isActive(snapshot: any) {
     return snapshot.state === 'running' && snapshot.bytesTransferred < snapshot.totalBytes;
   }
 
   convertBytes(bytes: number) {
     const sizes = ["Bytes", "KB", "MB", "GB", "TB"]
-  
+
     if (bytes == 0) {
       return "n/a"
     }
-  
+
     const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)).toString())
-  
+
     if (i == 0) {
       return bytes + " " + sizes[i]
     }
-  
+
     return (bytes / Math.pow(1024, i)).toFixed(1) + " " + sizes[i]
   }
-  
+
  //END Format bytes to a MB GB TB and so forth
-  private renderDocuments(document: any): FileElement{
-    let result: FileElement = null;
-    result = new FileElement;
+  public renderDocuments(document: any): FileElement{
+    let result: FileElement = new FileElement;
     result.id = document.id;
     result.name = document.data()?.name ? document.data()?.name : "Unknown File";
     result.isFolder = document.data()?.isFolder ? JSON.parse(document.data()?.isFolder) : false;
@@ -247,7 +243,7 @@ export class UploadComponent implements OnInit {
   public async getFsDocumentCollections() {
       //Get all folders from root directory
       await this.fbStore.collection('files').get().toPromise().then((snapShot)=> {
-  
+
         snapShot.docs.forEach(
           document => {
             let result = this.renderDocuments(document);
@@ -258,8 +254,8 @@ export class UploadComponent implements OnInit {
        function(error){
         console.log("Error getting document:", error);
        }
-       
-       ); 
+
+       );
 
        return this.map;
     }
@@ -273,7 +269,7 @@ clone(element: FileElement) {
 
   private renderParentDoc(parentName: string, parentPath: string,document: any): string
   {
-    this.parentId = null;
+    this.parentId = '';
     if(document.data()?.isFolder && document.data()?.name === parentName && document.data()?.fullPath === parentPath)
     {
       this.parentId = document.id;
@@ -282,11 +278,11 @@ clone(element: FileElement) {
 
     return this.parentId;
   }
-  
+
  public async getParentId(parentName: string, parentPath: string): Promise<string> {
 
     await this.fbStore.collection('files').get().toPromise().then((snapShot)=> {
-  
+
       snapShot.docs.forEach(
         document => {
           this.renderParentDoc(parentName, parentPath, document);
@@ -296,7 +292,7 @@ clone(element: FileElement) {
      },
      function(error){
       console.log("Error getting document:", error);
-     }); 
+     });
 
      return this.parentId;
   }
@@ -306,13 +302,15 @@ clone(element: FileElement) {
     parentPath = (parentPath === "root" || parentPath === undefined || parentPath === null) ? this.defaultPublicRootFilePath : this.defaultPublicRootFilePath + parentPath;
     var result = new FileElement;
 
-    await this.fbStore.collection('files', 
+    await this.fbStore.collection('files',
     document => document.where("fullPath", "==", parentPath) && document.where("name", "==", folderName)
     )
     .get().toPromise()
-    .then(function(querySnapshot) {
-        querySnapshot.forEach(function(document) {
+      .then( (querySnapshot) => {
+
+        querySnapshot.forEach((document) => {
           result = this.renderDocuments(document);
+
         });
     })
     .catch(function(error) {
@@ -321,7 +319,7 @@ clone(element: FileElement) {
     .finally(function(){
       return result;
     }
-      
+
     );
 
     return result

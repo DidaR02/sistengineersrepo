@@ -3,7 +3,7 @@ import { FormGroup, FormControl} from '@angular/forms'; // Reactive form service
 import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
 import { Router } from "@angular/router";
 import { DataTypeConversionService } from 'src/app/service/shared/dataType-conversion.service';
-import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
+// import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { UserAccess } from 'src/app/models/userAccess/IUserAccess';
 
 @Component({
@@ -51,7 +51,7 @@ export class SignInUserComponent implements OnInit {
   {
     this.router.navigate(['register-user']);
   }
-  
+
   resetPassword(){
     this.router.navigate(['forgotPassword']);
   }

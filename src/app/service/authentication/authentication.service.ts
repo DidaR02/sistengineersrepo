@@ -15,7 +15,7 @@ import { UserAccess } from '../../models/userAccess/IUserAccess';
 export class AuthenticationService {
   userData: any; // Save logged in user data
   userAccess: UserAccess;
-  
+
   constructor(public afs: AngularFirestore,   // Inject Firestore service
     public afAuth: AngularFireAuth, // Inject Firebase auth service
     public router: Router,
@@ -38,7 +38,7 @@ export class AuthenticationService {
         const result = await this.afAuth.signInWithEmailAndPassword(email, password);
         let userAccount = this.GetDbUserAccount(result.user);
 
-        if(userAccount && (userAccount.emailVerified != true && result.user.emailVerified))
+        if(userAccount && (userAccount.emailVerified != true && result?.user?.emailVerified))
         {
           userAccount.emailVerified = result.user.emailVerified;
         }
@@ -57,32 +57,35 @@ export class AuthenticationService {
         window.alert(errorMsg);
       }
     }
-  
+
     // Sign up with email/password
-    SignUp(user: User, password: string) {
+    async SignUp(user: User, password: string) {
       return this.afAuth.createUserWithEmailAndPassword(user.email, password)
         .then((result) => {
           /* Call the SendVerificaitonMail() function when new user sign
           up and returns promise */
-          this.SetFsUserData(user, result.user);
-          this.SetDbUserData(user, result);
-          this.SetUserAccess(result.user.uid);
-          this.SendVerificationMail();
+          if (result.user)
+          {
+            this.SetFsUserData(user, result.user);
+            this.SetDbUserData(user, result);
+            this.SetUserAccess(result.user.uid);
+            this.SendVerificationMail();
+          }
         }).catch((error) => {
           window.alert(error.message)
         })
     }
-  
+
     // Send email verfificaiton when new user sign up
-    SendVerificationMail() {
-      return this.afAuth.currentUser.then(verify => verify.sendEmailVerification())
+    async SendVerificationMail() {
+      return this.afAuth.currentUser.then(verify => verify?.sendEmailVerification())
       .then(() => {
         this.router.navigate(['verify-email-address']);
       })
     }
-  
+
     // Reset Forggot password
-    ForgotPassword(passwordResetEmail) {
+    async ForgotPassword(passwordResetEmail: string) {
       if(passwordResetEmail)
       {
         return this.afAuth.sendPasswordResetEmail(passwordResetEmail)
@@ -96,20 +99,20 @@ export class AuthenticationService {
         window.alert('Password reset email not sent, check your inbox. Please enter valid password.');
       }
     }
-  
+
     // Returns true when user is looged in and email is verified
     get isLoggedIn(): boolean {
-      const user = JSON.parse(localStorage.getItem('user'));
+      const user = JSON.parse(localStorage.getItem('user') ?? '');
       return (user !== null && user.emailVerified !== false) ? true : false;
     }
-  
+
     // Sign in with Google
     GoogleAuth() {
       return this.AuthLogin(new auth.auth.GoogleAuthProvider());
     }
-  
+
     // Auth logic to run auth providers
-    AuthLogin(provider) {
+    async AuthLogin(provider: any) {
       return this.afAuth.signInWithPopup(provider)
       .then((result) => {
          this.ngZone.run(() => {
@@ -120,17 +123,17 @@ export class AuthenticationService {
         window.alert(error)
       })
     }
-  
+
     /* Setting up user data when sign in with username/password,
     sign up with username/password and sign in with social auth
     provider in Firestore database using AngularFirestore + AngularFirestoreDocument service */
-     SetFsUserData(user, userResults?: any) {
+     async SetFsUserData(user: any, userResults?: any) {
       if(user){
         if(userResults)
         {
           user.uid = userResults.uid;
         }
-        
+
         if(user.firstName || user.lastName)
         {
           user.displayName = user.firstName.substring(0,1).toUpperCase() + ", " + user.lastName;
@@ -152,13 +155,13 @@ export class AuthenticationService {
       }
     }
 
-     SetDbUserData(user, userResults?: any) {
+     SetDbUserData(user: any, userResults?: any) {
       if(user){
         if(userResults?.user)
         {
           user.uid = userResults.user.uid;
         }
-                
+
         if(user.firstName || user.lastName)
         {
           user.displayName = user.firstName.substring(0,1).toUpperCase() + ", " + user.lastName;
@@ -193,23 +196,22 @@ export class AuthenticationService {
       this.afAuth.authState.subscribe(user => {
         if (user) {
           this.ngZone.run(async () => {
-            
+
           this.GetUserAccess(user);
           this.GetDbUserAccount(user);
-          
+
           localStorage.setItem('signedInUser', JSON.stringify(user));
-          JSON.parse(localStorage.getItem('signedInUser'));
 
           });
-          
+
         } else {
-          localStorage.setItem('user', null);
-          localStorage.setItem('signedInUser', null);
-          localStorage.setItem('userAccess', null);
+          localStorage.setItem('user', '');
+          localStorage.setItem('signedInUser', '');
+          localStorage.setItem('userAccess', '');
         }
       })
     }
-  
+
     // Sign out
      SignOut() {
       return this.afAuth.signOut().then(() => {
@@ -220,21 +222,20 @@ export class AuthenticationService {
       })
     }
 
-     GetUserAccess(user) : UserAccess {
+     GetUserAccess(user: any) : UserAccess {
       if(user)
       {
         const userAccessObj = this.afsDb.database.ref('tb_userAccess/' + user?.uid);
 
          userAccessObj.on('value', (useAccess) => {
-          this.userAccess = useAccess.val(); 
-  
+          this.userAccess = useAccess.val();
+
           localStorage.setItem('userAccess', JSON.stringify(this.userAccess));
-          JSON.parse(localStorage.getItem('userAccess'));
 
           return this.userAccess;
         });
-        return this.userAccess;
       }
+        return this.userAccess;
     }
 
      SetUserAccess(uid: string) : UserAccess{
@@ -249,37 +250,40 @@ export class AuthenticationService {
             canDownload: "false",
             canShare: "false",
             canLogin: "true",
-            disableView: null,
+            disableView: [],
             canDelete: "false",
             isAdmin: "false",
             adminAccessLevel: "partialAccess",
-            partialAccess: null
+            partialAccess: []
           };
         }
 
         localStorage.setItem('userAccess', JSON.stringify(this.userAccess));
-        JSON.parse(localStorage.getItem('userAccess'));
 
 
         this.afsDb.database.ref('tb_userAccess/' + uid).set(
           this.userAccess
         );
-        return this.userAccess;
       }
+        return this.userAccess;
     }
 
-     GetDbUserAccount(user) {
+     GetDbUserAccount(user: any) {
 
+       let userAccount!: User ;
       if(user)
       {
-        const userAccount = this.afsDb.database.ref('tb_user/' + user?.uid);
+        const getUserAccount = this.afsDb.database.ref('tb_user/' + user?.uid);
 
-        userAccount.on('value', (snapshot) => {
-          const userAccount = snapshot.val();
-
-          localStorage.setItem('user', JSON.stringify(userAccount));
-        });
+        getUserAccount.on('value', (snapshot) => {
+          if (snapshot.val())
+          {
+            userAccount = snapshot.val() as User;
+            localStorage.setItem('user', JSON.stringify(userAccount));
+          }
+      });
       }
-      return JSON.parse(localStorage.getItem('user')) as User;
+
+      return userAccount as User;
     }
   }

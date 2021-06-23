@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs'
 
 export class FileElement {
-    id?: string
+    id: string
     isFolder: boolean
     name: string
     parent?: string

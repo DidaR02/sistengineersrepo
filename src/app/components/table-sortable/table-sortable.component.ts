@@ -31,53 +31,11 @@ import { downloadFolderAsZip } from "../../service/fileService/zipFile.service";
 import { ShareDialogComponent } from "../share-dialog/share-dialog.component";
 import { MatIconRegistry } from "@angular/material/icon";
 import { DomSanitizer } from "@angular/platform-browser";
-
-export type SortColumn = keyof FileElement | "";
-export type SortDirection = "asc" | "desc" | "";
-const rotate: { [key: string]: SortDirection } = {
-  asc: "desc",
-  desc: "",
-  "": "asc",
-};
-
-const compare = (v1: string | number, v2: string | number) =>
-  v1 < v2 ? -1 : v1 > v2 ? 1 : 0;
-
-export interface SortEvent {
-  column: SortColumn;
-  direction: SortDirection;
-}
-
-@Directive({
-  selector: "th[sortable]",
-  host: {
-    "[class.asc]": 'direction === "asc"',
-    "[class.desc]": 'direction === "desc"',
-    "(click)": "rotate()",
-  },
-})
-export class NgbdSortableHeader {
-  @Input() sortable: SortColumn = "";
-  @Input() direction: SortDirection = "";
-  @Output() sort = new EventEmitter<SortEvent>();
-
-  rotate() {
-    this.direction = rotate[this.direction];
-    this.sort.emit({ column: this.sortable, direction: this.direction });
-  }
-}
-
-function search(
-  text: string,
-  filesToFilter: FileElement[],
-  pipe: PipeTransform
-): FileElement[] {
-  return filesToFilter?.filter((file) => {
-    const term = text.toLowerCase();
-    return file.name.toLowerCase().includes(term);
-  });
-}
-
+import { forEach } from "jszip";
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import { FileManagerService } from "src/app/service/shared/files-manager.service";
 @Component({
   selector: "app-table-sortable",
   templateUrl: "./table-sortable.component.html",
@@ -89,8 +47,6 @@ export class TableSortableComponent implements OnInit {
   @ViewChild("menuTrigger", { static: false }) selectedElement: ElementRef;
   @ViewChild("fileInput", { static: false }) fileInput: ElementRef;
   @ViewChild("moveToMenu", { static: false }) movedElement: ElementRef;
-  @ViewChildren(NgbdSortableHeader) headers: QueryList<NgbdSortableHeader>;
-  //@Input() path: string
 
   getfileElements: FileElement[];
   fileElements: Observable<FileElement[]>;
@@ -98,21 +54,24 @@ export class TableSortableComponent implements OnInit {
   files: File[] = [];
   currentRoot: FileElement;
   currentPath: string;
-
   canDownload: boolean = true;
   canDelete: boolean = true;
   canShare: boolean = true;
   canCreateFolder: boolean = true;
   canAddFile: boolean = true;
   canMove: boolean = true;
-
+  user: User;
   uploadProgress: Observable<number>;
+
+  private signedInUser: SignedInUser;
+  private userAccess: UserAccess;
 
   filter = new FormControl("");
 
-  private signedInUser: SignedInUser;
-  user: User;
-  private userAccess: UserAccess;
+  displayedColumns: string[] = ['name'];
+  dataSource!: MatTableDataSource<FileElement>;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor(
     public fileService: FileService,
@@ -121,38 +80,23 @@ export class TableSortableComponent implements OnInit {
     public pipe: DecimalPipe,
     public dialog: MatDialog,
     private convertDataType: DataTypeConversionService,
-    private matIconRegistry: MatIconRegistry,
-    private domSanitizer: DomSanitizer
+    private fileManager: FileManagerService
   ) {
     this.authService.getLocalUserData();
     this.getUserInfo();
-    //let filelements = this.fileElements.subscribe(fileelentz => filelements = fileelentz);
-
-    // this.filter.valueChanges.pipe(
-    //   startWith(''),
-    //   map(text => search(text,
-    //     filelements ,pipe))
-    //   )
-    //   .subscribe(
-    //     (data)=>{
-    //       if(data){
-    //         // this.fileElements = data;
-    //       }
-    //     }
-    //   );
   }
 
   async ngOnInit(element?: FileElement) {
     await this.updateFileElementQuery(element);
+  }
 
-    // var filesItem = this.fileElements.subscribe(
-    //   (val)=> {
-    //     if(val && val.length > 0){
-    //       var iconUrl =this.getCustomeIconUrl(val[0].metaData?.contentType);
-    //       this.addIconSvg("myCustomIcon", iconUrl)
-    //     }
-    //   }
-    // )
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
 
   async getUserInfo() {
@@ -213,7 +157,7 @@ export class TableSortableComponent implements OnInit {
         };
 
         localStorage.setItem("signedInUser", JSON.stringify(this.signedInUser));
-        JSON.parse(localStorage.getItem("signedInUser"));
+        JSON.parse(localStorage.getItem("signedInUser")?? '');
       } else {
         if (
           !this.signedInUser ||
@@ -229,9 +173,9 @@ export class TableSortableComponent implements OnInit {
   }
 
   async createSignInUser() {
-    const _signedInUser = JSON.parse(localStorage.getItem("signedInUser"));
-    const _user = JSON.parse(localStorage.getItem("user"));
-    this.userAccess = JSON.parse(localStorage.getItem("userAccess"));
+    const _signedInUser = JSON.parse(localStorage.getItem("signedInUser")?? '');
+    const _user = JSON.parse(localStorage.getItem("user")?? '');
+    this.userAccess = JSON.parse(localStorage.getItem("userAccess")?? '');
 
     if (_user) {
       this.user = {
@@ -256,386 +200,6 @@ export class TableSortableComponent implements OnInit {
     localStorage.setItem("signedInUser", JSON.stringify(this.signedInUser));
   }
 
-  onSort({ column, direction }: SortEvent) {
-    //   // resetting other headers
-    //   this.headers.forEach(header => {
-    //     if (header.sortable !== column) {
-    //       header.direction = '';
-    //     }
-    //   });
-    //   // sorting countries
-    //   if (direction === '' || column === '') {
-    //     this.fileElements = this.fileElements;
-    //   } else {
-    //     this.fileElements = [...this.fileElements].sort((a, b) => {
-    //       const res = compare(a[column], b[column]);
-    //       return direction === 'asc' ? res : -res;
-    //     });
-    //   }
-  }
-
-  getFileTypeIcon(file?: FileElement) {
-    debugger;
-    if (file && file.metaData) {
-      if (file.metaData?.contentType) {
-        switch (file.metaData.contentType) {
-          // case "application/msword":
-          // case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-          // case "application/vnd.ms-word.document.macroenabled.12":
-          // case "application/vnd.openxmlformats-officedocument.wordprocessingml.template":
-          //   {
-          //     this.addIconSvg("file-word", "../assets/icons/file-word.svg");
-          //     return "file-word";
-          //   }
-          // case "application/vnd.ms-excel":
-          // case "application/vnd.ms-excel.sheet.macroenabled.12":
-          // case "application/vnd.ms-excel.template.macroenabled.12":
-          // case "application/vnd.ms-excel.sheet.binary.macroenabled.12":
-          // case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-          // case "application/vnd.openxmlformats-officedocument.spreadsheetml.template":
-          //   {
-          //     this.addIconSvg("file-excel", "../assets/icons/file-excel.svg");
-          //     return "file-excel";
-          //   }
-          // case "application/vnd.ms-powerpoint":
-          // case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-          // case "application/vnd.openxmlformats-officedocument.presentationml.slide":
-          // case "application/vnd.openxmlformats-officedocument.presentationml.slideshow":
-          // case "application/vnd.openxmlformats-officedocument.presentationml.template":
-          // case "application/vnd.ms-powerpoint.addin.macroenabled.12":
-          // case "application/vnd.ms-powerpoint.slide.macroenabled.12":
-          // case "application/vnd.ms-powerpoint.presentation.macroenabled.12":
-          // case "application/vnd.ms-powerpoint.slideshow.macroenabled.12":
-          // case "application/vnd.ms-powerpoint.template.macroenabled.12":
-          //   {
-          //     this.addIconSvg("file-powerpoint", "../assets/icons/file-powerpoint.svg");
-          //     return "file-powerpoint";
-          //   }
-          case "application/acad":
-          case "application/clariscad":
-          case "application/dxf":
-          case "application/x-dwf":
-          case "application/x-dwf":
-          case "application/set": {
-            this.addIconSvg("file-cad", "../assets/icons/file-cad.svg");
-            return "file-cad";
-          }
-          // case "application/mp4":
-          // case "audio/mpeg":
-          // case "audio/adpcm":
-          // case "audio/x-aac":
-          // case "audio/x-aiff":
-          // case "audio/vnd.dece.audio":
-          // case "audio/vnd.digital-winds":
-          // case "audio/vnd.dts":
-          // case "audio/vnd.rip":
-          // case "audio/vnd.lucent.voice":
-          // case "audio/x-mpegurl":
-          // case "audio/vnd.ms-playready.media.pya":
-          // case "audio/x-ms-wma":
-          // case "audio/x-ms-wax":
-          // case "audio/midi":
-          // case "audio/mpeg":
-          // case "audio/mp4":
-          // case "audio/x-wav":
-          //     {
-          //       this.addIconSvg("file-audio", "../assets/icons/file-audio.svg");
-          //       return "file-audio";
-          //     }
-          // case "image/vnd.dxf":
-          // case "image/bmp":
-          // case "image/prs.btif":
-          // case "image/vnd.dvb.subtitle":
-          // case "image/x-cmu-raster":
-          // case "image/cgm":
-          // case "image/x-cmx":
-          // case "image/vnd.dece.graphic":
-          // case "image/vnd.djvu":
-          // case "image/vnd.dwg":
-          // case "image/vnd.fujixerox.edmics-mmr":
-          // case "image/vnd.fujixerox.edmics-rlc":
-          // case "image/vnd.xiff":
-          // case "image/vnd.fst":
-          // case "image/vnd.fastbidsheet":
-          // case "image/vnd.fpx":
-          // case "image/vnd.net-fpx":
-          // case "image/x-freehand":
-          // case "image/g3fax":
-          // case "image/gif":
-          // case "image/x-icon":
-          // case "image/ief":
-          // case "image/x-citrix-jpeg":
-          // case "image/jpeg":
-          // case "image/pjpeg":
-          // case "image/vnd.ms-modi":
-          // case "image/ktx":
-          // case "image/x-pcx":
-          // case "image/x-pict":
-          // case "image/x-portable-anymap":
-          // case "image/x-portable-bitmap":
-          // case "image/x-portable-graymap":
-          // case "image/x-png":
-          // case "image/x-portable-pixmap":
-          // case "image/svg+xml":
-          // case "image/tiff":
-          // case "image/webp":
-          // case "image/x-xbitmap":
-          // case "image/x-xpixmap":
-          // case "image/x-xwindowdump":
-          // case "image/x-png":
-          // case "image/x-portable-pixmap":
-          // case "image/svg+xml":
-          // case "image/tiff":
-          // case "image/webp":
-          //   {
-          //     this.addIconSvg("file-image", "../assets/icons/file-image.svg");
-          //     return "file-image";
-          //   }
-          // case "application/x-dvi":
-          // case "video/mpeg":
-          // case "video/3gpp":
-          // case "video/3gpp2":
-          // case "video/ogg":
-          // case "video/webm":
-          // case "video/x-msvideo":
-          // case "video/vnd.dece.hd":
-          // case "video/vnd.dece.mobile":
-          // case "video/vnd.uvvu.mp4":
-          // case "video/vnd.dece.pd":
-          // case "video/vnd.dece.sd":
-          // case "video/vnd.dece.video":
-          // case "video/vnd.fvt":
-          // case "video/x-f4v":
-          // case "video/x-flv":
-          // case "video/x-fli":
-          // case "video/h263":
-          // case "video/h264":
-          // case "video/jpm":
-          // case "video/jpeg":
-          // case "video/x-m4v":
-          // case "video/x-ms-asf":
-          // case "video/vnd.ms-playready.media.pyv":
-          // case "video/x-ms-wm":
-          // case "video/x-ms-wmx":
-          // case "video/x-ms-wmv":
-          // case "video/x-ms-wvx":
-          // case "video/mj2":
-          // case "video/vnd.mpegurl":
-          // case "video/quicktime":
-          // case "video/x-sgi-movie":
-          // case "video/vnd.vivo":
-          //     {
-          //       this.addIconSvg("file-video", "../assets/icons/file-video.svg");
-          //       return "file-video";
-          //     }
-          // case "application/x-7z-compressed":
-          // case "application/x-zip-compressed":
-          //   {
-          //     this.addIconSvg("file-zip", "../assets/icons/file-zip.svg");
-          //     return "file-zip";
-          //   }
-          // case "application/pdf":
-          //   {
-          //     this.addIconSvg("file-pdf", "../assets/icons/file-pdf.svg");
-          //     return "file-pdf";
-          //   }
-          case "image/vnd.adobe.photoshop":
-          case "application/photoshop":
-          case "application/x-photoshop": {
-            this.addIconSvg(
-              "file-adobePhotoshop",
-              "../assets/icons/file-adobePhotoshop.svg"
-            );
-            return "file-adobePhotoshop";
-          }
-          case "application/illustrator": {
-            this.addIconSvg(
-              "file-adobeIllustrator",
-              "../assets/icons/file-adobeIllustrator.svg"
-            );
-            return "file-adobeIllustrator";
-          }
-          case "application/octet-stream": {
-            let ext = this.convertDataType.getFileExtension(file.name);
-            if (ext) {
-              switch (ext) {
-                case "rvt": {
-                  this.addIconSvg("file-rvt", "../assets/icons/file-rvt.svg");
-                  return "file-rvt";
-                }
-                case "7z":
-                case "7zip":
-                case "zip":
-                case "rar": {
-                  this.addIconSvg("file-zip", "../assets/icons/file-zip.svg");
-                  return "file-zip";
-                }
-                default: {
-                  this.addIconSvg(
-                    "file-txt-default",
-                    "../assets/icons/file-txt-default.svg"
-                  );
-                  return "file-txt-default";
-                }
-              }
-            }
-          }
-          default: {
-            this.addIconSvg(
-              "file-txt-default",
-              "../assets/icons/file-txt-default.svg"
-            );
-            return "file-txt-default";
-          }
-        }
-      }
-    } else {
-      if (file) {
-        let filExt = this.convertDataType.getFileExtension(file.name);
-        switch (filExt) {
-          case "rvt": {
-            this.addIconSvg("file-rvt", "../assets/icons/file-rvt.svg");
-            return "file-rvt";
-          }
-          case "7z":
-          case "7zip":
-          case "zip":
-          case "rar": {
-            this.addIconSvg("file-zip", "../assets/icons/file-zip.svg");
-            return "file-zip";
-          }
-          case "mp4":
-          case "mpeg":
-          case "adpcm":
-          case "aac":
-          case "mpegurl":
-          case "wma":
-          case "wax":
-          case "midi":
-          case "mpeg":
-          case "mp4":
-          case "wav":
-          case "mp3": {
-            this.addIconSvg("file-audio", "../assets/icons/file-audio.svg");
-            return "file-audio";
-          }
-          case "bmp":
-          case "tif":
-          case "xiff":
-          case "fpx":
-          case "x-freehand":
-          case "g3fax":
-          case "gif":
-          case "icon":
-          case "ief":
-          case "jpeg":
-          case "pjpeg":
-          case "pcx":
-          case "pict":
-          case "anymap":
-          case "bitmap":
-          case "png":
-          case "pixmap":
-          case "svg":
-          case "tiff":
-          case "webp":
-          case "bitmap":
-          case "pixmap":
-          case "webp": {
-            this.addIconSvg("file-image", "../assets/icons/file-image.svg");
-            return "file-image";
-          }
-          case "dvi":
-          case "mpeg":
-          case "3gpp":
-          case "3gpp2":
-          case "ogg":
-          case "webm":
-          case "msvideo":
-          case "hd":
-          case "mp4":
-          case "fvt":
-          case "f4v":
-          case "flv":
-          case "fli":
-          case "jpm":
-          case "jpeg":
-          case "m4v":
-          case "asf":
-          case "wmx":
-          case "wmv":
-          case "wvx":
-          case "mpegurl":
-          case "quicktime":
-          case "vivo": {
-            this.addIconSvg("file-video", "../assets/icons/file-video.svg");
-            return "file-video";
-          }
-          case "doc":
-          case "docm":
-          case "docx":
-          case "dot":
-          case "dotx": {
-            this.addIconSvg("file-word", "../assets/icons/file-word.svg");
-            return "file-word";
-          }
-          case "xla":
-          case "xlam":
-          case "xll":
-          case "xlm":
-          case "xls":
-          case "xlsm":
-          case "xlsx":
-          case "xlt":
-          case "xltm":
-          case "xltx": {
-            this.addIconSvg("file-excel", "../assets/icons/file-excel.svg");
-            return "file-excel";
-          }
-          case "pptx":
-          case "pptm":
-          case "ppt":
-          case "ppsx":
-          case "ppsm":
-          case "pps":
-          case "ppam":
-          case "potx":
-          case "potm":
-          case "pot":
-          case "sldx": {
-            this.addIconSvg(
-              "file-powerpoint",
-              "../assets/icons/file-powerpoint.svg"
-            );
-            return "file-powerpoint";
-          }
-          case "pdf": {
-            this.addIconSvg("file-pdf", "../assets/icons/file-pdf.svg");
-            return "file-pdf";
-          }
-          case "dwg": {
-            this.addIconSvg("file-pdf", "../assets/icons/file-dwg.svg");
-            return "file-dwg";
-          }
-
-          default: {
-            this.addIconSvg(
-              "file-txt-default",
-              "../assets/icons/file-txt-default.svg"
-            );
-            return "file-txt-default";
-          }
-        }
-      }
-    }
-  }
-
-  addIconSvg(iconName: string, iconSvgPath) {
-    this.matIconRegistry.addSvgIcon(
-      iconName,
-      this.domSanitizer.bypassSecurityTrustResourceUrl(iconSvgPath)
-    );
-  }
 
   navigate(element: FileElement) {
     if (element?.isFolder) {
@@ -644,16 +208,35 @@ export class TableSortableComponent implements OnInit {
   }
 
   async navigateToFolder(element: FileElement) {
-    this.currentRoot = element;
-    await this.updateFileElementQuery(this.currentRoot);
+    await this.updateFileElementQuery(element);
     this.currentPath = this.pushToPath(this.currentPath, element.name);
     this.canNavigateUp = true;
+    this.currentRoot = element as FileElement;
   }
 
-  navigateUp() {
+  async navigateUp() {
     if (this.canNavigateUp) {
       if (this.currentRoot?.isFolder) {
-        this.navigateBackUp(this.currentRoot);
+        if (this.currentRoot.parent === "root") {
+          await this.backToRoot();
+    }
+    else {
+      //refresh if there was new files
+      await this.fileService.fireStoreCollections();
+      this.currentRoot = this.fileService.get(this.currentRoot?.parent ?? '');
+
+      if (this.currentRoot === null || this.currentRoot === undefined) {
+        this.currentRoot = new FileElement;
+        this.canNavigateUp = false;
+
+        //alert("The folder you are navigating to does not exist anymore!\nYou will be redirected back to root Files.");
+        await this.updateFileElementQuery(this.currentRoot);
+      }
+
+      await this.updateFileElementQuery(this.currentRoot);
+    }
+
+    this.currentPath = this.popFromPath(this.currentPath);
       }
     }
   }
@@ -662,28 +245,31 @@ export class TableSortableComponent implements OnInit {
     if (this.canNavigateUp) {
       this.currentPath = "root";
       await this.updateFileElementQuery();
-      this.currentRoot = null;
       this.canNavigateUp = false;
     }
   }
 
   async navigateBackUp(element: FileElement) {
-    if (this.currentRoot && this.currentRoot.parent === "root") {
-      this.currentRoot = null;
+    if (element && element.parent === "root") {
       this.canNavigateUp = false;
-      await this.updateFileElementQuery();
-    } else {
+      await this.updateFileElementQuery(element);
+    }
+    else {
+      //refresh if there was new files
       await this.fileService.fireStoreCollections();
 
-      this.currentRoot = this.fileService.get(this.currentRoot.parent);
+      this.currentRoot = this.fileService.get(this.currentRoot?.parent ?? '');
+
       if (this.currentRoot === null || this.currentRoot === undefined) {
-        this.currentRoot = null;
+        this.currentRoot = new FileElement;
         this.canNavigateUp = false;
         //alert("The folder you are navigating to does not exist anymore!\nYou will be redirected back to root Files.");
-        await this.updateFileElementQuery();
+        await this.updateFileElementQuery(this.currentRoot);
       }
+
       await this.updateFileElementQuery(this.currentRoot);
     }
+
     this.currentPath = this.popFromPath(this.currentPath);
   }
 
@@ -729,11 +315,11 @@ export class TableSortableComponent implements OnInit {
   }
 
   async addFolder(folder: { name: string }) {
-    await this.fileService.add(this.currentRoot, {
-      isFolder: true,
-      name: folder.name,
-      size: 0,
-    });
+    let newFolder = new FileElement;
+    newFolder.isFolder = true;
+    newFolder.name = folder.name;
+
+    await this.fileService.add(newFolder, this.currentRoot);
     await this.updateFileElementQuery(this.currentRoot);
   }
 
@@ -753,7 +339,7 @@ export class TableSortableComponent implements OnInit {
   }
 
   openShareDialog(element: FileElement) {
-    let dialogRef = this.dialog.open(ShareDialogComponent, {
+    this.dialog.open(ShareDialogComponent, {
       data: {
         shareLink: element.downloadURL,
         shareZipFolder: null,
@@ -777,10 +363,10 @@ export class TableSortableComponent implements OnInit {
     );
 
     if (getFilePath) {
-      await this.fileService.moveFile(
-        getFilePath,
-        event.moveTo.metaData?.fullPath
-      );
+      // await this.fileService.moveFile(
+      //   getFilePath,
+      //   event.moveTo.metaData?.fullPath
+      // );
       await this.fileService.update(event.fileElement.id, {
         parent: event.moveTo.id,
       });
@@ -811,11 +397,12 @@ export class TableSortableComponent implements OnInit {
   clone(element: FileElement) {
     return JSON.parse(JSON.stringify(element));
   }
+
   async deleteElement(element: FileElement) {
     this.currentPath = this.currentPath ? this.currentPath : "root";
 
     if (this.currentPath === "root") {
-      this.currentPath = null;
+      this.currentPath = '';
     }
 
     if (this.currentPath?.charAt(this.currentPath.length - 1) === "/") {
@@ -825,7 +412,7 @@ export class TableSortableComponent implements OnInit {
     var findCurrentFolder = this.currentPath?.split("/");
     var currentFolder = findCurrentFolder
       ? findCurrentFolder[findCurrentFolder.length - 1]
-      : null;
+      : '';
 
     var fileElement = await this.getParentFolder(
       this.currentPath,
@@ -847,12 +434,16 @@ export class TableSortableComponent implements OnInit {
     fileInput.files = null;
     fileInput.click();
   }
+
   async onDrop(files: FileList) {
     for (let i = 0; i < files.length; i++) {
-      this.files.push(files.item(i));
+      if (files.item(i))
+      {
+      this.files.push(files?.item(i) as File);
+      }
     }
 
-    this.currentPath = this.currentPath ? this.currentPath : null;
+    this.currentPath = this.currentPath ? this.currentPath : '';
 
     if (this.currentPath?.charAt(this.currentPath.length - 1) === "/") {
       this.currentPath = this.currentPath.slice(0, -1);
@@ -863,7 +454,7 @@ export class TableSortableComponent implements OnInit {
       ? findCurrentFolder[findCurrentFolder.length - 1]
       : null;
 
-    this.getParentFolder(this.currentPath, currentFolder).then(
+    this.getParentFolder(this.currentPath, currentFolder ?? '').then(
       (parentFolder) => {
         this.currentRoot = parentFolder;
       }
@@ -889,17 +480,19 @@ export class TableSortableComponent implements OnInit {
       for (var file = 0; file < newFileList.length; file++) {
         const docId = await this.fileService.createStoreDocumentUpload(
           this.currentPath,
-          null,
+          '',
           newFileList[file],
           fulldate
         );
 
         let uploadPrcnt = await this.fileService.uploadFile(
+          newFileList[file],
           this.currentPath,
           docId,
-          newFileList[file],
           this.currentRoot
         );
+
+        this.getFileIcon({name: newFileList[file].name, size: newFileList[file].size} as FileElement);
 
         //Todo, set percentage on the Observable
         this.fileElements = await this.fileService.queryInFolder(
@@ -908,7 +501,6 @@ export class TableSortableComponent implements OnInit {
         this.fileElements.subscribe((value) => {
           value.forEach((file) => {
             if (file.id == docId) {
-              this.getFileTypeIcon(file);
               file.uploadProgress = uploadPrcnt;
             }
           });
@@ -923,7 +515,12 @@ export class TableSortableComponent implements OnInit {
   }
 
   async updateFileElementQuery(element?: FileElement) {
-    this.currentRoot = element;
+
+    if (element)
+    {
+      this.currentRoot = element
+    }
+
     await this.fileService.fireStoreCollections();
 
     this.fileElements = await this.fileService.queryInFolder(
@@ -932,9 +529,20 @@ export class TableSortableComponent implements OnInit {
   }
 
   private async getParentFolder(
-    parentPath?: string,
-    folderName?: string
+    parentPath: string,
+    folderName: string
   ): Promise<FileElement> {
     return await this.fileService.getParentFolder(parentPath, folderName);
+  }
+
+  getFileIcon(file: FileElement) : string
+  {
+    let fileExt!: string;
+    if(file)
+    {
+      let ext = this.fileManager.getFileExtension(file.name);
+      fileExt  = this.fileManager.getFileExtensionIcon(ext);
+    }
+    return fileExt;
   }
 }

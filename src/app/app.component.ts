@@ -22,7 +22,7 @@ export class AppComponent {
     ) {
   }
 
-  public currentRoot: FileElement;
+  public currentRoot?: FileElement;
   currentPath: string;
   canNavigateUp = false;
   files: File[] = [];
@@ -31,14 +31,20 @@ export class AppComponent {
 
   ngOnInit() {
   }
-  
+
   async addFolder(folder: { name: string }) {
-    await this.fileService.add(this.currentRoot, { isFolder: true, name: folder.name, size: 0 });
+
+    let newFolder = new FileElement;
+    newFolder.name = folder.name;
+    newFolder.size = 0;
+    newFolder.isFolder = true;
+
+    await this.fileService.add(newFolder, this.currentRoot);
     await this.updateFileElementQuery(this.currentRoot);
   }
 
   async addFile(event: { element: FileElement;currentPath: string; files: File[] }) {
-    
+
     this.currentRoot = event.element ;
     await this.updateFileElementQuery(this.currentRoot);
   }
@@ -55,18 +61,18 @@ export class AppComponent {
     this.canNavigateUp = true;
   }
 
-  async navigateUp(element: FileElement) {
+  async navigateUp() {
     if (this.currentRoot && this.currentRoot.parent === 'root') {
-      this.currentRoot = null;
+      this.currentRoot = new FileElement;
       this.canNavigateUp = false;
       await this.updateFileElementQuery();
     } else {
-      
+
       await this.fileService.fireStoreCollections();
 
-      this.currentRoot = this.fileService.get(this.currentRoot.parent);
+      this.currentRoot = this.fileService.get(this.currentRoot?.parent ?? '');
       if(this.currentRoot === null || this.currentRoot === undefined){
-        this.currentRoot = null;
+        this.currentRoot = new FileElement;
         this.canNavigateUp = false
         await this.updateFileElementQuery();
       }
@@ -82,12 +88,12 @@ export class AppComponent {
     let getFilePath = await this.fileService.getStorageFilePath(event.fileElement);
 
     if(getFilePath){
-      await this.fileService.moveFile(getFilePath, event.moveTo.metaData?.fullPath);
-      await this.fileService.update(event.fileElement.id, { parent: event.moveTo.id });
-      
+      // await this.fileService.moveFile(getFilePath, event.moveTo.metaData?.fullPath);
+      //await this.fileService.update(event.fileElement.id, { parent: event.moveTo.id });
+
       await this.updateFileElementQuery();
     }
-    
+
   }
 
   async downloadElement(fileElement: FileElement) {
@@ -101,13 +107,13 @@ export class AppComponent {
     }
 
   }
-  
+
   renameElement(element: FileElement) {
     this.fileService.update(element.id, { name: element.name });
     this.updateFileElementQuery();
   }
 
-  async updateFileElementQuery(element?: FileElement) { 
+  async updateFileElementQuery(element?: FileElement) {
       this.currentRoot = element;
       await this.fileService.fireStoreCollections();
 
@@ -116,9 +122,9 @@ export class AppComponent {
 
   //TODO: REMOVE THIS METHOD
   async updateFileElementQueryAsync(element?: FileElement) {
-     
+
     if (this.currentRoot && this.currentRoot.parent === 'root') {
-      this.currentRoot = null;
+      this.currentRoot = new FileElement;
       this.canNavigateUp = false;
       await this.updateFileElementQuery();
     }
@@ -126,7 +132,7 @@ export class AppComponent {
       this.canNavigateUp = true;
       await this.updateFileElementQuery(this.currentRoot);
     }
-    
+
   }
 
   pushToPath(path: string, folderName: string) {

@@ -7,7 +7,7 @@ import { FileService } from 'src/app/service/fileService/file.service';
 export const downloadFolderAsZip = async (mainParent: FileElement, fileService: FileService) => {
 
     var downLoadFolderlist = fileService.getDownloadItems(mainParent.id);
-    
+
     if(downLoadFolderlist.size > 0)
     {
         const filePath = await fileService.getStorageFilePath(mainParent);
@@ -38,7 +38,7 @@ export const downloadFolderAsZip = async (mainParent: FileElement, fileService: 
                             firebase.storage().ref(folderPrefRef.fullPath)
                         );
                     });
-                    
+
                     res.items.forEach((itemRef) => {
                         fileItems.push(itemRef);
                     });
@@ -54,12 +54,12 @@ export const downloadFolderAsZip = async (mainParent: FileElement, fileService: 
 
                 if(nextFolder.fullPath === mainFolderRef.fullPath && nextFolder.name === mainFolderRef.name)
                 {
-                    downloadedFiles.forEach((file: null, i: string | number) => jszip.file(fileItems[i].name, file));
+                    downloadedFiles.forEach((file: null, i: string | number) => jszip.file(fileItems[i as number].name, file));
                 }
                 else
                 {
                     newfolder = jszip.folder(nextFolder.name);
-                    downloadedFiles.forEach((file: null, i: string | number) => newfolder.file(fileItems[i].name, file));
+                    downloadedFiles.forEach((file: null, i: string | number) => newfolder.file(fileItems[i as number].name, file));
                 }
             }
 
@@ -73,7 +73,7 @@ export const downloadFolderAsZip = async (mainParent: FileElement, fileService: 
     }
 };
 
-      
+
 // for (let [key, value] of downLoadFolderlist) {
 //     if(key.parent === "root")
 //     {
@@ -84,7 +84,7 @@ export const downloadFolderAsZip = async (mainParent: FileElement, fileService: 
 
 // for(folderSize; folderSize <= downLoadFolderlist.size; folderSize++){
 
-    
+
 
 //     folderSize++;
 // }

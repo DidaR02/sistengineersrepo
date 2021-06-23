@@ -1,6 +1,6 @@
 /* Sortable table demo */
 
-th[sortable] {
+/* th[sortable] {
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
@@ -21,7 +21,7 @@ th[sortable].asc:before {
 th[sortable].desc:before {
     transform: rotate(180deg);
     -ms-transform: rotate(180deg);
-}
+} */
 
 tr:hover {
     transform: scale(1);
@@ -47,7 +47,7 @@ tr:hover {
     z-index: 1;
 } */
 
-.pointer {
+.home-icon, .pointer {
     cursor: pointer;
 }
 
@@ -63,7 +63,7 @@ progress::-webkit-progress-value {
     transition: width 0.1s ease;
 }
 
-.table {
+table {
     height: 100% auto;
     width: 100%;
     /* overflow-y: auto; */
@@ -90,8 +90,14 @@ progress::-webkit-progress-value {
     margin-left: 8px;
 }
 
+.file-command{
+  text-align: center;
+}
+
 .btn-file-command {
-    background-color: #bebfc0;
+    color: inherit;
+    text-decoration: none;
+    margin: auto;
 }
 
 .btn-file-command:hover {

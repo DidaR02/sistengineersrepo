@@ -27,7 +27,7 @@ import { DropzoneDirective } from './service/fileService/dropzone.directive';
 import { UploadTaskComponent } from './components/upload-task/upload-task.component';
 import { UploaderComponent } from './components/uploader/uploader.component';
 import { UploadComponent } from './service/fileService/upload';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+// import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
 import { RenameDialogModule } from './components/rename-dialog/rename-dialog.module';
@@ -39,6 +39,7 @@ import { ShareDialogModule } from './components/share-dialog/share-dialog.module
 import { HttpClientModule } from "@angular/common/http";
 import { IconService } from './service/iconService/icon.service';
 import { APP_INITIALIZER } from '@angular/core';
+import { FileManagerService } from './service/shared/files-manager.service';
 
 @NgModule({
   declarations: [
@@ -66,7 +67,7 @@ import { APP_INITIALIZER } from '@angular/core';
     MatSortModule,
     MatPaginatorModule,
     MatIconModule,
-    NgbModule,
+    // NgbModule,
     FormsModule,
     ReactiveFormsModule,
     RenameDialogModule,
@@ -84,7 +85,8 @@ import { APP_INITIALIZER } from '@angular/core';
       useFactory: initIconService,
       deps: [IconService],
       multi: true
-    }
+    },
+    FileManagerService
   ],
   bootstrap: [AppComponent]
 })

@@ -5,10 +5,10 @@ import { Injectable } from "@angular/core";
   })
 
 export class DataTypeConversionService {
-    
+
     constructor(){}
-    
-    getBoolean(value){
+
+    getBoolean(value: any){
         switch(value){
             case true:
             case "true":
@@ -17,12 +17,12 @@ export class DataTypeConversionService {
             case "on":
             case "yes":
                 return true;
-            default: 
+            default:
                 return false;
         }
     }
 
-    getStringBoolean(value){
+    getStringBoolean(value: any){
         switch(value){
             case true:
             case "true":
@@ -31,12 +31,12 @@ export class DataTypeConversionService {
             case "on":
             case "yes":
                 return "yes";
-            default: 
+            default:
                 return "no";
         }
     }
 
-    convertBooleanToString(value){
+    convertBooleanToString(value: any){
         switch(value){
             case true:
             case "true":
@@ -45,23 +45,19 @@ export class DataTypeConversionService {
             case "on":
             case "yes":
                 return "true";
-            default: 
+            default:
                 return "false";
         }
     }
 
-    getAdminAccess(value){
+    getAdminAccess(value: string){
         switch(value){
             case "fullAccess":
-                return "fullAccess"; 
+                return "fullAccess";
             case "partialAccess":
-                return "partialAccess"; 
-            default: 
+                return "partialAccess";
+            default:
                 return "noAccess";
         }
     }
-
-    getFileExtension(filename) {
-        return filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2);
-      }
 }

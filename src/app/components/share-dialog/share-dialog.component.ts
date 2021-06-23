@@ -17,7 +17,7 @@ export class ShareDialogComponent implements OnInit {
 
   displayItem : any;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: {shareLink?: string, shareZipFolder?: JSZip}) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: {shareLink: string, shareZipFolder?: JSZip}) {
     this.shareLink = this.data.shareLink;
     this.shareZipFolder = this.data.shareZipFolder;
     this.setDisplay();

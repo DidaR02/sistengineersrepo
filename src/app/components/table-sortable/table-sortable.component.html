@@ -1,121 +1,124 @@
 <div class="pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Manage Files</h1>
+  <h1 class="h2">Manage Files</h1>
 </div>
 
-<form>
-    <div class="form-group form-inline">
-        Search: <input class="form-control ml-2" type="text" [formControl]="filter" />
-    </div>
-</form>
+<!-- <form>
+  <div class="form-group form-inline">
+    Search: <input class="form-control ml-2" type="text" [formControl]="filter" />
+  </div>
+</form> -->
 
-<mat-icon aria-hidden="false" aria-label="homer" (click)="backToRoot()">home</mat-icon>
-<span class="iconSpace"></span>
-<mat-icon *ngIf="canNavigateUp" class="pointer" (click)="navigateUp()">
+<div class="container">
+  <div class="row">
+    <div *ngIf="canCreateFolder" class="col file-command">
+      <a (click)="openNewFolderDialog()" class="pointer btn-file-command">
+        <mat-icon class="file-icon">
+          create_new_folder
+        </mat-icon>
+        <span>New Folder</span>
+      </a>
+    </div>
+    <div *ngIf="canAddFile" class="col file-command">
+      <a class="pointer btn-file-command" (click)="onFileUploadButtonClick()">
+        <mat-icon class="file-icon">
+          note_add
+        </mat-icon>
+        New File
+      </a>
+    </div>
+  </div>
+</div>
+
+<div>
+  <input type="file" #fileInput id="fileUpload" (change)="onDrop($event.target.files)" name="fileUpload"
+    multiple="multiple" accept="*" style="display:none;" />
+</div>
+
+<span class="spacer"></span>
+<div>
+  <mat-icon aria-hidden="false" aria-label="homer" class="home-icon" (click)="backToRoot()">home</mat-icon>
+  <span class="iconSpace"></span>
+  <mat-icon *ngIf="canNavigateUp" class="pointer" (click)="navigateUp()">
     arrow_back
-</mat-icon>
-<span style="margin-left: 8px; font-size: 14px;font-weight: 400px;"> {{currentPath !='root' ?  currentPath : 'Files' || 'Files'}} </span>
+  </mat-icon>
+  <span style="margin-left: 8px; font-size: 14px;font-weight: 400px;">
+    {{currentPath !='root' ?  currentPath : 'Files' || 'Files'}} </span>
+
+</div>
 
 <span class="spacer"></span>
 
-<div class="container">
-    <div class="row">
-        <div *ngIf="canCreateFolder" class="col-sm file-command">
-            <button class="btn-file-command" mat-menu-item (click)="openNewFolderDialog()">
-            <mat-icon class="pointer">
-                create_new_folder
-            </mat-icon>
-            <span>New Folder</span>
-            </button>
-        </div>
-        <div *ngIf="canAddFile" class="col-sm file-command">
-            <button class="btn-file-command" mat-menu-item (click)="onFileUploadButtonClick()">
-            <mat-icon class="pointer">
-                note_add
-            </mat-icon>
-            <span>New File</span>
-            </button>
-        </div>
-    </div>
-</div>
-
-<label class="file-label"> </label>
-<input type="file" #fileInput id="fileUpload" (change)="onDrop($event.target.files)" name="fileUpload" multiple="multiple" accept="*" style="display:none;" />
-
 <table class="table">
-    <thead>
-        <tr>
-            <!-- <th scope="col"></th> -->
-            <th scope="col" sortable="name" (sort)="onSort($event)">Name</th>
-            <th scope="col"></th>
-        </tr>
-    </thead>
-    <tbody class="tbBody">
-        <tr *ngFor="let file of fileElements | async" (dblclick)="navigate(file)">
-            <!-- <td scope="row" class="row-checkbox">
-                <mat-checkbox class="tbl-checkbox" (click)="fileChecked(file)">
-                </mat-checkbox>
-            </td> -->
-            <td scope="row" class="row-item" [term]="filter.value">
-
-                <div *ngIf="file.isFolder">
-                    <mat-icon [ngStyle]="{'color':'#92CEFF'}" class=" fa file-or-folder-icon pointer" *ngIf="file.isFolder">
-                        folder
-                    </mat-icon>
-                    <span class="row-item-span"> {{ file.name }} </span>
-                </div>
-
-                <div *ngIf="!file.isFolder">
-                    <a *ngIf="!file.isFolder" style="text-decoration: none; color: inherit !important;" [href]="file.downloadURL" target="_blank" rel="noopener noreferrer" class="urlLink">
-                        <mat-icon svgIcon={{getFileTypeIcon(file)}} *ngIf="!file.isFolder" [ngStyle]="{'color':'#78726e'}" class="pointer">
-                        </mat-icon>
-                        <span class="row-item-span"> {{ file.name }}</span>
-                        <br>
-                        <span class="row-item-span"> {{ file.size }}</span>
-                    </a>
-                </div>
-                <div *ngIf="(file.uploadProgress | async) as pct">
-                    <progress [value]="pct" max="100"></progress> {{ pct | number }}%
-                </div>
-            </td>
-            <td>
-                <span [matMenuTriggerFor]="rootMenu" [matMenuTriggerData]="{self: file}" #menuTrigger="matMenuTrigger"></span>
-                <button type="button" class="btn btn-light btn-sm" (click)="openMenu($event, menuTrigger)">More</button>
-            </td>
-        </tr>
-    </tbody>
+  <thead>
+    <tr>
+      <th scope="col">File Name</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody class="tbBody">
+    <tr *ngFor="let file of fileElements | async" (dblclick)="navigate(file)">
+      <td scope="row" class="row-item">
+        <div *ngIf="file.isFolder">
+          <mat-icon [ngStyle]="{'color':'#92CEFF'}" class=" fa file-or-folder-icon pointer" *ngIf="file.isFolder">
+            folder
+          </mat-icon>
+          <span class="row-item-span"> {{ file.name }} </span>
+        </div>
+        <!--  -->
+        <div *ngIf="!file.isFolder">
+          <a *ngIf="!file.isFolder" style="text-decoration: none; color: inherit !important;" [href]="file.downloadURL"
+            target="_blank" rel="noopener noreferrer" class="urlLink">
+            <mat-icon *ngIf="!file.isFolder" [ngStyle]="{'color':'#78726e'}" class="pointer"
+              svgIcon={{getFileIcon(file)}}>
+            </mat-icon>
+            <span class="row-item-span"> {{ file.name }}</span>
+            <br>
+            <span class="row-item-span"> {{ file.size }}</span>
+          </a>
+        </div>
+        <div *ngIf="(file.uploadProgress | async) as pct">
+          <progress [value]="pct" max="100"></progress> {{ pct | number }}%
+        </div>
+      </td>
+      <td>
+        <span [matMenuTriggerFor]="rootMenu" [matMenuTriggerData]="{self: file}" #menuTrigger="matMenuTrigger"></span>
+        <button type="button" class="btn btn-light btn-sm" (click)="openMenu($event, menuTrigger)">More</button>
+      </td>
+    </tr>
+  </tbody>
 </table>
 
 <mat-menu #rootMenu="matMenu" [overlapTrigger]="false">
-    <ng-template matMenuContent let-self="self">
-        <!-- <button [disabled]="!canMove" mat-menu-item [matMenuTriggerFor]="moveToMenu" [matMenuTriggerData]="{self: self}">
+  <ng-template matMenuContent let-self="self">
+    <!-- <button [disabled]="!canMove" mat-menu-item [matMenuTriggerFor]="moveToMenu" [matMenuTriggerData]="{self: self}">
         <mat-icon>open_with</mat-icon>
         <span>Move To</span>
       </button> -->
-        <button [disabled]="!canDownload" mat-menu-item [matMenuTriggerData]="{self: self}" (click)="downloadElement(self)">
-        <mat-icon [disabled]="!canDownload">cloud_download</mat-icon>
-        <span>Download</span>
-      </button>
-        <!-- <button mat-menu-item (click)="openRenameDialog(self)">
+    <button [disabled]="!canDownload" mat-menu-item [matMenuTriggerData]="{self: self}" (click)="downloadElement(self)">
+      <mat-icon [disabled]="!canDownload">cloud_download</mat-icon>
+      <span>Download</span>
+    </button>
+    <!-- <button mat-menu-item (click)="openRenameDialog(self)">
         <mat-icon>edit</mat-icon>
         <span>Rename</span>
       </button> -->
-        <button [disabled]="!canShare || self.isFolder" mat-menu-item (click)="openShareDialog(self)">
-        <mat-icon>share</mat-icon>
-        <span>Share</span>
-        </button>
-        <button [disabled]="!canDelete" mat-menu-item [matMenuTriggerData]="{self: self}" (click)="deleteElement(self)">
-        <mat-icon [disabled]="!canDelete">delete</mat-icon>
-        <span>Delete</span>
-      </button>
-    </ng-template>
+    <button [disabled]="!canShare || self.isFolder" mat-menu-item (click)="openShareDialog(self)">
+      <mat-icon>share</mat-icon>
+      <span>Share</span>
+    </button>
+    <button [disabled]="!canDelete" mat-menu-item [matMenuTriggerData]="{self: self}" (click)="deleteElement(self)">
+      <mat-icon [disabled]="!canDelete">delete</mat-icon>
+      <span>Delete</span>
+    </button>
+  </ng-template>
 </mat-menu>
 
 <mat-menu #moveToMenu="matMenu">
-    <ng-template matMenuContent let-self="self">
-        <ng-container *ngFor="let file of fileElements | async">
-            <button *ngIf="file.isFolder" mat-menu-item (click)="moveElement(self, file)">
-          {{file.name}}
-        </button>
-        </ng-container>
-    </ng-template>
+  <ng-template matMenuContent let-self="self">
+    <ng-container *ngFor="let file of fileElements | async">
+      <button *ngIf="file.isFolder" mat-menu-item (click)="moveElement(self, file)">
+        {{file.name}}
+      </button>
+    </ng-container>
+  </ng-template>
 </mat-menu>
