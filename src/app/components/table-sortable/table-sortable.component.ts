@@ -27,6 +27,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { FileManagerService } from "src/app/service/shared/files-manager.service";
 import { UserManagerService } from "src/app/service/authentication/userManager.service";
 import { MatMenuModule } from '@angular/material/menu';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: "app-table-sortable",
@@ -73,7 +74,8 @@ export class TableSortableComponent implements OnInit {
     public dialog: MatDialog,
     private convertDataType: DataTypeConversionService,
     private fileManager: FileManagerService,
-    public userManagerService: UserManagerService
+    public userManagerService: UserManagerService,
+    public snackBar : MatSnackBar
   ) {
     this.authService.getLocalUserData();
     this.getUserInfo();
@@ -471,6 +473,10 @@ export class TableSortableComponent implements OnInit {
     const fulldate = year + month + date;
 
     const localCurrentF = localStorage.getItem('currentFolderId');
+
+    this.snackBar.open('Uploading files started...','close' ,{
+      duration: 3000
+    });
 
     if (newFileList.length > 0) {
       for (var file = 0; file < newFileList.length; file++) {
