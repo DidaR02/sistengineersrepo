@@ -21,7 +21,7 @@ const routes: Routes = [
     loadChildren: ()=> import('./components/dashboard/dashboard.module').then(dashModule => dashModule.DashboardModule),
   },
   { path: 'verify-email-address', component: VerifyEmailComponent }
-  
+
 ];
 
 @NgModule({

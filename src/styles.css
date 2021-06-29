@@ -3,31 +3,32 @@
 @import "~bootstrap/dist/css/bootstrap.css";
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+
 .dropzone {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    min-width: 80vw;
-    font-weight: 200;
-    height: 300px;
-    border: 2px dashed #f16624;
-    border-radius: 5px;
-    background: white;
-    margin: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  min-width: 80vw;
+  font-weight: 200;
+  height: 300px;
+  border: 2px dashed #f16624;
+  border-radius: 5px;
+  background: white;
+  margin: 10px 0;
 }
 
 .dropzone:hovering {
-    border: 2px solid #7c5c4d;
-    color: #dadada !important;
+  border: 2px solid #7c5c4d;
+  color: #dadada !important;
 }
 
 .file-label {
-    font-size: 1.2em;
+  font-size: 1.2em;
 }
 
 progress::-webkit-progress-value {
-    transition: width 0.1s ease;
+  transition: width 0.1s ease;
 }
 
 *,
@@ -40,17 +41,36 @@ progress::-webkit-progress-value {
 
 
 body {
-    background-color: #d30752;
-    height: 100% !important;
-    display: inline-block;
-    width: 100%;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
-    font-size: 14px;
+  background-color: #d30752;
+  height: 100% !important;
+  display: inline-block;
+  width: 100%;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-size: 14px;
+}
+
+:root {
+  --input-border: #8b8a8b;
+  --input-focus-h: 245;
+  --input-focus-s: 100%;
+  --input-focus-l: 42%;
+}
+
+input,
+.input {
+  font-size: 16px;
+  font-size: max(16px, 1em);
+  font-family: inherit;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: #fff;
+  border: 2px solid var(--input-border);
+  border-radius: 4px;
 }
 
 .footer {
-    height: 150px;
-    text-align: center;
+  height: 150px;
+  text-align: center;
 }
 
 
@@ -59,8 +79,8 @@ body {
 @media screen and (max-width: 600px) {}
 
 @media screen and (max-width: 860px) {
-    .footer .container {
-        /* font-size: 3vw; */
-        padding: 0px;
-    }
+  .footer .container {
+    /* font-size: 3vw; */
+    padding: 0px;
+  }
 }

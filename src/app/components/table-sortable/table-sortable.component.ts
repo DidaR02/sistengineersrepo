@@ -233,7 +233,6 @@ export class TableSortableComponent implements OnInit {
     this.currentPath = "root";
        await this.updateFileElementQuery().then(
          async (backToRoot) => {
-           console.log("Back to root", backToRoot)
           this.canNavigateUp = false;
           localStorage.setItem('currentFolderId', 'root');
           });
@@ -253,7 +252,6 @@ export class TableSortableComponent implements OnInit {
       if (this.currentRoot === null || this.currentRoot === undefined) {
         this.currentRoot = new FileElement;
         this.canNavigateUp = false;
-        //alert("The folder you are navigating to does not exist anymore!\nYou will be redirected back to root Files.");
         await this.updateFileElementQuery(this.currentRoot);
         this.currentPath = this.popFromPath(this.currentPath);
       }

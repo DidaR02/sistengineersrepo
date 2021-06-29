@@ -1,77 +1,82 @@
 <div class="container">
 
-    <div class="row align-items-center">
-        <div class="col">
+  <div class="row align-items-center">
+    <div class="col">
 
-            <div class="container">
+      <div class="container">
 
-                <div class="signup-user">
-                    <h1>Please create Sign In credentials</h1>
-                    <br>
+        <div class="signup-user">
+          <h1>Please create Sign In credentials</h1>
+          <br>
 
-                    <form [formGroup]="signUpFormGroup" id="signUp-form" action="#" (ngSubmit)="submitSigUpDetails()">
+          <form [formGroup]="signUpFormGroup" id="signUp-form" action="#" (ngSubmit)="submitSigUpDetails()">
 
-                        <div class="panel panel-primary">
-                            <div class="panel-heading">Your Personal Details</div>
-                            <div class="panel-body">
+            <div class="panel panel-primary">
+              <div class="panel-heading">Your Personal Details</div>
+              <div class="panel-body">
 
-                                <div *ngIf="!this.isPasswordValid">
-                                    <div class="alert alert-danger alert-dismissible">
-                                        <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="resetErrorMsg()">&times;</a>
-                                        <strong>Password not valid!</strong> Please reenter your password correctly.
-                                    </div>
-                                </div>
-
-                                <div class="form-row ">
-                                    <div class="form-group col-md-6">
-                                        <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name" aria-required="true" formControlName="FirstName">
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name" aria-required="true" formControlName="LastName">
-                                    </div>
-                                </div>
-
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="Email *" aria-required="true" formControlName="Email">
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <input type="text" class="form-control" id="confirmEmail" name="confirmEmail" placeholder="Confirm Email *" aria-required="true" formControlName="ConfirmEmail">
-                                    </div>
-                                </div>
-
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <input type="password" class="form-control" id="password" name="password" placeholder="Password *" aria-required="true" formControlName="Password">
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password *" aria-required="true" formControlName="ConfirmPassword">
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        </div>
-                        <button type="submit" class="btn btn-success btn-primary">Sign Up</button>
-
-                        <div class="signup-div" style="padding-top: 15px;">
-                            <p>
-                                I already have an account.
-                                <span>
-                                    <li class="signup-item" style="list-style-type: none;">
-                                        <a class="sign-link" (click)="redirectToSignin()">
-                                            <i class="fas fa-sign-in-alt"></i>Sign in with an existing account
-                                        </a>
-                                    </li>
-                                </span>
-                            </p>
-                        </div>
-
-                    </form>
+                <div *ngIf="!this.isPasswordValid">
+                  <div class="alert alert-danger alert-dismissible">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close"
+                      (click)="resetErrorMsg()">&times;</a>
+                    <strong>Password not valid!</strong> Please reenter your password correctly.
+                  </div>
                 </div>
+
+                <div class="form-row row">
+                  <div class="form-group col-md-6">
+                    <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name"
+                      aria-required="true" formControlName="FirstName">
+                  </div>
+                  <div class="form-group col-md-6">
+                    <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name"
+                      aria-required="true" formControlName="LastName">
+                  </div>
+                </div>
+
+                <div class="form-row row">
+                  <div class="form-group col-md-6">
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Email *"
+                      aria-required="true" formControlName="Email">
+                  </div>
+                  <div class="form-group col-md-6">
+                    <input type="text" class="form-control" id="confirmEmail" name="confirmEmail"
+                      placeholder="Confirm Email *" aria-required="true" formControlName="ConfirmEmail">
+                  </div>
+                </div>
+
+                <div class="form-row row">
+                  <div class="form-group col-md-6">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Password *"
+                      aria-required="true" formControlName="Password">
+                  </div>
+                  <div class="form-group col-md-6">
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
+                      placeholder="Confirm Password *" aria-required="true" formControlName="ConfirmPassword">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-success btn-primary">Sign Up</button>
+
+            <div class="signup-div" style="padding-top: 15px;">
+              <p>
+                I already have an account.
+                <span>
+                  <li class="signup-item" style="list-style-type: none;">
+                    <a class="sign-link" (click)="redirectToSignin()">
+                      <i class="fas fa-sign-in-alt"></i>Sign in with an existing account
+                    </a>
+                  </li>
+                </span>
+              </p>
             </div>
 
+          </form>
         </div>
+      </div>
 
     </div>
+
+  </div>
 </div>
