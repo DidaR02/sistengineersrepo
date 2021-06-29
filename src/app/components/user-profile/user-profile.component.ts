@@ -33,29 +33,29 @@ export class UserProfileComponent implements OnInit {
     public userManagerService: UserManagerService,
     public router: Router
   ) {
-      this.refreshAll();
+      // this.refreshAll();
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
      this.refreshAll();
   }
 
   async refreshAll()
   {
-    this.getUserInfo();
-    this.GetAllUsers();
+    await this.getUserInfo();
+    await this.GetAllUsers();
   }
 
   async getUserInfo()
   {
-    await this.createSignInUser();
+    this.userManagerService.createSignInUser();
 
     if(this.authService?.isLoggedIn)
     {
       if(!this.userAccess)
       {
-        this.authService.getLocalUserData();
-        await this.createSignInUser();
+        //this.authService.getLocalUserData();
+        this.userManagerService.createSignInUser();
       }
 
       if(this.authService?.userAccess)
@@ -78,64 +78,33 @@ export class UserProfileComponent implements OnInit {
         }
       }
 
-      if(this.authService.userData){
+      if(this.userManagerService.user){
         this.user = {
-          uid: this.authService.userData?.uid,
-          displayName: this.authService.userData?.displayName,
-          email: this.authService.userData?.email,
-          emailVerified: this.authService.userData?.emailVerified,
-          photoURL: this.authService.userData?.photoURL,
-          firstName: this.authService.userData?.firstName,
-          lastName: this.authService.userData?.lastName
+          uid: this.userManagerService.user?.uid,
+          displayName: this.userManagerService.user?.displayName,
+          email: this.userManagerService.user?.email,
+          emailVerified: this.userManagerService.user?.emailVerified,
+          photoURL: this.userManagerService.user?.photoURL,
+          firstName: this.userManagerService.user?.firstName,
+          lastName: this.userManagerService.user?.lastName
         };
 
         this.signedInUser = {
-          Uid: this.authService.userData?.uid,
+          Uid: this.userManagerService.user?.uid,
           User: this.user,
           UserAccess: this.userAccess
         };
 
         localStorage.setItem('signedInUser', JSON.stringify(this.signedInUser));
-        JSON.parse(localStorage.getItem('signedInUser') ?? '');
         }
         else
         {
           if(!this.signedInUser || !this.signedInUser.Uid || !this.signedInUser.User || !this.signedInUser.User.uid || !this.signedInUser.UserAccess)
           {
-            this.createSignInUser();
+            this.userManagerService.createSignInUser();
           }
         }
     }
-  }
-
-  async createSignInUser(){
-
-    const _signedInUser = JSON.parse(localStorage.getItem('signedInUser') ?? '');
-    const _user = JSON.parse(localStorage.getItem('user') ?? '');
-    this.userAccess = JSON.parse(localStorage.getItem('userAccess') ?? '');
-
-    if(_user){
-      this.user = {
-        uid: _user.uid ??_signedInUser?.uid,
-        displayName: _user.displayName ?? _signedInUser?.displayName,
-        email: _user?.email ?? _signedInUser?.email,
-        emailVerified: _user?.emailVerified ?? _signedInUser?.emailVerified,
-        photoURL: _user?.photoURL ?? _signedInUser?.photoURL,
-        firstName: _user?.firstName,
-        lastName: _user?.lastName
-        };
-      };
-
-      if(this.user){
-        this.signedInUser = {
-        Uid: this.user.uid?? null,
-        User: this.user ?? null,
-        UserAccess: this.userAccess?? null
-      };
-    }
-
-    localStorage.setItem('signedInUser', JSON.stringify(this.signedInUser));
-    return this.signedInUser;
   }
 
   async GetAllUsers()
@@ -145,19 +114,17 @@ export class UserProfileComponent implements OnInit {
       let users = this.userManagerService.GetAllUsers();
       console.log(this.userList);
 
-      users.snapshotChanges().subscribe(data =>{
+      users.snapshotChanges().subscribe(async data => {
         this.userList = [];
-        data.forEach(currentUser => {
-
+        data.forEach(async currentUser => {
           let a: any = currentUser.payload.toJSON();
           a['uid'] = currentUser.key;
-
           this.setupUser(a as User);
-
-          //this.userList.push(a as User);
         })
-      })
+      });
+      return this.userList;
     }
+    return this.userList;
   }
 
   setupUser(user: User){

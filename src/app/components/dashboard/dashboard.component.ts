@@ -7,6 +7,7 @@ import { UserAccess } from 'src/app/models/userAccess/IUserAccess';
 import { User } from '../../models/userAccess/IUser';
 import { SignedInUser } from '../../models/userAccess/ISignedInUser';
 import { DataTypeConversionService } from 'src/app/service/shared/dataType-conversion.service';
+import { UserManagerService } from 'src/app/service/authentication/userManager.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -27,7 +28,8 @@ export class DashboardComponent implements OnInit {
     private router: Router,
     public convertDataType: DataTypeConversionService,
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
+    public userManagerService: UserManagerService
   ) {
     this.getUserInfo();
   }
@@ -77,14 +79,14 @@ export class DashboardComponent implements OnInit {
 
   async getUserInfo()
   {
-    let userSignedIn = await this.createSignInUser();
+    let userSignedIn = await this.userManagerService.createSignInUser();
 
     if(this.authService.isLoggedIn)
     {
       if(!this.userAccess)
       {
         await this.authService.getLocalUserData();
-        await this.createSignInUser();
+        await this.userManagerService.createSignInUser();
       }
 
       if(this.authService.userAccess)
@@ -112,19 +114,19 @@ export class DashboardComponent implements OnInit {
         }
       }
 
-      if(this.authService.userData){
+      if(this.userManagerService.user){
         this.user = {
-          uid: this.authService.userData?.uid,
-          displayName: this.authService.userData?.displayName,
-          email: this.authService.userData?.email,
-          emailVerified: this.authService.userData?.emailVerified,
-          photoURL: this.authService.userData?.photoURL,
-          firstName: this.authService.userData?.firstName,
-          lastName: this.authService.userData?.lastName
+          uid: this.userManagerService.user?.uid,
+          displayName: this.userManagerService.user?.displayName,
+          email: this.userManagerService.user?.email,
+          emailVerified: this.userManagerService.user?.emailVerified,
+          photoURL: this.userManagerService.user?.photoURL,
+          firstName: this.userManagerService.user?.firstName,
+          lastName: this.userManagerService.user?.lastName
         };
 
         this.signedInUser = {
-          Uid: this.authService.userData?.uid,
+          Uid: this.userManagerService.user?.uid,
           User: this.user,
           UserAccess: this.userAccess
         };
@@ -135,41 +137,9 @@ export class DashboardComponent implements OnInit {
         {
           if(!this.signedInUser || !this.signedInUser.Uid || !this.signedInUser.User || !this.signedInUser.User.uid || !this.signedInUser.UserAccess)
           {
-            this.createSignInUser();
+            this.userManagerService.createSignInUser();
           }
         }
     }
   }
-
-  async createSignInUser(){
-
-    const _signedInUser = JSON.parse(localStorage.getItem('signedInUser') ?? '');
-    const _user = JSON.parse(localStorage.getItem('user') ?? '');
-    this.userAccess = JSON.parse(localStorage.getItem('userAccess') ?? '');
-
-    if(_user){
-      this.user = {
-        uid: _user.uid ??_signedInUser?.uid,
-        displayName: _user.displayName ?? _signedInUser?.displayName,
-        email: _user?.email ?? _signedInUser?.email,
-        emailVerified: _user?.emailVerified ?? _signedInUser?.emailVerified,
-        photoURL: _user?.photoURL ?? _signedInUser?.photoURL,
-        firstName: _user?.firstName,
-        lastName: _user?.lastName
-        };
-      };
-
-    if(this.user){
-        this.signedInUser = {
-        Uid: this.user.uid?? null,
-        User: this.user ?? null,
-        UserAccess: this.userAccess?? null
-      };
-    }
-
-
-    localStorage.setItem('signedInUser', JSON.stringify(this.signedInUser));
-    return this.signedInUser;
-  }
-
 }

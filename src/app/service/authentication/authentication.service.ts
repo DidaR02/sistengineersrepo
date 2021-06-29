@@ -5,15 +5,13 @@ import auth from 'firebase';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
-import { AngularFireDatabase, AngularFireDatabaseModule } from '@angular/fire/database';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { AngularFireDatabase } from '@angular/fire/database';
 import { UserAccess } from '../../models/userAccess/IUserAccess';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
-  userData: any; // Save logged in user data
   userAccess: UserAccess;
 
   constructor(public afs: AngularFirestore,   // Inject Firestore service
@@ -33,42 +31,62 @@ export class AuthenticationService {
     }
 
     // Sign in with email/password
-    async SignIn(email: string, password: string) {
+     SignIn(email: string, password: string): any {
       try {
-        const result = await this.afAuth.signInWithEmailAndPassword(email, password);
-        let userAccount = this.GetDbUserAccount(result.user);
+        return this.afAuth.signInWithEmailAndPassword(email, password).then(
+          async (signedUser) => {
+            let userAccount = await this.GetDbUserAccount(signedUser.user);
 
-        if(userAccount && (userAccount.emailVerified != true && result?.user?.emailVerified))
-        {
-          userAccount.emailVerified = result.user.emailVerified;
-        }
+            if(userAccount && (userAccount.emailVerified != true && signedUser?.user?.emailVerified))
+            {
+              userAccount.emailVerified = signedUser.user.emailVerified;
+            }
 
-        //check if user login first time and verified
-        this.SetFsUserData(userAccount, result.user);
-        this.SetDbUserData(userAccount, result.user);
+            await this.SetFsUserData(userAccount, signedUser.user);
+            await this.SetDbUserData(userAccount, signedUser.user);
+            await this.GetUserAccess(signedUser.user);
 
-        //this.GetUserAccess(result.user);
-
-        this.ngZone.run(() => {
-          this.router.navigate(['dashboard']);
-        });
+            if (this.userAccess && this.userAccess.canLogin)
+            {
+              //Zone.js does not support async/await.
+              this.ngZone.run(() => {
+              this.router.navigate(['dashboard']);
+              });
+            }
+            else if (this.userAccess && !this.userAccess.canLogin)
+            {
+              window.alert("SignIn not allowed.");
+              // return false;
+            }
+            else {
+              window.alert("SignIn failed!\r\n Please check your input.");
+              // return false;
+            }
+          }
+        ).catch(
+          (exception) => {
+            let errorMsg = "Error Signing in:" + exception;
+            throw errorMsg;
+          }
+        );
       } catch (error) {
         let errorMsg = "Error Signing in:" + error;
         window.alert(errorMsg);
-      }
+       }
+      //  return
     }
 
     // Sign up with email/password
     async SignUp(user: User, password: string) {
       return this.afAuth.createUserWithEmailAndPassword(user.email, password)
-        .then((result) => {
+        .then(async(result) => {
           /* Call the SendVerificaitonMail() function when new user sign
           up and returns promise */
           if (result.user)
           {
-            this.SetFsUserData(user, result.user);
-            this.SetDbUserData(user, result);
-            this.SetUserAccess(result.user.uid);
+            await this.SetFsUserData(user, result.user);
+            await this.SetDbUserData(user, result);
+            await this.SetUserAccess(result.user.uid);
             this.SendVerificationMail();
           }
         }).catch((error) => {
@@ -101,10 +119,19 @@ export class AuthenticationService {
     }
 
     // Returns true when user is looged in and email is verified
-    get isLoggedIn(): boolean {
-      const user = JSON.parse(localStorage.getItem('user') ?? '');
-      return (user !== null && user.emailVerified !== false) ? true : false;
+  get isLoggedIn(): boolean {
+
+    let getSignedInUder = localStorage.getItem('user');
+    let isLoggedIn: boolean = false;
+
+    if (getSignedInUder)
+    {
+      const user : User = JSON.parse(getSignedInUder);
+      isLoggedIn = (user !== null && user.emailVerified !== false) ? true : false;
     }
+
+    return isLoggedIn;
+  }
 
     // Sign in with Google
     GoogleAuth() {
@@ -127,7 +154,7 @@ export class AuthenticationService {
     /* Setting up user data when sign in with username/password,
     sign up with username/password and sign in with social auth
     provider in Firestore database using AngularFirestore + AngularFirestoreDocument service */
-     async SetFsUserData(user: any, userResults?: any) {
+  async SetFsUserData(user: any, userResults?: any) {
       if(user){
         if(userResults)
         {
@@ -149,96 +176,136 @@ export class AuthenticationService {
           firstName: user.firstName?? null,
           lastName: user.lastName?? null
         }
-        return userRef.set(userData, {
+        await userRef.set(userData, {
           merge: true
-        });
+        }).then(
+          async (mergeFsComplete) =>
+          {
+            return true;
+            }
+        ).catch(
+          (exception) =>
+          {
+            throw exception;
+            }
+        );
+        return true;
       }
+      else
+      {
+        console.log("merge firestore user not processed : No user was supplied");
+      }
+      return false;
     }
 
-     SetDbUserData(user: any, userResults?: any) {
-      if(user){
-        if(userResults?.user)
-        {
-          user.uid = userResults.user.uid;
-        }
+     async SetDbUserData(user: any, userResults?: any) {
+       if (user) {
+         if (userResults?.user) {
+           user.uid = userResults.user.uid;
+         }
 
-        if(user.firstName || user.lastName)
-        {
-          user.displayName = user.firstName.substring(0,1).toUpperCase() + ", " + user.lastName;
-        }
+         if (user.firstName || user.lastName) {
+           user.displayName = user.firstName.substring(0, 1).toUpperCase() + ", " + user.lastName;
+         }
 
-        if(!user?.uid || user?.uid === "")
-        {
-          window.alert('Cannot get user Id from document collection or database');
-          return;
-        }
+         if (!user?.uid || user?.uid === "") {
+           window.alert('Database Eroor: Cannot get user Id');
+           return false;
+         }
 
-        const userData: User = {
-          uid: user.uid,
-          email: user.email ?? null,
-          displayName: user.displayName ?? null,
-          photoURL: user.photoURL ?? null,
-          emailVerified: user.emailVerified ?? false,
-          firstName: user.firstName?? null,
-          lastName: user.lastName?? null
-        }
-        this.afsDb.database.ref(`tb_user/${user.uid}`)
-        .set(userData);
-
-        localStorage.setItem('user', JSON.stringify(userData));
+         const userData: User = {
+           uid: user.uid,
+           email: user.email ?? null,
+           displayName: user.displayName ?? null,
+           photoURL: user.photoURL ?? null,
+           emailVerified: user.emailVerified ?? false,
+           firstName: user.firstName ?? null,
+           lastName: user.lastName ?? null
+         }
+         await this.afsDb.database.ref(`tb_user/${user.uid}`)
+           .set(userData)
+           .then(
+             async () => {
+               localStorage.setItem('user', JSON.stringify(userData));
+               return true;
+             }
+           ).catch(
+             async (exception) => {
+               throw exception;
+             }
+           );
+       }
+      else
+      {
+         console.log("updating Db user not processed : No user was supplied");
+         return false;
       }
+      return true;
     }
 
     /* Saving user data in localstorage when
     logged in and setting up null when logged out */
-     getLocalUserData() {
+     async getLocalUserData() {
 
-      this.afAuth.authState.subscribe(user => {
+      return this.afAuth.authState.subscribe(async user => {
         if (user) {
-          this.ngZone.run(async () => {
-
-          this.GetUserAccess(user);
-          this.GetDbUserAccount(user);
-
+          await this.GetUserAccess(user);
+          await this.GetDbUserAccount(user);
           localStorage.setItem('signedInUser', JSON.stringify(user));
-
-          });
-
         } else {
-          localStorage.setItem('user', '');
-          localStorage.setItem('signedInUser', '');
-          localStorage.setItem('userAccess', '');
+          console.log("Failed at getLocalUserData method, no user found or no user loggedIn yet.\r\n Removing local data");
+          localStorage.removeItem('user');
+          localStorage.removeItem('signedInUser');
+          localStorage.removeItem('userAccess');
         }
       })
     }
 
     // Sign out
-     SignOut() {
-      return this.afAuth.signOut().then(() => {
-        localStorage.removeItem('user');
-        localStorage.removeItem('userAccess');
-        localStorage.removeItem('signedInUser');
-        this.router.navigate(['sign-in']);
-      })
+     async SignOut() {
+      await this.afAuth.signOut();
+       localStorage.clear();
+       this.router.navigate(['sign-in']);
     }
 
-     GetUserAccess(user: any) : UserAccess {
+  async GetUserAccess(user: any): Promise<UserAccess>{
       if(user)
       {
-        const userAccessObj = this.afsDb.database.ref('tb_userAccess/' + user?.uid);
+        try
+        {
+          const userAccessObj = this.afsDb.database.ref('tb_userAccess/' + user?.uid);
 
-         userAccessObj.on('value', (useAccess) => {
-          this.userAccess = useAccess.val();
-
-          localStorage.setItem('userAccess', JSON.stringify(this.userAccess));
-
-          return this.userAccess;
-        });
+          await userAccessObj.once('value')
+            .then(async (useAccess) => {
+              if (useAccess.val())
+              {
+                localStorage.setItem('userAccess', JSON.stringify(useAccess.val()));
+                this.userAccess = useAccess.val();
+              }
+              return this.userAccess;
+            }).catch(async (exception) =>
+            {
+              let errorMsg = "Failed to get user permissions :" + exception;
+              console.log(errorMsg)
+              throw exception;
+          });
+        }
+        catch (error)
+        {
+          let errorMsg = "Permission Error :" + error;
+          console.log(errorMsg)
+          throw error;
+        };
       }
-        return this.userAccess;
+      else
+      {
+        console.log("Get User Access failed : No user was supplied");
+      }
+
+      return this.userAccess;
     }
 
-     SetUserAccess(uid: string) : UserAccess{
+     async SetUserAccess(uid: string) : Promise<UserAccess>{
       if(uid)
       {
         if(!this.userAccess)
@@ -260,28 +327,39 @@ export class AuthenticationService {
 
         localStorage.setItem('userAccess', JSON.stringify(this.userAccess));
 
+        await this.afsDb.database.ref('tb_userAccess/' + uid).set(this.userAccess)
+          .then(async (setUserAccess) => {
+            localStorage.setItem('userAccess', JSON.stringify(this.userAccess));
+          })
+          .catch(async (exception) => {
+            let errorMsg = "setUserAccess Error :" + exception;
+            console.log(errorMsg)
+            throw exception
+          });
+       }
+      else
+      {
+        console.log("Set User Access failed : No userId was supplied");
+       }
 
-        this.afsDb.database.ref('tb_userAccess/' + uid).set(
-          this.userAccess
-        );
-      }
-        return this.userAccess;
+       return this.userAccess;
     }
 
-     GetDbUserAccount(user: any) {
+      async GetDbUserAccount(user: any) {
 
        let userAccount!: User ;
       if(user)
       {
         const getUserAccount = this.afsDb.database.ref('tb_user/' + user?.uid);
 
-        getUserAccount.on('value', (snapshot) => {
-          if (snapshot.val())
-          {
-            userAccount = snapshot.val() as User;
-            localStorage.setItem('user', JSON.stringify(userAccount));
-          }
-      });
+        await getUserAccount.once('value').then(
+          async (snapshot) => {
+            if (snapshot.val())
+            {
+              userAccount = snapshot.val() as User;
+              localStorage.setItem('user', JSON.stringify(userAccount));
+            }
+        });
       }
 
       return userAccount as User;

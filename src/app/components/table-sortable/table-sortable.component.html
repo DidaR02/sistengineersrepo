@@ -36,13 +36,16 @@
 
 <span class="spacer"></span>
 <div>
-  <mat-icon aria-hidden="false" aria-label="homer" class="home-icon" (click)="backToRoot()">home</mat-icon>
+  <a (click)="backToRoot()">
+    <mat-icon aria-hidden="false" aria-label="homer" class="home-icon">home</mat-icon>
+  </a>
+
   <span class="iconSpace"></span>
   <mat-icon *ngIf="canNavigateUp" class="pointer" (click)="navigateUp()">
     arrow_back
   </mat-icon>
   <span style="margin-left: 8px; font-size: 14px;font-weight: 400px;">
-    {{currentPath !='root' ?  currentPath : 'Files' || 'Files'}} </span>
+    {{currentPath !='root' ?  currentPath : '' || ''}} </span>
 
 </div>
 
@@ -81,14 +84,17 @@
         </div>
       </td>
       <td>
-        <span [matMenuTriggerFor]="rootMenu" [matMenuTriggerData]="{self: file}" #menuTrigger="matMenuTrigger"></span>
-        <button type="button" class="btn btn-light btn-sm" (click)="openMenu($event, menuTrigger)">More</button>
+        <span [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu"
+          [matMenuTriggerData]="{self: file}" #menuTrigger="matMenuTrigger"></span>
+        <button type="button" class="btn btn-light btn-sm" (click)="openMenu($event, menuTrigger)">
+          <mat-icon>more_vert</mat-icon>
+        </button>
       </td>
     </tr>
   </tbody>
 </table>
 
-<mat-menu #rootMenu="matMenu" [overlapTrigger]="false">
+<mat-menu #menu="matMenu" [overlapTrigger]="false">
   <ng-template matMenuContent let-self="self">
     <!-- <button [disabled]="!canMove" mat-menu-item [matMenuTriggerFor]="moveToMenu" [matMenuTriggerData]="{self: self}">
         <mat-icon>open_with</mat-icon>

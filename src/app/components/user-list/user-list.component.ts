@@ -30,7 +30,7 @@ export class UserListComponent implements OnInit {
   saveComplete: boolean = false;
 
   constructor(
-    public dataTypeConv: DataTypeConversionService, 
+    public dataTypeConv: DataTypeConversionService,
     public authService: AuthenticationService,
     public userManagerService: UserManagerService) { }
 
@@ -102,10 +102,10 @@ export class UserListComponent implements OnInit {
       this.userAccess.isAdmin = userDetails.isAdmin;
       this.userAccess.adminAccessLevel = userDetails.adminAccessLevel;
 
-      this.authService.SetFsUserData(this.selectedUser);
-      this.authService.SetDbUserData(this.selectedUser);
+      await this.authService.SetFsUserData(this.selectedUser);
+      await this.authService.SetDbUserData(this.selectedUser);
       this.authService.userAccess = this.userAccess;
-      this.authService.SetUserAccess(this.authService.userAccess.uid);
+      await this.authService.SetUserAccess(this.authService.userAccess.uid);
 
       this.saveComplete = true
     }

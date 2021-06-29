@@ -29,6 +29,7 @@ export class SignInUserComponent implements OnInit {
     Password: new FormControl()
   });
 
+
   async submitSignInDetails()
   {
     this.isUserSignInAllowed = true;
@@ -39,7 +40,27 @@ export class SignInUserComponent implements OnInit {
 
     if(email && password)
     {
-      await this.authService.SignIn(email, password);
+      let response = this.authService.SignIn(email, password);
+      console.log("final response :",response);
+      //   .then(
+      //   (canSignIn) => {
+      //     if (canSignIn)
+      //     {
+      //       console.log("User has signed in successfully : ", canSignIn);
+      //       this.isUserSignInAllowed = true;
+      //     }
+      //     else {
+      //       if (this.authService.userAccess)
+      //       {
+      //         this.isUserSignInAllowed = this.convertDataType.getBoolean(this.authService.userAccess.canLogin);
+      //       }
+      //     }
+      //   }
+      // ).catch(
+      //   (exception) => {
+      //     throw exception;
+      //   }
+      // );
     }
     else
     {

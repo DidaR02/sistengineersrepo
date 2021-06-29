@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { TableSortableRoutingModule } from './table-sortable-routing.module'
 import { TableSortableComponent } from './table-sortable.component';
+import {MatMenuModule} from '@angular/material/menu';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UploadComponent } from 'src/app/service/fileService/upload';
@@ -33,7 +33,6 @@ import {MatGridListModule} from '@angular/material/grid-list';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatListModule} from '@angular/material/list';
-import {MatMenuModule} from '@angular/material/menu';
 import {MatNativeDateModule, MatRippleModule} from '@angular/material/core';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
@@ -50,11 +49,12 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatTreeModule} from '@angular/material/tree';
-import {OverlayModule} from '@angular/cdk/overlay';
+import { OverlayModule } from '@angular/cdk/overlay';
+import { Component } from '@angular/core';
 
 @NgModule({
   declarations: [TableSortableComponent],
-  providers: [ UploadComponent, FileService],
+  providers: [ UploadComponent, FileService, Component],
   imports: [
     TableSortableRoutingModule,
     CommonModule,
@@ -62,6 +62,7 @@ import {OverlayModule} from '@angular/cdk/overlay';
     ReactiveFormsModule,
     HttpClientModule,
     FormsModule,
+    MatMenuModule,
     A11yModule,
     ClipboardModule,
     CdkStepperModule,
@@ -85,7 +86,6 @@ import {OverlayModule} from '@angular/cdk/overlay';
     MatIconModule,
     MatInputModule,
     MatListModule,
-    MatMenuModule,
     MatNativeDateModule,
     MatPaginatorModule,
     MatProgressBarModule,
@@ -108,7 +108,8 @@ import {OverlayModule} from '@angular/cdk/overlay';
     ScrollingModule,
   ],
   exports: [
-    TableSortableComponent
+    TableSortableComponent,
+    Component
   ],
   entryComponents: [],
   bootstrap: [TableSortableComponent]

@@ -24,7 +24,7 @@ export interface IFileService {
   uploadFile(fileToUpload: File, parentPath: string, docId: string, currentFoler: FileElement): Promise<Observable<number | any>>;
   // moveFile(currentPath: string, destinationPath: any): any;
   getStorageFilePath(fileElement: FileElement): Promise<string>;
-  createStoreDocumentUpload(filePath: string, docId: string ,file: File, date: string) :Promise<string>;
+  createStoreDocumentUpload(filePath: string,file: File, date: string, docId: string, parentFolder: string) :Promise<string>;
   updateProgress(id: string, update: Partial<FileElement>): any;
   getDownloadItems(fileId :string) : any;
 }
@@ -474,9 +474,6 @@ async uploadFile(fileToUpload: File, parentPath: string, docId: string, currentF
           await this.fireStore.collection('files')
           .doc('/' + docId)
           .update(updateFileDetails)
-          .then(() => {
-            //alert("Document added");
-          })
           .catch(function(error) {
           console.error('Error writing document: ', error);
           alert("Error writing document.");
@@ -489,11 +486,10 @@ async uploadFile(fileToUpload: File, parentPath: string, docId: string, currentF
           element = Object.assign(element, newFileElement);
           this.map.set(element.id, element);
 
-          this.fireStoreCollections();
+          await this.fireStoreCollections();
       })//end finalise async
     ).subscribe(); //end snapshotChanges finalise
 
-  //this.fireStoreCollections();
   return this.percentage;
 }
 
@@ -513,7 +509,7 @@ async uploadFile(fileToUpload: File, parentPath: string, docId: string, currentF
        return result;
     }
 
-    async createStoreDocumentUpload(filePath: string, docId: string ,file: File, date: string){
+    async createStoreDocumentUpload(filePath: string,file: File, date: string, docId: string = '', parentFolder: string){
       const path = filePath ? filePath.charAt(filePath.length - 1) === "/" ? filePath + file.name : filePath +"/" + file.name : `${this.defaultPublicRootFilePath}${file.name}`;
 
       if(!date){
@@ -546,6 +542,7 @@ async uploadFile(fileToUpload: File, parentPath: string, docId: string, currentF
                 size: file.size,
                 isFolder: false,
                 timeCreated: date,
+                parent: parentFolder,
               })
             .then(async ()=>
               {

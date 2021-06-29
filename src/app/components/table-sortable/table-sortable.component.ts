@@ -1,22 +1,14 @@
 import {
   Component,
   OnInit,
-  Directive,
-  EventEmitter,
-  Input,
-  Output,
-  QueryList,
-  ViewChildren,
-  PipeTransform,
   ElementRef,
   ViewChild,
 } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
+import { Observable } from "rxjs";
 import { FileElement } from "../../models/file-element/file-element";
 import { FileService } from "../../service/fileService/file.service";
 import { FormControl } from "@angular/forms";
 import { DecimalPipe } from "@angular/common";
-import { first, map, startWith } from "rxjs/operators";
 import { NewFolderDialogComponent } from "../new-folder-dialog/new-folder-dialog.component";
 import { RenameDialogComponent } from "../rename-dialog/rename-dialog.component";
 import { MatMenuTrigger } from "@angular/material/menu";
@@ -29,18 +21,18 @@ import { Router } from "@angular/router";
 import { DataTypeConversionService } from "src/app/service/shared/dataType-conversion.service";
 import { downloadFolderAsZip } from "../../service/fileService/zipFile.service";
 import { ShareDialogComponent } from "../share-dialog/share-dialog.component";
-import { MatIconRegistry } from "@angular/material/icon";
-import { DomSanitizer } from "@angular/platform-browser";
-import { forEach } from "jszip";
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FileManagerService } from "src/app/service/shared/files-manager.service";
+import { UserManagerService } from "src/app/service/authentication/userManager.service";
+import { MatMenuModule } from '@angular/material/menu';
+
 @Component({
   selector: "app-table-sortable",
   templateUrl: "./table-sortable.component.html",
   styleUrls: ["./table-sortable.component.css"],
-  providers: [DecimalPipe],
+  providers: [DecimalPipe,MatMenuModule],
 })
 export class TableSortableComponent implements OnInit {
   checked = false;
@@ -80,7 +72,8 @@ export class TableSortableComponent implements OnInit {
     public pipe: DecimalPipe,
     public dialog: MatDialog,
     private convertDataType: DataTypeConversionService,
-    private fileManager: FileManagerService
+    private fileManager: FileManagerService,
+    public userManagerService: UserManagerService
   ) {
     this.authService.getLocalUserData();
     this.getUserInfo();
@@ -88,6 +81,7 @@ export class TableSortableComponent implements OnInit {
 
   async ngOnInit(element?: FileElement) {
     await this.updateFileElementQuery(element);
+    localStorage.removeItem('currentFolderId');
   }
 
   applyFilter(event: Event) {
@@ -103,7 +97,7 @@ export class TableSortableComponent implements OnInit {
     if (this.authService.isLoggedIn) {
       if (!this.userAccess) {
         await this.authService.getLocalUserData();
-        await this.createSignInUser();
+        await this.userManagerService.createSignInUser();
       }
       if (this.authService.userAccess) {
         this.userAccess = this.authService.userAccess;
@@ -139,25 +133,24 @@ export class TableSortableComponent implements OnInit {
         }
       }
 
-      if (this.authService.userData) {
+      if (this.userManagerService.user) {
         this.user = {
-          uid: this.authService.userData?.uid,
-          displayName: this.authService.userData?.displayName,
-          email: this.authService.userData?.email,
-          emailVerified: this.authService.userData?.emailVerified,
-          photoURL: this.authService.userData?.photoURL,
-          firstName: this.authService.userData?.firstName,
-          lastName: this.authService.userData?.lastName,
+          uid: this.userManagerService.user?.uid,
+          displayName: this.userManagerService.user?.displayName,
+          email: this.userManagerService.user?.email,
+          emailVerified: this.userManagerService.user?.emailVerified,
+          photoURL: this.userManagerService.user?.photoURL,
+          firstName: this.userManagerService.user?.firstName,
+          lastName: this.userManagerService.user?.lastName,
         };
 
         this.signedInUser = {
-          Uid: this.authService.userData?.uid,
+          Uid: this.userManagerService.user?.uid,
           User: this.user,
           UserAccess: this.userAccess,
         };
 
         localStorage.setItem("signedInUser", JSON.stringify(this.signedInUser));
-        JSON.parse(localStorage.getItem("signedInUser")?? '');
       } else {
         if (
           !this.signedInUser ||
@@ -166,40 +159,11 @@ export class TableSortableComponent implements OnInit {
           !this.signedInUser.User.uid ||
           !this.signedInUser.UserAccess
         ) {
-          this.createSignInUser();
+          this.userManagerService.createSignInUser();
         }
       }
     }
   }
-
-  async createSignInUser() {
-    const _signedInUser = JSON.parse(localStorage.getItem("signedInUser")?? '');
-    const _user = JSON.parse(localStorage.getItem("user")?? '');
-    this.userAccess = JSON.parse(localStorage.getItem("userAccess")?? '');
-
-    if (_user) {
-      this.user = {
-        uid: _user.uid ?? _signedInUser?.uid,
-        displayName: _user.displayName ?? _signedInUser?.displayName,
-        email: _user?.email ?? _signedInUser?.email,
-        emailVerified: _user?.emailVerified ?? _signedInUser?.emailVerified,
-        photoURL: _user?.photoURL ?? _signedInUser?.photoURL,
-        firstName: _user?.firstName,
-        lastName: _user?.lastName,
-      };
-    }
-
-    if (this.user) {
-      this.signedInUser = {
-        Uid: this.user.uid ?? null,
-        User: this.user ?? null,
-        UserAccess: this.userAccess ?? null,
-      };
-    }
-
-    localStorage.setItem("signedInUser", JSON.stringify(this.signedInUser));
-  }
-
 
   navigate(element: FileElement) {
     if (element?.isFolder) {
@@ -208,51 +172,77 @@ export class TableSortableComponent implements OnInit {
   }
 
   async navigateToFolder(element: FileElement) {
-    await this.updateFileElementQuery(element);
-    this.currentPath = this.pushToPath(this.currentPath, element.name);
-    this.canNavigateUp = true;
-    this.currentRoot = element as FileElement;
+
+    let getCurrentFolder = localStorage.getItem('currentFolderId');
+
+    if (getCurrentFolder != element.id)
+    {
+      await this.updateFileElementQuery(element);
+      this.canNavigateUp = true;
+
+      this.currentRoot = element as FileElement;
+      this.currentPath = this.pushToPath(this.currentPath, element.name);
+
+      localStorage.setItem('currentFolderId', element.id);
+    }
+    else {
+      await this.updateFileElementQuery(element);
+      localStorage.setItem('currentFolderId', element.id);
+    }
   }
 
   async navigateUp() {
     if (this.canNavigateUp) {
       if (this.currentRoot?.isFolder) {
         if (this.currentRoot.parent === "root") {
-          await this.backToRoot();
-    }
-    else {
-      //refresh if there was new files
-      await this.fileService.fireStoreCollections();
-      this.currentRoot = this.fileService.get(this.currentRoot?.parent ?? '');
+           await this.backToRoot();
+        }
+        else {
 
-      if (this.currentRoot === null || this.currentRoot === undefined) {
-        this.currentRoot = new FileElement;
-        this.canNavigateUp = false;
+        //refresh if there was new files
+        await this.fileService.fireStoreCollections();
+        this.currentRoot = this.fileService.get(this.currentRoot?.parent ?? 'root');
 
-        //alert("The folder you are navigating to does not exist anymore!\nYou will be redirected back to root Files.");
-        await this.updateFileElementQuery(this.currentRoot);
+        if (this.currentRoot === null || this.currentRoot === undefined) {
+          this.currentRoot = new FileElement;
+          this.canNavigateUp = false;
+
+          await this.updateFileElementQuery(this.currentRoot).then(
+            (refreshComplt) => {
+              console.log("Refresh completed inside :", refreshComplt);
+            }
+          );
+          this.currentPath = this.popFromPath(this.currentPath);
+          }
+
+          await this.updateFileElementQuery(this.currentRoot).then(
+            (refreshComplt) => {
+              console.log("Refresh completed outside:", refreshComplt);
+            }
+          );
+
+          this.currentPath = this.popFromPath(this.currentPath);
+
+        }
       }
-
-      await this.updateFileElementQuery(this.currentRoot);
-    }
-
-    this.currentPath = this.popFromPath(this.currentPath);
-      }
+    localStorage.setItem('currentFolderId', this.currentRoot.id);
     }
   }
 
   async backToRoot() {
-    if (this.canNavigateUp) {
-      this.currentPath = "root";
-      await this.updateFileElementQuery();
-      this.canNavigateUp = false;
-    }
+    this.currentPath = "root";
+       await this.updateFileElementQuery().then(
+         async (backToRoot) => {
+           console.log("Back to root", backToRoot)
+          this.canNavigateUp = false;
+          localStorage.setItem('currentFolderId', 'root');
+          });
   }
 
   async navigateBackUp(element: FileElement) {
     if (element && element.parent === "root") {
       this.canNavigateUp = false;
-      await this.updateFileElementQuery(element);
+      this.backToRoot();
     }
     else {
       //refresh if there was new files
@@ -265,12 +255,14 @@ export class TableSortableComponent implements OnInit {
         this.canNavigateUp = false;
         //alert("The folder you are navigating to does not exist anymore!\nYou will be redirected back to root Files.");
         await this.updateFileElementQuery(this.currentRoot);
+        this.currentPath = this.popFromPath(this.currentPath);
       }
-
-      await this.updateFileElementQuery(this.currentRoot);
+      else
+      {
+        await this.updateFileElementQuery(this.currentRoot);
+        this.currentPath = this.popFromPath(this.currentPath);
+      }
     }
-
-    this.currentPath = this.popFromPath(this.currentPath);
   }
 
   pushToPath(path: string, folderName: string) {
@@ -282,7 +274,7 @@ export class TableSortableComponent implements OnInit {
       p += `/${folderName}/`;
     }
     if (path === "root") {
-      p = `Files/${folderName}/`;
+      p = `${folderName}/`;
     }
     if (!path) {
       p = `${folderName}/`;
@@ -319,8 +311,12 @@ export class TableSortableComponent implements OnInit {
     newFolder.isFolder = true;
     newFolder.name = folder.name;
 
-    await this.fileService.add(newFolder, this.currentRoot);
-    await this.updateFileElementQuery(this.currentRoot);
+    await this.fileService.add(newFolder, this.currentRoot).then(
+      async () => {
+       await this.updateFileElementQuery(this.currentRoot);
+      }
+    );
+
   }
 
   async openRenameDialog(element: FileElement) {
@@ -454,7 +450,7 @@ export class TableSortableComponent implements OnInit {
       ? findCurrentFolder[findCurrentFolder.length - 1]
       : null;
 
-    this.getParentFolder(this.currentPath, currentFolder ?? '').then(
+    await this.getParentFolder(this.currentPath, currentFolder ?? '').then(
       (parentFolder) => {
         this.currentRoot = parentFolder;
       }
@@ -476,14 +472,19 @@ export class TableSortableComponent implements OnInit {
 
     const fulldate = year + month + date;
 
+    const localCurrentF = localStorage.getItem('currentFolderId');
+
     if (newFileList.length > 0) {
       for (var file = 0; file < newFileList.length; file++) {
         const docId = await this.fileService.createStoreDocumentUpload(
           this.currentPath,
-          '',
           newFileList[file],
-          fulldate
+          fulldate,
+          '',
+          this.currentRoot?.id ?? localCurrentF
         );
+
+        this.getFileIcon({ name: newFileList[file].name, size: newFileList[file].size } as FileElement);
 
         let uploadPrcnt = await this.fileService.uploadFile(
           newFileList[file],
@@ -492,12 +493,11 @@ export class TableSortableComponent implements OnInit {
           this.currentRoot
         );
 
-        this.getFileIcon({name: newFileList[file].name, size: newFileList[file].size} as FileElement);
+        await this.fileService.queryInFolder(this.currentRoot ? this.currentRoot.id : "root")
+          .then((results) => {
+            this.fileElements = results;
+          });
 
-        //Todo, set percentage on the Observable
-        this.fileElements = await this.fileService.queryInFolder(
-          this.currentRoot ? this.currentRoot.id : "root"
-        );
         this.fileElements.subscribe((value) => {
           value.forEach((file) => {
             if (file.id == docId) {
@@ -507,7 +507,7 @@ export class TableSortableComponent implements OnInit {
         });
 
         uploadPrcnt.toPromise().then(async () => {
-          this.updateFileElementQuery(this.currentRoot ?? this.currentRoot);
+          await this.updateFileElementQuery(this.currentRoot ?? this.currentRoot);
         });
       }
     }
@@ -516,16 +516,16 @@ export class TableSortableComponent implements OnInit {
 
   async updateFileElementQuery(element?: FileElement) {
 
-    if (element)
-    {
-      this.currentRoot = element
-    }
-
     await this.fileService.fireStoreCollections();
 
-    this.fileElements = await this.fileService.queryInFolder(
-      this.currentRoot ? this.currentRoot.id : "root"
-    );
+    this.currentRoot = element ? element : { id : 'root' } as FileElement;
+
+    await this.fileService.queryInFolder(this.currentRoot ? this.currentRoot.id : "root")
+      .then((results) => {
+        this.fileElements = results;
+      });
+
+    localStorage.setItem('currentFolderId', this.currentRoot.id);
   }
 
   private async getParentFolder(
