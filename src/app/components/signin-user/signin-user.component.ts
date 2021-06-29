@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl} from '@angular/forms'; // Reactive form services
 import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
-import { Router } from "@angular/router";
 import { DataTypeConversionService } from 'src/app/service/shared/dataType-conversion.service';
 // import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { UserAccess } from 'src/app/models/userAccess/IUserAccess';
+import { ActivatedRoute, Event as RouterEvent, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
 
 @Component({
   selector: 'app-signin-user',
@@ -14,14 +14,18 @@ import { UserAccess } from 'src/app/models/userAccess/IUserAccess';
 export class SignInUserComponent implements OnInit {
 
   isUserSignInAllowed : boolean = true;
-
+ public showOverlay = false;
   constructor(
     public authService: AuthenticationService,
     public router: Router,
     public convertDataType: DataTypeConversionService
-    ) {}
+  ) {
+      router.events.subscribe((event: RouterEvent) => {
+      this.navigationInterceptor(event)
+    });
+    }
 
-  ngOnInit(): void {
+  ngOnInit() {
   }
 
   public signInFormGroup = new FormGroup({
@@ -29,9 +33,32 @@ export class SignInUserComponent implements OnInit {
     Password: new FormControl()
   });
 
+   // Shows and hides the loading spinner during RouterEvent changes
+  navigationInterceptor(event: RouterEvent): void {
+    if (event instanceof NavigationStart) {
+      this.showOverlay = true;
+      console.log("NavigationStart",NavigationStart);
+    }
+    if (event instanceof NavigationEnd) {
+      this.showOverlay = false;
+      console.log("NavigationEnd", NavigationEnd);
+    }
+
+    // Set loading state to false in both of the below events to hide the spinner in case a request fails
+    if (event instanceof NavigationCancel) {
+      this.showOverlay = false;
+      console.log("NavigationCancel",NavigationCancel);
+    }
+    if (event instanceof NavigationError) {
+      this.showOverlay = false;
+      console.log("NavigationError",NavigationError);
+    }
+  }
 
   async submitSignInDetails()
   {
+    this.showOverlay = true;
+
     this.isUserSignInAllowed = true;
 
     var signInDetails = this.signInFormGroup?.value;
@@ -42,25 +69,6 @@ export class SignInUserComponent implements OnInit {
     {
       let response = this.authService.SignIn(email, password);
       console.log("final response :",response);
-      //   .then(
-      //   (canSignIn) => {
-      //     if (canSignIn)
-      //     {
-      //       console.log("User has signed in successfully : ", canSignIn);
-      //       this.isUserSignInAllowed = true;
-      //     }
-      //     else {
-      //       if (this.authService.userAccess)
-      //       {
-      //         this.isUserSignInAllowed = this.convertDataType.getBoolean(this.authService.userAccess.canLogin);
-      //       }
-      //     }
-      //   }
-      // ).catch(
-      //   (exception) => {
-      //     throw exception;
-      //   }
-      // );
     }
     else
     {

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { FormBuilder, FormGroup, FormControl, Validators,FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
@@ -8,6 +7,7 @@ import { User } from '../../models/userAccess/IUser';
 import { SignedInUser } from '../../models/userAccess/ISignedInUser';
 import { DataTypeConversionService } from 'src/app/service/shared/dataType-conversion.service';
 import { UserManagerService } from 'src/app/service/authentication/userManager.service';
+import { ActivatedRoute, Event as RouterEvent, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,6 +15,8 @@ import { UserManagerService } from 'src/app/service/authentication/userManager.s
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
+
+    public showOverlay = false;
 
   user: User;
   private userData: any;
@@ -31,12 +33,37 @@ export class DashboardComponent implements OnInit {
     private location: Location,
     public userManagerService: UserManagerService
   ) {
+    // router.events.subscribe((event: RouterEvent) => {
+    //   this.navigationInterceptor(event)
+    // });
     this.getUserInfo();
   }
 
   ngOnInit(): void {
 
   }
+   // Shows and hides the loading spinner during RouterEvent changes
+  navigationInterceptor(event: RouterEvent): void {
+    if (event instanceof NavigationStart) {
+      this.showOverlay = true;
+      console.log("NavigationStart",NavigationStart);
+    }
+    if (event instanceof NavigationEnd) {
+      this.showOverlay = false;
+      console.log("NavigationEnd", NavigationEnd);
+    }
+
+    // Set loading state to false in both of the below events to hide the spinner in case a request fails
+    if (event instanceof NavigationCancel) {
+      this.showOverlay = false;
+      console.log("NavigationCancel",NavigationCancel);
+    }
+    if (event instanceof NavigationError) {
+      this.showOverlay = false;
+      console.log("NavigationError",NavigationError);
+    }
+  }
+
   async clickNavigateHandler(url: string)
   {
     if (this.viewDashboard)

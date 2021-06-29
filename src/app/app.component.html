@@ -1,21 +1,24 @@
 <!-- <div *ngIf="canLogin"> -->
 <nav class="navbar navbar-inverse ">
-    <div class="container-fluid ">
-        <div class="navbar-header ">
-            <a href="# " title="SIST Engineers">
-                <img src="./assets//logo/sist-logo.png " alt="SIST Engineers" class="logo ">
-            </a>
-        </div>
+  <div class="container-fluid ">
+    <div class="navbar-header ">
+      <a href="# " title="SIST Engineers">
+        <img src="./assets//logo/sist-logo.png " alt="SIST Engineers" class="logo ">
+      </a>
     </div>
+  </div>
 </nav>
 
 <div class="fileExplore center">
-    <div class="container mat-card-container">
-        <mat-card>
-            <div class="router-outlet-item">
-                <router-outlet></router-outlet>
-            </div>
-        </mat-card>
-    </div>
+  <div class="container mat-card-container">
+    <mat-card>
+      <div class="router-outlet-item">
+        <router-outlet></router-outlet>
+      </div>
+    </mat-card>
+  </div>
 </div>
 <!-- </div> -->
+<div class="my-overlay" *ngIf="showOverlay">
+  <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+</div>

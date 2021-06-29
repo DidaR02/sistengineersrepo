@@ -4,7 +4,7 @@ import { FileElement } from './models/file-element/file-element';
 import { FileService } from './service/fileService/file.service';
 import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
 import { User } from './models/userAccess/IUser';
-import { Router } from '@angular/router';
+import { Event as RouterEvent, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -14,12 +14,16 @@ import { Router } from '@angular/router';
 export class AppComponent {
   title = 'Sist Engineers';
   fileElements: Observable<FileElement[]>;
+  public showOverlay = false;
 
   constructor(
     public fileService: FileService,
     public authService: AuthenticationService,
     public router: Router
-    ) {
+  ) {
+    router.events.subscribe((event: RouterEvent) => {
+      this.navigationInterceptor(event)
+    })
   }
 
   public currentRoot?: FileElement;
@@ -30,6 +34,27 @@ export class AppComponent {
   user: User;
 
   ngOnInit() {
+  }
+ // Shows and hides the loading spinner during RouterEvent changes
+  navigationInterceptor(event: RouterEvent): void {
+    if (event instanceof NavigationStart) {
+      this.showOverlay = true;
+      console.log("NavigationStart",NavigationStart);
+    }
+    if (event instanceof NavigationEnd) {
+      this.showOverlay = false;
+      console.log("NavigationEnd", NavigationEnd);
+    }
+
+    // Set loading state to false in both of the below events to hide the spinner in case a request fails
+    if (event instanceof NavigationCancel) {
+      this.showOverlay = false;
+      console.log("NavigationCancel",NavigationCancel);
+    }
+    if (event instanceof NavigationError) {
+      this.showOverlay = false;
+      console.log("NavigationError",NavigationError);
+    }
   }
 
   async addFolder(folder: { name: string }) {
