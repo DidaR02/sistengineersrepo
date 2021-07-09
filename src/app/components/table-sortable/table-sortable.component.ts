@@ -410,13 +410,12 @@ export class TableSortableComponent implements OnInit {
       ? findCurrentFolder[findCurrentFolder.length - 1]
       : '';
 
-    var fileElement = await this.getParentFolder(
+    await this.getParentFolder(
       this.currentPath,
       currentFolder
     );
 
-    this.removeElement(element);
-    await this.updateFileElementQuery(this.currentRoot);
+    await this.removeElement(element);
   }
 
   async removeElement(element: FileElement) {

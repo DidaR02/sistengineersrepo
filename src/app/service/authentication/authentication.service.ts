@@ -30,10 +30,13 @@ export class AuthenticationService {
       }
     }
 
-    // Sign in with email/password
-     SignIn(email: string, password: string): any {
-      try {
-        return this.afAuth.signInWithEmailAndPassword(email, password).then(
+
+        /*Set user return only CanLogin from FireStore instead of the Database UserAccess Table.
+        Both userAccessTable and FireStore user table will sync this value on login and userprofile actions
+        */
+      SignIn(email: string, password: string): any {
+       try {
+        return  this.afAuth.signInWithEmailAndPassword(email, password).then(
           async (signedUser) => {
             let userAccount = await this.GetDbUserAccount(signedUser.user);
 
@@ -41,7 +44,6 @@ export class AuthenticationService {
             {
               userAccount.emailVerified = signedUser.user.emailVerified;
             }
-
             await this.SetFsUserData(userAccount, signedUser.user);
             await this.SetDbUserData(userAccount, signedUser.user);
             await this.GetUserAccess(signedUser.user);
@@ -262,10 +264,11 @@ export class AuthenticationService {
     }
 
     // Sign out
-     async SignOut() {
-      await this.afAuth.signOut();
+    SignOut() {
+      this.afAuth.signOut().then(() => {
        localStorage.clear();
        this.router.navigate(['sign-in']);
+      });
     }
 
   async GetUserAccess(user: any): Promise<UserAccess>{

@@ -123,16 +123,14 @@ export class FileService implements IFileService {
     if(filePath){
 
       await this.fireStore.collection('files').doc(element?.id).delete().then(
-        ()=>{
+        async () => {
           this.map.delete(element.id);
         }
       )
-      .catch((error)=>{
-        console.log("error", error);
-      })
-      .finally(
-        async ()=>{
-          await this.fireStoreCollections();
+        .catch((error) => {
+          const errorMsg = "Failed to delete files."
+          console.log("error", error);
+          window.alert("errorMsg");
         });
     }
   }
@@ -146,9 +144,6 @@ export class FileService implements IFileService {
     const renameFileInfo = {
       "name": update.name
     }
-
-    //Update storage && Get the entiremetadata to update firestore document
-    //this.fireStorage.bucket()
 
     //Update firestor
     await this.fireStore.collection('files')

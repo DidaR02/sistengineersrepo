@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { Directive, NgModule } from '@angular/core';
 
 import { FileService } from './service/fileService/file.service';
 
@@ -84,7 +84,11 @@ import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatTreeModule} from '@angular/material/tree';
 import {OverlayModule} from '@angular/cdk/overlay';
+@Directive({
+  selector:
+      'input[type=checkbox][formControlName],input[type=checkbox][formControl],input[type=checkbox][ngModel]',
 
+})
 @NgModule({
   declarations: [
     AppComponent,
