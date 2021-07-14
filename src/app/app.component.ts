@@ -39,21 +39,17 @@ export class AppComponent {
   navigationInterceptor(event: RouterEvent): void {
     if (event instanceof NavigationStart) {
       this.showOverlay = true;
-      console.log("NavigationStart",NavigationStart);
     }
     if (event instanceof NavigationEnd) {
       this.showOverlay = false;
-      console.log("NavigationEnd", NavigationEnd);
     }
 
     // Set loading state to false in both of the below events to hide the spinner in case a request fails
     if (event instanceof NavigationCancel) {
       this.showOverlay = false;
-      console.log("NavigationCancel",NavigationCancel);
     }
     if (event instanceof NavigationError) {
       this.showOverlay = false;
-      console.log("NavigationError",NavigationError);
     }
   }
 
@@ -107,8 +103,6 @@ export class AppComponent {
   }
 
   async moveElement(event: { fileElement: FileElement; moveTo: FileElement }) {
-    debugger;
-
     //get file metadata and current file path
     let getFilePath = await this.fileService.getStorageFilePath(event.fileElement);
 
@@ -122,7 +116,6 @@ export class AppComponent {
   }
 
   async downloadElement(fileElement: FileElement) {
-    debugger;
 
     //get file metadata and current file path
     let getFilePath = await this.fileService.getStorageFilePath(fileElement);

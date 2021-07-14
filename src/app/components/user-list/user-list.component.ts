@@ -77,7 +77,7 @@ export class UserListComponent implements OnInit {
         lastName: this.selectedUser?.lastName?.toString(),
         canAddFile: this.dataTypeConv.getStringBoolean(this.canAddFile?.toString()),
         canCreateFolder: this.dataTypeConv.getStringBoolean(this.canCreateFolder?.toString()),
-        canDownload: this.dataTypeConv.getBoolean(this.canDownload?.toString()),
+        canDownload: this.dataTypeConv.getStringBoolean(this.canDownload?.toString()),
         canShare: this.dataTypeConv.getStringBoolean(this.canShare?.toString()),
         canLogin: this.dataTypeConv.getStringBoolean(this.canLogin?.toString()),
         canDelete: this.dataTypeConv.getStringBoolean(this.canDelete?.toString()),
