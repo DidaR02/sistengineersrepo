@@ -37,21 +37,17 @@ export class SignInUserComponent implements OnInit {
   navigationInterceptor(event: RouterEvent): void {
     if (event instanceof NavigationStart) {
       this.showOverlay = true;
-      console.log("NavigationStart",NavigationStart);
     }
     if (event instanceof NavigationEnd) {
       this.showOverlay = false;
-      console.log("NavigationEnd", NavigationEnd);
     }
 
     // Set loading state to false in both of the below events to hide the spinner in case a request fails
     if (event instanceof NavigationCancel) {
       this.showOverlay = false;
-      console.log("NavigationCancel",NavigationCancel);
     }
     if (event instanceof NavigationError) {
       this.showOverlay = false;
-      console.log("NavigationError",NavigationError);
     }
   }
 
@@ -68,7 +64,6 @@ export class SignInUserComponent implements OnInit {
     if(email && password)
     {
       let response = this.authService.SignIn(email, password);
-      console.log("final response :",response);
     }
     else
     {

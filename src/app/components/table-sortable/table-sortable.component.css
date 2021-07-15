@@ -102,12 +102,13 @@ table {
   margin: auto;
 }
 
-.btn-file-command:hover {
-  background-color: #ff5313;
-}
-
 .iconSpace {
   padding: 10px 10px;
+}
+
+.fileMetadata {
+  display: inline;
+  max-width: 100%;
 }
 
 @media screen and (max-width: 600px) {
@@ -118,6 +119,7 @@ table {
   .table {
     max-width: 600px;
     width: 100%;
+    max-height: 500px;
   }
 }
 
@@ -125,5 +127,17 @@ table {
   .table {
     max-width: 400px;
     width: 100%;
+  }
+}
+
+@media screen and (max-width: 500px) {
+
+  .truncate-cell,
+  .mat-header-cell {
+    max-width: 100px;
+    /* feel free to include any other value */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }

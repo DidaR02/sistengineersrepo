@@ -61,7 +61,7 @@ export class TableSortableComponent implements OnInit {
 
   filter = new FormControl("");
 
-  displayedColumns: string[] = ['name'];
+  displayedColumns: string[] = ['icons','name', 'actions'];
   dataSource!: MatTableDataSource<FileElement>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -526,6 +526,11 @@ export class TableSortableComponent implements OnInit {
     await this.fileService.queryInFolder(this.currentRoot ? this.currentRoot.id : "root")
       .then((results) => {
         this.fileElements = results;
+        this.fileElements.subscribe((resul) => {
+          this.dataSource = new MatTableDataSource(resul);
+          this.dataSource.paginator = this.paginator;
+          this.dataSource.sort = this.sort;
+        });
       });
 
     localStorage.setItem('currentFolderId', this.currentRoot.id);
