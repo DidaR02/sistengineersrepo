@@ -2,12 +2,6 @@
   <h1 class="h2">Manage Files</h1>
 </div>
 
-<!-- <form>
-  <div class="form-group form-inline">
-    Search: <input class="form-control ml-2" type="text" [formControl]="filter" />
-  </div>
-</form> -->
-
 <mat-form-field>
   <mat-label>Filter</mat-label>
   <input matInput (keyup)="applyFilter($event)" placeholder="Example. Peter" #input>
@@ -20,7 +14,7 @@
         <mat-icon class="file-icon">
           create_new_folder
         </mat-icon>
-        <span>New Folder</span>
+        <span>Folder</span>
       </a>
     </div>
     <div *ngIf="canAddFile" class="col file-command">
@@ -28,7 +22,7 @@
         <mat-icon class="file-icon">
           note_add
         </mat-icon>
-        New File
+        File
       </a>
     </div>
   </div>
@@ -56,7 +50,7 @@
 
 <span class="spacer"></span>
 
-<div class="mat-elevation-z8">
+<div class="mat-elevation-z8 table-container">
   <table mat-table [dataSource]="dataSource" matSort>
 
     <ng-container matColumnDef="icons">
@@ -121,9 +115,9 @@
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
     <!-- Row shown when there is no matching data. -->
-    <tr class="mat-row" *matNoDataRow>
-      <td class="mat-cell" colspan="4">No data matching the filter "{{input.value}}"</td>
-    </tr>
+    <!-- <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell" colspan="4">The request did not return any data.</td>
+    </tr> -->
   </table>
 
   <mat-paginator [length]="100" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
