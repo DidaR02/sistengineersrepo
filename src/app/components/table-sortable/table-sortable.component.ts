@@ -28,6 +28,9 @@ import { FileManagerService } from "src/app/service/shared/files-manager.service
 import { UserManagerService } from "src/app/service/authentication/userManager.service";
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { HostListener } from "@angular/core";
+import { ThemePalette } from "@angular/material/core";
+import { ProgressSpinnerMode } from "@angular/material/progress-spinner";
 
 @Component({
   selector: "app-table-sortable",
@@ -65,6 +68,7 @@ export class TableSortableComponent implements OnInit {
   dataSource!: MatTableDataSource<FileElement>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
+  public innerWidth: any;
 
   constructor(
     public fileService: FileService,
@@ -82,8 +86,14 @@ export class TableSortableComponent implements OnInit {
   }
 
   async ngOnInit(element?: FileElement) {
+    this.onResize();
     await this.updateFileElementQuery(element);
     localStorage.removeItem('currentFolderId');
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event?: Event) {
+    this.innerWidth = window.innerWidth;
   }
 
   applyFilter(event: Event) {
@@ -92,6 +102,13 @@ export class TableSortableComponent implements OnInit {
 
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
+    }
+  }
+
+  openUrl(url: string)
+  {
+    if (url) {
+      window.open(url, '_blank');
     }
   }
 

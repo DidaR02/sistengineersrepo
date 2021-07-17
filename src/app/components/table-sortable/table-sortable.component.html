@@ -65,8 +65,7 @@
 
         <!-- If not folder show extention file -->
         <div *ngIf="!file.isFolder">
-          <a *ngIf="!file.isFolder" style="text-decoration: none; color: inherit !important;" [href]="file.downloadURL"
-            target="_blank" rel="noopener noreferrer" class="urlLink">
+          <a *ngIf="!file.isFolder" [href]="file.downloadURL" target="_blank" rel="noopener noreferrer" class="urlLink">
             <mat-icon *ngIf="!file.isFolder" [ngStyle]="{'color':'#78726e'}" class="pointer"
               svgIcon={{getFileIcon(file)}}>
             </mat-icon>
@@ -78,24 +77,36 @@
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef mat-sort-header> File Name </th>
       <td mat-cell *matCellDef="let file" class="truncate-cell">
+
         <div *ngIf="file.isFolder" (dblclick)="navigate(file)">
           {{file.name}}
         </div>
 
-        <a *ngIf="!file.isFolder" style="text-decoration: none; color: inherit !important;" [href]="file.downloadURL"
-          target="_blank" rel="noopener noreferrer" class="urlLink">
+        <!-- <div (dblclick)="openUrl(file.downloadURL)"> -->
+        <a *ngIf="!file.isFolder" (dblclick)="openUrl(file.downloadURL)" rel="noopener noreferrer" class="urlLink">
           {{file.name}}
           <br>
-          <div class="fileMetadata">
+          <div>
             <div *ngIf="!file.isFolder" class="fileMetadata">
               <span class="row-item-span"> {{ file.size }}</span>
             </div>
 
-            <div *ngIf="(file.uploadProgress | async) as pct" class="fileMetadata">
+            <div *ngIf="innerWidth > 510 && (file.uploadProgress | async) as pct "
+              class="fileMetadata progressbar-counter">
               <progress [value]="pct" max="100"></progress> {{ pct | number }}%
+            </div>
+            <div *ngIf="innerWidth < 510 && (file.uploadProgress | async) as pct"
+              class="fileMetadata progressbar-counter">
+              <mat-icon *ngIf="pct === 100" class="mat-icon-rtl-mirror"> <span class="material-icons-outlined">
+                  thumb_up
+                </span></mat-icon>
+
+              {{ pct | number }}%
             </div>
           </div>
         </a>
+        <!-- </div> -->
+
       </td>
     </ng-container>
 

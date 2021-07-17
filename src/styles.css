@@ -267,6 +267,16 @@ a:hover {
   color: #125699;
 }
 
+.urlLink {
+  text-decoration: none;
+  text-decoration: none;
+  color: inherit !important;
+}
+
+.progressbar-counter {
+  padding-left: 5px;
+}
+
 .terminal {
   position: relative;
   width: 80%;
