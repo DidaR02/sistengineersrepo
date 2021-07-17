@@ -83,7 +83,8 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatTreeModule} from '@angular/material/tree';
-import {OverlayModule} from '@angular/cdk/overlay';
+import { OverlayModule } from '@angular/cdk/overlay';
+
 @Directive({
   selector:
       'input[type=checkbox][formControlName],input[type=checkbox][formControl],input[type=checkbox][ngModel]',
@@ -115,7 +116,6 @@ import {OverlayModule} from '@angular/cdk/overlay';
     // MatSortModule,
     // MatPaginatorModule,
     // MatIconModule,
-    // NgbModule,
     FormsModule,
     ReactiveFormsModule,
     MatMenuModule,

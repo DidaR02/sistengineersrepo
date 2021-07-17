@@ -20,5 +20,7 @@
 </div>
 <!-- </div> -->
 <div class="my-overlay" *ngIf="showOverlay">
-  <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+  <!-- <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> -->
+  <mat-progress-spinner class="loading-progress-spinner" color="primary" mode="indeterminate" value="50">
+  </mat-progress-spinner>
 </div>

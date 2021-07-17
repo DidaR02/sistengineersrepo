@@ -5,6 +5,8 @@ import { DataTypeConversionService } from 'src/app/service/shared/dataType-conve
 // import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { UserAccess } from 'src/app/models/userAccess/IUserAccess';
 import { ActivatedRoute, Event as RouterEvent, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
+import {ThemePalette} from '@angular/material/core';
+import {ProgressSpinnerMode} from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-signin-user',

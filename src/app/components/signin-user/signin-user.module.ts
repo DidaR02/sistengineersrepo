@@ -16,7 +16,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
 import { UploadComponent } from 'src/app/service/fileService/upload';
 import { FileService } from '../../service/fileService/file.service';
-//import { DataTypeConversionService } from '../../service/shared/dataType-conversion.service';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [SignInUserComponent],
@@ -37,6 +38,8 @@ import { FileService } from '../../service/fileService/file.service';
     // NgbModule,
     ReactiveFormsModule,
     MatCheckboxModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule
   ],
   exports: [
     SignInUserComponent

@@ -119,7 +119,7 @@ progress::-webkit-progress-value {
   width: 100% !important;
   height: 100% !important;
   position: fixed !important;
-  background-color: rgba(0, 0, 0, 0.9) !important;
+  background-color: transparent !important;
   cursor: pointer !important;
   visibility: visible !important;
   transition: visibility 0s, opacity 0.4s linear !important;
@@ -129,8 +129,7 @@ progress::-webkit-progress-value {
   cursor: wait !important;
 }
 
-.my-overlay i.fa.fa-spinner.fa-spin,
-.spinner-big {
+.my-overlay .loading-progress-spinner {
   font-size: 100px !important;
 }
 
